@@ -1,6 +1,9 @@
 export class PermissionModel {
   id: string;
   name: string;
+  parentOption?: string;
+  route?: string;
+  icon?: string;
   actions: Permission[];
   suboptions: PermissionModel[];
 }

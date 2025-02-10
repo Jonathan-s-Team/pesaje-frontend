@@ -2,6 +2,8 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ILayout, LayoutType } from '../../core/configs/config';
 import { LayoutService } from '../../core/layout.service';
+import { AuthService } from 'src/app/modules/auth';
+import { PermissionModel } from 'src/app/modules/auth/models/permission.model';
 
 @Component({
   selector: 'app-sidebar',
@@ -38,9 +40,16 @@ export class SidebarComponent implements OnInit, OnDestroy {
   toggleType: string;
   toggleState: string;
 
-  constructor(private layout: LayoutService) {}
+  menuData: PermissionModel[] = [];
+
+  constructor(
+    private layout: LayoutService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+    this.menuData = this.authService.currentUserValue?.permissions || [];
+
     const subscr = this.layout.layoutConfigSubject
       .asObservable()
       .subscribe((config: ILayout) => {
@@ -50,7 +59,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   updateProps(config: ILayout) {
-    this.appSidebarDisplay = this.layout.getProp('app.sidebar.display', config) as boolean;
+    this.appSidebarDisplay = this.layout.getProp(
+      'app.sidebar.display',
+      config
+    ) as boolean;
     if (!this.appSidebarDisplay) {
       return;
     }
