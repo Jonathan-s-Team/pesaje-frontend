@@ -1,6 +1,7 @@
 export interface UserModel {
   person: string;
-  username: string;
+  names: string;
+  lastNames: string;
   password: string;
   roles: { _id: string; name: string }[];
   brokers?: string[];

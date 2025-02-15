@@ -9,9 +9,10 @@ import {InlineSVGModule} from "ng-inline-svg-2";
 import {PersonalSettingsComponent} from "./settings/personal-settings.component";
 import {PersonalProfileDetailsComponent} from "./settings/forms/profile-details/personal-profile-details.component";
 import {AccountModule} from "../account/account.module";
+import {PersonalSignInMethodComponent} from "./settings/forms/sign-in-method/personal-sign-in-method.component";
 
 @NgModule({
-  declarations: [MyProfileComponent,PersonalInformationComponent, PersonalSettingsComponent, PersonalProfileDetailsComponent],
+  declarations: [MyProfileComponent,PersonalInformationComponent, PersonalSettingsComponent, PersonalProfileDetailsComponent, PersonalSignInMethodComponent],
   imports: [
     CommonModule,
     PersonalProfileRoutingModule,

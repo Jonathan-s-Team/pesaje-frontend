@@ -47,7 +47,7 @@
                   cursor-pointer
                 "
               >
-                {{ user?.username }}
+                {{ (user?.names || '') + ' ' + (user?.lastNames || '') }}
               </a>
 
             </div>

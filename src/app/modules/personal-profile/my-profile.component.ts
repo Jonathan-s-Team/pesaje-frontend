@@ -18,7 +18,8 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.user = {
       person: "65b1234567890abcdef12345",
-      username: "Test User Name",
+      names: "Jonathan",
+      lastNames: "Pillajo",
       password: "hashedpassword",
       roles: [
         {_id: "65c1234567890abcdef67890", name: "Admin"},
@@ -26,7 +27,7 @@ export class MyProfileComponent implements OnInit, OnDestroy {
       ],
       brokers: ["65d1234567890abcdef54321"],
       deletedAt: null,
-      company: "Jonathan",
+      company: "Test Company",
       phone: "090000000",
       companySite: "jpillajo@test.com",
       country: "ecuador",
