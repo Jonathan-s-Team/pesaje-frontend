@@ -1,15 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {AuthService, UserModel} from "../auth";
 import {Subscription} from "rxjs";
-
-interface UserModelMock {
-  person: string;
-  username: string;
-  password: string;
-  roles: { _id: string; name: string }[];
-  brokers?: string[];
-  deletedAt?: Date | null;
-}
+import {UserService} from "./services/user.service";
+import {UserModel} from "../../shared/models/user.model";
 
 @Component({
   selector: 'app-my-profile',
@@ -17,14 +9,13 @@ interface UserModelMock {
 })
 
 export class MyProfileComponent implements OnInit, OnDestroy {
-  user: UserModelMock | undefined;
+  user: UserModel | undefined;
   private unsubscribe: Subscription[] = [];
 
-  constructor() {
+  constructor(private userService: UserService) {
   }
 
   ngOnInit(): void {
-    // Mock de datos hasta que esté disponible el servicio real
     this.user = {
       person: "65b1234567890abcdef12345",
       username: "Test User Name",
@@ -34,8 +25,16 @@ export class MyProfileComponent implements OnInit, OnDestroy {
         {_id: "65c9876543210abcdef12345", name: "Developer"}
       ],
       brokers: ["65d1234567890abcdef54321"],
-      deletedAt: null
+      deletedAt: null,
+      company: "Jonathan",
+      phone: "090000000",
+      companySite: "jpillajo@test.com",
+      country: "ecuador",
+      communication: "Email, Teléfono",
+      allowChanges: true
     };
+
+    this.userService.user = this.user;
   }
 
   ngOnDestroy(): void {

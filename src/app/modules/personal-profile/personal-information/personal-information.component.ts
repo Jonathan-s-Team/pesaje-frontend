@@ -1,10 +1,17 @@
-import {Component} from "@angular/core";
+import {Component, Input, OnInit} from "@angular/core";
+import {UserService} from "../services/user.service";
+import {UserModel} from "../../../shared/models/user.model";
 
 @Component({
   selector: 'app-personal-information',
-  templateUrl: 'personal-information.component.html',
+  templateUrl: './personal-information.component.html',
 })
-export class PersonalInformationComponent {
-  constructor() {
+export class PersonalInformationComponent implements OnInit {
+  user: UserModel | undefined;
+
+  constructor(private userService: UserService,) {
+  }
+  ngOnInit() {
+    this.user = this.userService.user;
   }
 }

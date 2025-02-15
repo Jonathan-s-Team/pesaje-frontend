@@ -6,9 +6,12 @@ import {CardsModule, DropdownMenusModule, WidgetsModule} from "../../_metronic/p
 import {SharedModule} from "../../_metronic/shared/shared.module";
 import {PersonalInformationComponent} from "./personal-information/personal-information.component";
 import {InlineSVGModule} from "ng-inline-svg-2";
+import {PersonalSettingsComponent} from "./settings/personal-settings.component";
+import {PersonalProfileDetailsComponent} from "./settings/forms/profile-details/personal-profile-details.component";
+import {AccountModule} from "../account/account.module";
 
 @NgModule({
-  declarations: [MyProfileComponent,PersonalInformationComponent],
+  declarations: [MyProfileComponent,PersonalInformationComponent, PersonalSettingsComponent, PersonalProfileDetailsComponent],
   imports: [
     CommonModule,
     PersonalProfileRoutingModule,
@@ -16,7 +19,9 @@ import {InlineSVGModule} from "ng-inline-svg-2";
     DropdownMenusModule,
     WidgetsModule,
     CardsModule,
-    SharedModule],
+    SharedModule,
+    AccountModule
+  ],
 })
 export class PersonalProfileModule {
 }
