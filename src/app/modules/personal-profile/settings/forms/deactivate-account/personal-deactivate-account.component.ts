@@ -8,6 +8,6 @@ export class PersonalDeactivateAccountComponent {
   constructor() {}
 
   saveSettings() {
-    alert('Account has been successfully deleted!');
+    alert('La cuenta fue bloqueada satisfactoriamente!');
   }
 }
