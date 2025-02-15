@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
-import {UserModel} from "../../../../../shared/models/user.model";
+import {PersonModel} from "../../../../../shared/models/person.model";
 import {UserService} from "../../../services/user.service";
 
 @Component({
@@ -8,7 +8,7 @@ import {UserService} from "../../../services/user.service";
   templateUrl: './personal-profile-details.component.html',
 })
 export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
-  user: UserModel | undefined = undefined;
+  user: PersonModel | undefined = undefined;
   isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   isLoading: boolean;
   private unsubscribe: Subscription[] = [];

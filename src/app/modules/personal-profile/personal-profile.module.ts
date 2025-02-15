@@ -14,9 +14,20 @@ import {
   PersonalDeactivateAccountComponent
 } from "./settings/forms/deactivate-account/personal-deactivate-account.component";
 import {FormsModule} from "@angular/forms";
+import {PaymentInformationComponent} from "./payment-information/payment-information.component";
+import { CrudModule } from 'src/app/modules/crud/crud.module';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { NgbCollapseModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
-  declarations: [MyProfileComponent, PersonalInformationComponent, PersonalSettingsComponent, PersonalProfileDetailsComponent, PersonalSignInMethodComponent, PersonalDeactivateAccountComponent],
+  declarations: [
+    MyProfileComponent,
+    PersonalInformationComponent,
+    PaymentInformationComponent,
+    PersonalSettingsComponent,
+    PersonalProfileDetailsComponent,
+    PersonalSignInMethodComponent,
+    PersonalDeactivateAccountComponent],
   imports: [
     CommonModule,
     PersonalProfileRoutingModule,
@@ -26,7 +37,13 @@ import {FormsModule} from "@angular/forms";
     CardsModule,
     SharedModule,
     AccountModule,
-    FormsModule
+    FormsModule,
+    CrudModule,
+    SweetAlert2Module.forChild(),
+    NgbNavModule,
+    NgbDropdownModule,
+    NgbCollapseModule,
+    NgbTooltipModule,
   ],
 })
 export class PersonalProfileModule {

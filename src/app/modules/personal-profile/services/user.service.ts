@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {UserModel} from "../../../shared/models/user.model";
+import {PersonModel} from "../../../shared/models/person.model";
 import {BehaviorSubject} from "rxjs";
 
 @Injectable({
@@ -7,14 +7,14 @@ import {BehaviorSubject} from "rxjs";
 })
 
 export class UserService {
-  private userSubject = new BehaviorSubject<UserModel | undefined>(undefined);
+  private userSubject = new BehaviorSubject<PersonModel | undefined>(undefined);
   user$ = this.userSubject.asObservable();
 
-  set user(user: UserModel) {
+  set user(user: PersonModel) {
     this.userSubject.next(user);
   }
 
-  get user(): UserModel | undefined {
+  get user(): PersonModel | undefined {
     return this.userSubject.getValue();
   }
 }
