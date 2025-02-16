@@ -1,4 +1,5 @@
 export interface PersonModel {
+  id: string;
   photo?: string;
   names: string;
   lastNames: string;
