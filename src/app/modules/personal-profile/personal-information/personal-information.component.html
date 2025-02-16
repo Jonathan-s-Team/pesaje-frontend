@@ -12,50 +12,50 @@
     <div class="row mb-7">
       <label class="col-lg-4 fw-bold text-muted">Nombre Completo</label>
       <div class="col-lg-8">
-        <span class="fw-bolder fs-6 text-gray-900">{{ (user?.names || '') + ' ' + (user?.lastNames || '') }}</span>
+        <span class="fw-bolder fs-6 text-gray-900">{{ (user!.person.names || '') + ' ' + (user!.person.lastNames || '') }}</span>
       </div>
     </div>
 
-    <div class="row mb-7">
+    <!-- <div class="row mb-7">
       <label class="col-lg-4 fw-bold text-muted">Empresa</label>
       <div class="col-lg-8 fv-row">
         <span class="fw-bold fs-6">{{ user?.company || 'N/D' }}</span>
       </div>
-    </div>
+    </div> -->
 
     <div class="row mb-7">
       <label class="col-lg-4 fw-bold text-muted">Teléfono de Contacto</label>
       <div class="col-lg-8 d-flex align-items-center">
-        <span class="fw-bolder fs-6 me-2">{{ user?.phone || 'N/D' }}</span>
+        <span class="fw-bolder fs-6 me-2">{{ user!.phone || 'N/D' }}</span>
       </div>
     </div>
 
-    <div class="row mb-7">
+    <!-- <div class="row mb-7">
       <label class="col-lg-4 fw-bold text-muted">Sitio Web de la Empresa</label>
       <div class="col-lg-8">
         <a href="#" class="fw-bold fs-6 text-gray-900 text-hover-primary">{{ user?.companySite || 'N/D' }}</a>
       </div>
-    </div>
+    </div> -->
 
-    <div class="row mb-7">
+    <!-- <div class="row mb-7">
       <label class="col-lg-4 fw-bold text-muted">País</label>
       <div class="col-lg-8">
         <span class="fw-bolder fs-6 text-gray-900">{{ user?.country || 'N/D' }}</span>
       </div>
-    </div>
+    </div> -->
 
-    <div class="row mb-7">
+    <!-- <div class="row mb-7">
       <label class="col-lg-4 fw-bold text-muted">Comunicación</label>
       <div class="col-lg-8">
         <span class="fw-bolder fs-6 text-gray-900">{{ user?.communication || 'N/D' }}</span>
       </div>
-    </div>
+    </div> -->
 
-    <div class="row mb-10">
+    <!-- <div class="row mb-10">
       <label class="col-lg-4 fw-bold text-muted">Permitir Cambios</label>
       <div class="col-lg-8">
         <span class="fw-bold fs-6">{{ user?.allowChanges ? 'Sí' : 'No' }}</span>
       </div>
-    </div>
+    </div> -->
   </div>
 </div>

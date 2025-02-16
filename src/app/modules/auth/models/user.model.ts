@@ -2,15 +2,17 @@ import { AuthModel } from './auth.model';
 import { AddressModel } from './address.model';
 import { SocialNetworksModel } from './social-networks.model';
 import { PermissionModel } from './permission.model';
+import { PersonModel } from 'src/app/shared/models/person.model';
+import { RoleModel } from './role.model';
 
 export class UserModel extends AuthModel {
-  id: number;
+  id: string;
   username: string;
   password: string;
   fullname: string;
   email: string;
   pic: string;
-  roles: number[] = [];
+  roles: RoleModel[] = [];
   occupation: string;
   companyName: string;
   phone: string;
@@ -29,6 +31,7 @@ export class UserModel extends AuthModel {
     phone: boolean;
   };
   permissions: PermissionModel[];
+  person: PersonModel;
   // email settings
   emailSettings?: {
     emailNotification: boolean;

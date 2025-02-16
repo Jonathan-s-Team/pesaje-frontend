@@ -2,13 +2,14 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import {PersonModel} from "../../../../../shared/models/person.model";
 import {UserService} from "../../../services/user.service";
+import { UserModel } from 'src/app/modules/auth';
 
 @Component({
   selector: 'app-personal-sign-in-method',
   templateUrl: './personal-sign-in-method.component.html',
 })
 export class PersonalSignInMethodComponent implements OnInit, OnDestroy {
-  user: PersonModel | undefined = undefined;
+  user: UserModel | undefined = undefined;
   showChangeEmailForm: boolean = false;
   showChangePasswordForm: boolean = false;
   isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);

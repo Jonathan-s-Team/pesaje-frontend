@@ -1,15 +1,14 @@
 export interface PersonModel {
-  person: string;
+  photo?: string;
   names: string;
   lastNames: string;
-  password: string;
-  roles: { _id: string; name: string }[];
-  brokers?: string[];
-  deletedAt?: Date | null;
-  company?: string;
+  identification: string;
+  birthDate: Date;
+  address: string;
   phone?: string;
-  companySite?: string;
-  country?: string;
-  communication?: string;
-  allowChanges?: boolean;
+  mobilePhone: string;
+  mobilePhone2?: string;
+  email: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
 }

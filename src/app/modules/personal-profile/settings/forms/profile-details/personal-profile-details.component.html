@@ -46,7 +46,7 @@
                   "
                   placeholder="First name"
                   name="fName"
-                  [value]="user?.names"
+                  [value]="user!.person.names"
                 />
               </div>
               <div class="col-lg-6 fv-row">
@@ -55,7 +55,7 @@
                   class="form-control form-control-lg form-control-solid"
                   placeholder="Last name"
                   name="lName"
-                  [value]="user?.lastNames"
+                  [value]="user!.person.lastNames"
                 />
               </div>
             </div>
@@ -65,7 +65,7 @@
           <label class="col-lg-4 col-form-label required fw-bold fs-6"
           >Empresa</label
           >
-          <div class="col-lg-8 fv-row">
+          <!-- <div class="col-lg-8 fv-row">
             <input
               type="text"
               class="form-control form-control-lg form-control-solid"
@@ -73,7 +73,7 @@
               name="company"
               [value]="user?.company"
             />
-          </div>
+          </div> -->
         </div>
         <div class="row mb-6">
           <label class="col-lg-4 col-form-label fw-bold fs-6"
@@ -93,7 +93,7 @@
           <label class="col-lg-4 col-form-label fw-bold fs-6"
           ><span class="required">Sitio Web de la Empresa</span></label
           >
-          <div class="col-lg-8 fv-row">
+          <!-- <div class="col-lg-8 fv-row">
             <input
               type="text"
               class="form-control form-control-lg form-control-solid"
@@ -101,7 +101,7 @@
               name="companySite"
               [value]="user?.company"
             />
-          </div>
+          </div> -->
         </div>
         <div class="row mb-6">
           <label class="col-lg-4 col-form-label fw-bold fs-6"
@@ -170,7 +170,7 @@
           <label class="col-lg-4 col-form-label fw-bold fs-6"
           >Métodos de Contacto</label
           >
-          <div class="col-lg-8 fv-row">
+          <!-- <div class="col-lg-8 fv-row">
             <div class="d-flex align-items-center mt-3">
               <label class="form-check form-check-inline form-check-solid me-5"
               ><input
@@ -188,21 +188,21 @@
             /><span class="fw-bold ps-2 fs-6">Teléfono</span></label
             >
             </div>
-          </div>
+          </div> -->
         </div>
         <div class="row mb-0">
           <label class="col-lg-4 col-form-label fw-bold fs-6"
           >Permitir Marketing</label
           >
           <div class="col-lg-8 d-flex align-items-center">
-            <div class="form-check form-check-solid form-switch fv-row">
+            <!-- <div class="form-check form-check-solid form-switch fv-row">
               <input
                 class="form-check-input w-45px h-30px"
                 type="checkbox"
                 id="allowmarketing"
                 [checked]="user?.allowChanges"
               /><label class="form-check-label"></label>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>

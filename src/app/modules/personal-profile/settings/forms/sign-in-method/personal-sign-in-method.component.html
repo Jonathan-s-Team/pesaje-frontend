@@ -15,7 +15,7 @@
         <div class="d-flex flex-wrap align-items-center">
           <div id="kt_signin_email" class="false">
             <div class="fs-6 fw-bolder mb-1">Correo Electrónico</div>
-            <div class="fw-bold text-gray-600">{{ user?.companySite }}</div>
+            <!-- <div class="fw-bold text-gray-600">{{ user?.companySite }}</div> -->
           </div>
           <div id="kt_signin_email_edit" class="flex-row-fluid d-none">
             <form id="kt_signin_change_email" class="form" novalidate="">
@@ -32,7 +32,7 @@
                     id="emailaddress"
                     placeholder="Correo Electrónico"
                     name="newEmail"
-                    [value]="user?.companySite"
+                    [value]="user!.email"
                   />
                   </div>
                 </div>
@@ -87,7 +87,7 @@
         <div class="d-flex flex-wrap align-items-center">
           <div id="kt_signin_email" class="d-none">
             <div class="fs-6 fw-bolder mb-1">Correo Electrónico</div>
-            <div class="fw-bold text-gray-600">{{ user?.companySite }}</div>
+            <div class="fw-bold text-gray-600">{{ user!.email }}</div>
           </div>
           <div id="kt_signin_email_edit" class="flex-row-fluid false">
             <form id="kt_signin_change_email" class="form" novalidate="">
@@ -104,7 +104,7 @@
                     id="emailaddress"
                     placeholder="Correo Electrónico"
                     name="newEmail"
-                    [value]="user?.companySite"
+                    [value]="user!.email"
                   />
                   </div>
                 </div>

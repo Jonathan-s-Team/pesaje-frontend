@@ -1,44 +1,42 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Subscription} from "rxjs";
-import {UserService} from "./services/user.service";
-import {PersonModel} from "../../shared/models/person.model";
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
+import { UserService } from './services/user.service';
+import { PersonModel } from '../../shared/models/person.model';
+import { AuthService, UserModel } from '../auth';
 
 @Component({
   selector: 'app-my-profile',
-  templateUrl: './my-profile.component.html'
+  templateUrl: './my-profile.component.html',
 })
-
 export class MyProfileComponent implements OnInit, OnDestroy {
-  user: PersonModel | undefined;
+  user: UserModel | undefined;
+  isLoading$: Observable<boolean>;
   private unsubscribe: Subscription[] = [];
 
-  constructor(private userService: UserService) {
+  constructor(
+    private userService: UserService,
+    private authService: AuthService
+  ) {
+    this.isLoading$ = this.userService.isLoading$;
   }
 
   ngOnInit(): void {
-    this.user = {
-      person: "65b1234567890abcdef12345",
-      names: "Jonathan",
-      lastNames: "Pillajo",
-      password: "hashedpassword",
-      roles: [
-        {_id: "65c1234567890abcdef67890", name: "Admin"},
-        {_id: "65c9876543210abcdef12345", name: "Developer"}
-      ],
-      brokers: ["65d1234567890abcdef54321"],
-      deletedAt: null,
-      company: "Test Company",
-      phone: "090000000",
-      companySite: "jpillajo@test.com",
-      country: "ecuador",
-      communication: "Email, Teléfono",
-      allowChanges: true
-    };
+    const userId = this.authService.currentUserValue!.id;
 
-    this.userService.user = this.user;
+    // Subscribe to userSubject for live updates
+    const userSub = this.userService.user$.subscribe((user) => {
+      this.user = user;
+    });
+    this.unsubscribe.push(userSub); // Store the subscription
+
+    // Fetch user only if not already loaded
+    if (!this.userService.user) {
+      const apiSub = this.userService.getUserById(userId).subscribe();
+      this.unsubscribe.push(apiSub);
+    }
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe.forEach(sub => sub.unsubscribe());
+    this.unsubscribe.forEach((sub) => sub.unsubscribe());
   }
 }

@@ -6,6 +6,7 @@ import { AuthModel } from '../models/auth.model';
 import { AuthHTTPService } from './auth-http';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
+import { TokenStorageService } from './token-storage.service';
 
 export type UserType = UserModel | undefined;
 
@@ -33,7 +34,8 @@ export class AuthService implements OnDestroy {
 
   constructor(
     private authHttpService: AuthHTTPService,
-    private router: Router
+    private router: Router,
+    private tokenStorageService: TokenStorageService
   ) {
     this.isLoadingSubject = new BehaviorSubject<boolean>(false);
     this.currentUserSubject = new BehaviorSubject<UserType>(undefined);
@@ -48,8 +50,9 @@ export class AuthService implements OnDestroy {
     this.isLoadingSubject.next(true);
     return this.authHttpService.login(username, password).pipe(
       map((auth: AuthModel) => {
-        const result = this.setAuthFromLocalStorage(auth);
-        return result;
+        // const result = this.setAuthFromLocalStorage(auth);
+        // return result;
+        this.tokenStorageService.setAuthFromLocalStorage(auth);
       }),
       switchMap(() => this.getUserByToken()),
       catchError((err) => {
@@ -61,14 +64,16 @@ export class AuthService implements OnDestroy {
   }
 
   logout() {
-    localStorage.removeItem(this.authLocalStorageToken);
+    // localStorage.removeItem(this.authLocalStorageToken);
+    this.tokenStorageService.removeToken();
     this.router.navigate(['/auth/login'], {
       queryParams: {},
     });
   }
 
   getUserByToken(): Observable<UserType> {
-    const auth = this.getAuthFromLocalStorage();
+    // const auth = this.getAuthFromLocalStorage();
+    const auth = this.tokenStorageService.getAuthFromLocalStorage();
     if (!auth || !auth.authToken) {
       return of(undefined);
     }
@@ -111,29 +116,29 @@ export class AuthService implements OnDestroy {
   }
 
   // private methods
-  private setAuthFromLocalStorage(auth: AuthModel): boolean {
-    // store auth authToken/refreshToken/epiresIn in local storage to keep user logged in between page refreshes
-    if (auth && auth.authToken) {
-      localStorage.setItem(this.authLocalStorageToken, JSON.stringify(auth));
-      return true;
-    }
-    return false;
-  }
+  // private setAuthFromLocalStorage(auth: AuthModel): boolean {
+  //   // store auth authToken/refreshToken/epiresIn in local storage to keep user logged in between page refreshes
+  //   if (auth && auth.authToken) {
+  //     localStorage.setItem(this.authLocalStorageToken, JSON.stringify(auth));
+  //     return true;
+  //   }
+  //   return false;
+  // }
 
-  private getAuthFromLocalStorage(): AuthModel | undefined {
-    try {
-      const lsValue = localStorage.getItem(this.authLocalStorageToken);
-      if (!lsValue) {
-        return undefined;
-      }
+  // private getAuthFromLocalStorage(): AuthModel | undefined {
+  //   try {
+  //     const lsValue = localStorage.getItem(this.authLocalStorageToken);
+  //     if (!lsValue) {
+  //       return undefined;
+  //     }
 
-      const authData = JSON.parse(lsValue);
-      return authData;
-    } catch (error) {
-      console.error(error);
-      return undefined;
-    }
-  }
+  //     const authData = JSON.parse(lsValue);
+  //     return authData;
+  //   } catch (error) {
+  //     console.error(error);
+  //     return undefined;
+  //   }
+  // }
 
   ngOnDestroy() {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());

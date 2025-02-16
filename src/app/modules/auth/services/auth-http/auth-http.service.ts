@@ -33,12 +33,19 @@ export class AuthHTTPService {
     });
   }
 
+  refreshToken(refreshToken: string): Observable<any> {
+    return this.http.post<AuthModel>(`${API_USERS_URL}/renew`, {
+      refreshToken,
+    });
+  }
+
   getUserByToken(token: string): Observable<UserModel> {
-    const httpHeaders = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-    return this.http.get<UserModel>(`${API_USERS_URL}/me`, {
-      headers: httpHeaders,
-    });
+    // const httpHeaders = new HttpHeaders({
+    //   Authorization: `Bearer ${token}`,
+    // });
+    // return this.http.get<UserModel>(`${API_USERS_URL}/me`, {
+    //   headers: httpHeaders,
+    // });
+    return this.http.get<UserModel>(`${API_USERS_URL}/me`);
   }
 }

@@ -1,4 +1,4 @@
-export class PermissionModel {
+export interface PermissionModel {
   id: string;
   name: string;
   parentOption?: string;
