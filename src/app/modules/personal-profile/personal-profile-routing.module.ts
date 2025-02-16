@@ -1,15 +1,36 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { MyProfileComponent } from './my-profile/my-profile.component';
+import {NgModule} from '@angular/core';
+import {Routes, RouterModule} from '@angular/router';
+import {MyProfileComponent} from "./my-profile.component";
+import {PersonalInformationComponent} from "./personal-information/personal-information.component";
+import {PersonalSettingsComponent} from "./settings/personal-settings.component";
+import {PaymentInformationComponent} from "./payment-information/payment-information.component";
 
 const routes: Routes = [
-  { path: 'my-profile', component: MyProfileComponent },
-  { path: '', redirectTo: 'my-profile', pathMatch: 'full' }, // Default route
-  { path: '**', redirectTo: 'my-profile', pathMatch: 'full' }, // Catch-all for invalid routes
+  {
+    path: 'my-profile',
+    component: MyProfileComponent,
+    children: [
+      {
+        path: 'personal-information',
+        component: PersonalInformationComponent,
+      },
+      {
+        path: 'personal-settings',
+        component: PersonalSettingsComponent,
+      },
+      {
+        path: 'payment-information',
+        component: PaymentInformationComponent,
+      },
+      {path: '', redirectTo: 'personal-information', pathMatch: 'full'},
+      {path: '**', redirectTo: 'personal-information', pathMatch: 'full'},
+    ],
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class PersonalProfileRoutingModule {}
+export class PersonalProfileRoutingModule {
+}

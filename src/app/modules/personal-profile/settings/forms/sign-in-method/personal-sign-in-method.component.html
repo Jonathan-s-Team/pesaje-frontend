@@ -1,0 +1,261 @@
+<div class="card mb-5 mb-xl-10">
+  <div
+    class="card-header border-0 cursor-pointer"
+    role="button"
+    data-bs-toggle="collapse"
+    data-bs-target="#kt_account_signin_method"
+  >
+    <div class="card-title m-0">
+      <h3 class="fw-bolder m-0">Método de Inicio de Sesión</h3>
+    </div>
+  </div>
+  <div id="kt_account_signin_method" class="collapse show">
+    <div class="card-body border-top p-9">
+      <ng-container *ngIf="!showChangeEmailForm">
+        <div class="d-flex flex-wrap align-items-center">
+          <div id="kt_signin_email" class="false">
+            <div class="fs-6 fw-bolder mb-1">Correo Electrónico</div>
+            <div class="fw-bold text-gray-600">{{ user?.companySite }}</div>
+          </div>
+          <div id="kt_signin_email_edit" class="flex-row-fluid d-none">
+            <form id="kt_signin_change_email" class="form" novalidate="">
+              <div class="row mb-6">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                  <div class="fv-row mb-0">
+                    <label
+                      for="emailaddress"
+                      class="form-label fs-6 fw-bolder mb-3"
+                    >Ingrese Nuevo Correo Electrónico</label
+                    ><input
+                    type="email"
+                    class="form-control form-control-lg form-control-solid"
+                    id="emailaddress"
+                    placeholder="Correo Electrónico"
+                    name="newEmail"
+                    [value]="user?.companySite"
+                  />
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="fv-row mb-0">
+                    <label
+                      for="confirmemailpassword"
+                      class="form-label fs-6 fw-bolder mb-3"
+                    >Confirmar Contraseña</label
+                    ><input
+                    type="password"
+                    class="form-control form-control-lg form-control-solid"
+                    id="confirmemailpassword"
+                    name="confirmPassword"
+                    value=""
+                  />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">La contraseña es requerida<</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex">
+                <button
+                  id="kt_signin_submit"
+                  type="submit"
+                  class="btn btn-primary me-2 px-6"
+                >
+                    Actualizar Correo</button
+                ><button
+                id="kt_signin_cancel"
+                type="button"
+                class="btn btn-color-gray-500 btn-active-light-primary px-6"
+              >
+                  Cancelar
+              </button>
+              </div>
+            </form>
+          </div>
+          <div id="kt_signin_email_button" class="ms-auto false">
+            <button
+              class="btn btn-light btn-active-light-primary"
+              (click)="toggleEmailForm(true)"
+            >
+                Cambiar Correo
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="showChangeEmailForm">
+        <div class="d-flex flex-wrap align-items-center">
+          <div id="kt_signin_email" class="d-none">
+            <div class="fs-6 fw-bolder mb-1">Correo Electrónico</div>
+            <div class="fw-bold text-gray-600">{{ user?.companySite }}</div>
+          </div>
+          <div id="kt_signin_email_edit" class="flex-row-fluid false">
+            <form id="kt_signin_change_email" class="form" novalidate="">
+              <div class="row mb-6">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                  <div class="fv-row mb-0">
+                    <label
+                      for="emailaddress"
+                      class="form-label fs-6 fw-bolder mb-3"
+                    >Ingrese un Nuevo Correo Electrónico</label
+                    ><input
+                    type="email"
+                    class="form-control form-control-lg form-control-solid"
+                    id="emailaddress"
+                    placeholder="Correo Electrónico"
+                    name="newEmail"
+                    [value]="user?.companySite"
+                  />
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex">
+                <button
+                  id="kt_signin_submit"
+                  type="button"
+                  class="btn btn-primary me-2 px-6"
+                  (click)="saveEmail()"
+                >
+                  <ng-container *ngIf="!isLoading"> Actualizar Correo </ng-container>
+                  <ng-container *ngIf="isLoading">
+                    <span class="indicator-progress" [style.display]="'block'">
+                      Por favor espere...{{ " " }}
+                      <span
+                        class="
+                          spinner-border spinner-border-sm
+                          align-middle
+                          ms-2
+                        "
+                      ></span>
+                    </span>
+                  </ng-container></button
+                ><button
+                id="kt_signin_cancel"
+                type="button"
+                class="btn btn-color-gray-500 btn-active-light-primary px-6"
+                (click)="toggleEmailForm(false)"
+              >
+                  Cancelar
+              </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="separator separator-dashed my-6"></div>
+
+      <ng-container *ngIf="!showChangePasswordForm">
+        <div class="d-flex flex-wrap align-items-center mb-10">
+          <div id="kt_signin_password" class="false">
+            <div class="fs-6 fw-bolder mb-1">Contraseña</div>
+            <div class="fw-bold text-gray-600">************</div>
+          </div>
+          <div id="kt_signin_password_button" class="ms-auto false">
+            <button
+              class="btn btn-light btn-active-light-primary"
+              (click)="togglePasswordForm(true)"
+            >
+                Restablecer Contraseña
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="showChangePasswordForm">
+        <div class="d-flex flex-wrap align-items-center mb-10">
+          <div id="kt_signin_password_edit" class="flex-row-fluid false">
+            <form id="kt_signin_change_password" class="form" novalidate="">
+              <div class="row mb-1">
+                <div class="col-lg-4">
+                  <div class="fv-row mb-0">
+                    <label
+                      for="currentpassword"
+                      class="form-label fs-6 fw-bolder mb-3"
+                    >Contraseña Actual</label
+                    ><input
+                    type="password"
+                    class="form-control form-control-lg form-control-solid"
+                    id="currentpassword"
+                    name="currentPassword"
+                    value=""
+                  />
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="fv-row mb-0">
+                    <label
+                      for="newpassword"
+                      class="form-label fs-6 fw-bolder mb-3"
+                    >Nueva Contraseña</label
+                    ><input
+                    type="password"
+                    class="form-control form-control-lg form-control-solid"
+                    id="newpassword"
+                    name="newPassword"
+                    value="1234"
+                  />
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="fv-row mb-0">
+                    <label
+                      for="confirmpassword"
+                      class="form-label fs-6 fw-bolder mb-3"
+                    >Confirmar Nueva Contraseña</label
+                    ><input
+                    type="password"
+                    class="form-control form-control-lg form-control-solid"
+                    id="confirmpassword"
+                    name="passwordConfirmation"
+                    value=""
+                  />
+                  </div>
+                </div>
+              </div>
+              <div class="form-text mb-5">
+                  La contraseña debe tener al menos 8 caracteres y contener símbolos.
+              </div>
+              <div class="d-flex">
+                <button
+                  id="kt_password_submit"
+                  type="button"
+                  class="btn btn-primary me-2 px-6"
+                  (click)="savePassword()"
+                >
+                  <ng-container *ngIf="!isLoading"
+                  >Actualizar Contraseña</ng-container
+                  >
+                  <ng-container *ngIf="isLoading">
+                    <span class="indicator-progress" [style.display]="'block'">
+                      Por favor, espere...{{ " " }}
+                      <span
+                        class="
+                          spinner-border spinner-border-sm
+                          align-middle
+                          ms-2
+                        "
+                      ></span>
+                    </span>
+                  </ng-container></button
+                ><button
+                id="kt_password_cancel"
+                type="button"
+                class="btn btn-color-gray-500 btn-active-light-primary px-6"
+                (click)="togglePasswordForm(false)"
+              >
+                  Cancelar
+              </button>
+              </div>
+            </form>
+          </div>
+          <div id="kt_signin_password_button" class="ms-auto d-none">
+            <button class="btn btn-light btn-active-light-primary">
+                Restablecer Contraseña
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
