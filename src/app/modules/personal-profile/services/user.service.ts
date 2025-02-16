@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, finalize, Observable, tap } from 'rxjs';
+import { BehaviorSubject, finalize, map, Observable, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { UserModel } from '../../auth/models/user.model';
 import { AuthService } from '../../auth';
@@ -37,7 +37,8 @@ export class UserService {
   getUserById(id: string): Observable<UserModel> {
     this.isLoadingSubject.next(true);
 
-    return this.http.get<UserModel>(`${API_USERS_URL}/${id}`).pipe(
+    return this.http.get<{ user: UserModel }>(`${API_USERS_URL}/${id}`).pipe(
+      map((response) => response.user),
       tap((user) => {
         this.userSubject.next(user); // Update stored user
       }),
@@ -45,7 +46,32 @@ export class UserService {
     );
   }
 
-  updateUser(id: string, data: UpdateUserInterface): Observable<any> {
-    return this.http.put(`${API_USERS_URL}/users/${id}`, data);
+  // createUser(userData: Partial<UserModel>): Observable<UserModel> {
+  //   this.isLoadingSubject.next(true);
+  //   return this.http.post<UserModel>(`${API_USERS_URL}`, userData).pipe(
+  //     tap((newUser) => {
+  //       this.userSubject.next(newUser); // Update stored user
+  //     }),
+  //     finalize(() => this.isLoadingSubject.next(false))
+  //   );
+  // }
+
+  updateUser(id: string, userData: Partial<UserModel>): Observable<UserModel> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .put<{ updatedUser: UserModel }>(`${API_USERS_URL}/${id}`, userData)
+      .pipe(
+        map((response) => response.updatedUser),
+        tap((updatedUser) => {
+          this.userSubject.next(updatedUser); // Update stored user in UserService
+          this.authService.currentUserValue = {
+            id: updatedUser.id,
+            username: updatedUser.username,
+            fullname: updatedUser.fullname,
+            email: updatedUser.email,
+          } as UserModel; // Update current user in AuthService
+        }),
+        finalize(() => this.isLoadingSubject.next(false))
+      );
   }
 }

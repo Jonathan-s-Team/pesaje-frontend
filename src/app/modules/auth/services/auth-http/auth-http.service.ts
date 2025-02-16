@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { UserModel } from '../../models/user.model';
 import { environment } from '../../../../../environments/environment';
@@ -46,6 +46,8 @@ export class AuthHTTPService {
     // return this.http.get<UserModel>(`${API_USERS_URL}/me`, {
     //   headers: httpHeaders,
     // });
-    return this.http.get<UserModel>(`${API_USERS_URL}/me`);
+    return this.http.get<{ user: UserModel }>(`${API_USERS_URL}/me`).pipe(
+      map((response) => response.user) // ✅ Extract array from response
+    );
   }
 }
