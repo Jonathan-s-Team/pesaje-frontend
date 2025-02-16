@@ -9,10 +9,6 @@ import {InlineSVGModule} from "ng-inline-svg-2";
 import {PersonalSettingsComponent} from "./settings/personal-settings.component";
 import {PersonalProfileDetailsComponent} from "./settings/forms/profile-details/personal-profile-details.component";
 import {AccountModule} from "../account/account.module";
-import {PersonalSignInMethodComponent} from "./settings/forms/sign-in-method/personal-sign-in-method.component";
-import {
-  PersonalDeactivateAccountComponent
-} from "./settings/forms/deactivate-account/personal-deactivate-account.component";
 import {FormsModule} from "@angular/forms";
 import {PaymentInformationComponent} from "./payment-information/payment-information.component";
 import { CrudModule } from 'src/app/modules/crud/crud.module';
@@ -26,8 +22,7 @@ import { NgbCollapseModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule } 
     PaymentInformationComponent,
     PersonalSettingsComponent,
     PersonalProfileDetailsComponent,
-    PersonalSignInMethodComponent,
-    PersonalDeactivateAccountComponent],
+    ],
   imports: [
     CommonModule,
     PersonalProfileRoutingModule,

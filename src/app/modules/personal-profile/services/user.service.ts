@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { PersonModel } from '../../../shared/models/person.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, finalize, Observable, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { UserModel } from '../../auth/models/user.model';
 import { AuthService } from '../../auth';
+import {UpdateUserInterface} from "../interface/UpdateUserInterface";
 
 const API_USERS_URL = `${environment.apiUrl}/user`;
 
@@ -43,5 +43,9 @@ export class UserService {
       }),
       finalize(() => this.isLoadingSubject.next(false))
     );
+  }
+
+  updateUser(id: string, data: UpdateUserInterface): Observable<any> {
+    return this.http.put(`${API_USERS_URL}/users/${id}`, data);
   }
 }

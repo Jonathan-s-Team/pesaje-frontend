@@ -15,7 +15,16 @@
             symbol symbol-100px symbol-lg-160px symbol-fixed
             position-relative
           ">
-            <img src="./assets/media/avatars/300-1.jpg" alt="Metronic" />
+            <img
+              *ngIf="user?.person?.photo"
+              [src]="user?.person?.photo"
+              alt="Foto de perfil"
+            />
+            <img
+              *ngIf="!user?.person?.photo"
+              src="./assets/media/avatars/300-1.jpg"
+              alt="Foto por defecto"
+            />
             <div class="
               position-absolute
               translate-middle
@@ -51,6 +60,11 @@
                   {{ (user?.person?.names || '') + ' ' + (user?.person?.lastNames || '') }}
                 </a>
               </div>
+              <div class="d-flex flex-wrap fw-bold fs-6 mb-4 pe-2">
+                <div class="d-flex align-items-center text-gray-500 me-5 mb-2">
+                  {{ user?.username }}
+                </div>
+              </div>
 
               <div class="d-flex flex-wrap fw-bold fs-6 mb-4 pe-2">
                 <div *ngFor="let role of user?.roles" class="d-flex align-items-center text-gray-500 me-5 mb-2">
@@ -75,12 +89,6 @@
             <a class="nav-link text-active-primary me-6" routerLink="/personal-profile/my-profile/personal-information"
               routerLinkActive="active">
               Informacion Personal
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-active-primary me-6" routerLink="/personal-profile/my-profile/personal-settings"
-              routerLinkActive="active">
-              Editar
             </a>
           </li>
           <li class="nav-item">
