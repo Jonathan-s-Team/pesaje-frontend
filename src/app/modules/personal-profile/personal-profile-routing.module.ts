@@ -2,7 +2,6 @@ import {NgModule} from '@angular/core';
 import {Routes, RouterModule} from '@angular/router';
 import {MyProfileComponent} from "./my-profile.component";
 import {PersonalInformationComponent} from "./personal-information/personal-information.component";
-import {PersonalSettingsComponent} from "./settings/personal-settings.component";
 import {PaymentInformationComponent} from "./payment-information/payment-information.component";
 
 const routes: Routes = [
@@ -13,10 +12,6 @@ const routes: Routes = [
       {
         path: 'personal-information',
         component: PersonalInformationComponent,
-      },
-      {
-        path: 'personal-settings',
-        component: PersonalSettingsComponent,
       },
       {
         path: 'payment-information',
