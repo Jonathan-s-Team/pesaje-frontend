@@ -36,6 +36,8 @@ export class PaymentInformationComponent
 
   datatableConfig: Config = {
     serverSide: false,
+    paging: true,
+    pageLength: 10,
     data: [], // ✅ Ensure default is an empty array
     columns: [
       {
@@ -80,32 +82,26 @@ export class PaymentInformationComponent
       }
     });
     this.subscriptions.push(userSub);
-
-    this.reloadEvent.subscribe(() => {
-      console.log(
-        '🔹 DataTable reload event triggered',
-        this.datatableConfig.data
-      );
-    });
   }
 
   ngAfterViewInit(): void {}
 
   // 🔹 Load Payment Info List for Person
-  loadPaymentInfos(): void {
+  loadPaymentInfos(isRefreshTable: boolean = false): void {
     if (!this.personId) return;
 
     const paymentSub = this.paymentInfoService
       .getPaymentInfosByPerson(this.personId)
       .subscribe({
         next: (data) => {
-          this.paymentData = data.length ? data : []; // Ensure it's an array
+          this.paymentData = [...data];
           this.datatableConfig = {
             ...this.datatableConfig,
-            data: this.paymentData,
-          }; // Update datatable config
+            data: [...this.paymentData],
+          };
+
           this.cdr.detectChanges();
-          this.reloadEvent.emit(true); // Reload only if data is available
+          this.reloadEvent.emit(isRefreshTable);
         },
         error: () => {
           this.showAlert({
@@ -138,7 +134,6 @@ export class PaymentInformationComponent
 
   // 🔹 Edit Payment Info
   edit(id: any): void {
-    console.log('🔹 Event received in edit:', id, 'Type:', typeof id);
     const foundItem = this.paymentData.find((item) => item.id === id);
     this.paymentInfoModel = foundItem
       ? { ...foundItem }
@@ -188,9 +183,16 @@ export class PaymentInformationComponent
             const index = this.paymentData.findIndex(
               (item) => item.id === updatedInfo.id
             );
-            if (index > -1) this.paymentData[index] = updatedInfo;
+            if (index > -1) this.paymentData[index] = { ...updatedInfo };
 
             this.showAlert(successAlert);
+
+            this.datatableConfig = {
+              ...this.datatableConfig,
+              data: [...this.paymentData],
+            };
+
+            this.cdr.detectChanges();
             this.reloadEvent.emit(true);
           },
           error: (error) => {
@@ -208,7 +210,7 @@ export class PaymentInformationComponent
         .subscribe({
           next: () => {
             this.showAlert(successAlert);
-            this.loadPaymentInfos(); // ✅ Reload the list after creation
+            this.loadPaymentInfos(true); // ✅ Reload the list after creation
           },
           error: (error) => {
             errorAlert.text = 'No se pudo crear la información de pago.';

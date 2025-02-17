@@ -28,14 +28,10 @@
   </div>
 
   <div class="card-body pt-0">
-    <app-crud *ngIf="paymentData.length > 0" [datatableConfig]="datatableConfig" (deleteEvent)="delete($event)"
-      (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal">
+    <app-crud *ngIf="paymentData.length > 0" [datatableConfig]="datatableConfig"
+      route="/personal-profile/my-profile/payment-information" (deleteEvent)="delete($event)" (editEvent)="edit($event)"
+      (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal">
     </app-crud>
-
-    <!-- Show message when no data is available -->
-    <div *ngIf="paymentData.length === 0" class="text-center py-3">
-      <p>No hay información de pago disponible.</p>
-    </div>
   </div>
 </div>
 
