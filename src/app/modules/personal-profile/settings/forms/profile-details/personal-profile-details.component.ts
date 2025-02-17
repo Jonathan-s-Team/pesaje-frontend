@@ -4,7 +4,8 @@ import {UserService} from "../../../services/user.service";
 import {UserModel} from 'src/app/modules/auth';
 import {ViewChild} from '@angular/core';
 import {NgForm} from '@angular/forms';
-import { UpdateUserInterface } from "../../../interface/UpdateUserInterface";
+import {UpdateUserDTO} from "../../../interface/UpdateUserDTO";
+import Swal, {SweetAlertOptions} from "sweetalert2";
 
 @Component({
   selector: 'app-personal-profile-details',
@@ -39,7 +40,7 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
 
     this.isLoading$.next(true);
 
-    const payload: UpdateUserInterface = {
+    const payload: UpdateUserDTO = {
       username: this.user.username,
       password: this.user.password,
       roles: this.user.roles?.map(role => role.id),
@@ -63,18 +64,52 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }, 1500);
 
-    /*this.userService.updateUser(this.user.id, payload).subscribe({
+    this.userService.updateUser(this.user.id, payload).subscribe({
       next: (response) => {
         this.isLoading$.next(false);
         console.log('Usuario actualizado:', response);
         this.cdr.detectChanges();
+        this.showSuccessAlert();
       },
       error: (error) => {
         this.isLoading$.next(false);
         console.error('Error actualizando usuario:', error);
         this.cdr.detectChanges();
+        this.showErrorAlert(error);
       }
-    });*/
+    });
+  }
+
+  private getErrorMessage(error: any) {
+    return error.error?.message || error.message || 'Ocurrió  un error inesperado. Por favor verifique los datos e intente nuevamente.';
+  }
+
+  private showSuccessAlert() {
+    const options: SweetAlertOptions = {
+      title: '¡Éxito!',
+      text: 'Los cambios se guardaron correctamente',
+      icon: 'success',
+      confirmButtonText: 'Aceptar',
+      confirmButtonColor: '#3085d6',
+      timer: 5000,
+      timerProgressBar: true
+    };
+    Swal.fire(options);
+  }
+
+  private showErrorAlert(error: any) {
+    const errorMessage = this.getErrorMessage(error);
+
+    const options: SweetAlertOptions = {
+      title: 'Error',
+      html: `<strong>${errorMessage}</strong>`,
+      icon: 'error',
+      confirmButtonText: 'Entendido',
+      confirmButtonColor: '#d33',
+      showCloseButton: true,
+      focusConfirm: false
+    };
+    Swal.fire(options);
   }
 
   ngOnDestroy() {

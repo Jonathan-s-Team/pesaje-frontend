@@ -7,7 +7,12 @@ import { UserModel } from '../../auth';
   templateUrl: './personal-information.component.html',
 })
 export class PersonalInformationComponent implements OnInit {
+  isEditing = false;
   user: UserModel | undefined;
+
+  toggleEditMode() {
+    this.isEditing = !this.isEditing;
+  }
 
   constructor(private userService: UserService) {}
   ngOnInit() {
