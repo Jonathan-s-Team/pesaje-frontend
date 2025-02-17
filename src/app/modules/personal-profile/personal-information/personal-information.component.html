@@ -1,9 +1,9 @@
 <div class="card mb-5 mb-xl-10" id="kt_profile_details_view">
-  <div class="card-header cursor-pointer">
+  <div class="card-header">
     <div class="card-title m-0">
       <h3 class="fw-bolder m-0">Detalles de Perfil</h3>
     </div>
-    <button (click)="toggleEditMode()" class="btn align-self-center" [ngClass]="isEditing ? 'btn-danger' : 'btn-primary'">
+    <button (click)="toggleEditMode()" class="btn align-self-center cursor-pointer" [ngClass]="isEditing ? 'btn-danger' : 'btn-primary' ">
       {{ isEditing ? 'Cancelar' : 'Editar Perfil' }}
     </button>
   </div>
