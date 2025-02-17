@@ -15,6 +15,8 @@ import { Config } from 'datatables.net';
 import { PaymentInfoModel } from '../../../shared/models/paymentInfo.model';
 import { PaymentInfoService } from '../services/payment-info.service';
 import { UserService } from '../services/user.service';
+import { PermissionService } from 'src/app/shared/services/permission.service';
+import { Permission } from '../../auth/models/permission.model';
 
 @Component({
   selector: 'app-payment-information',
@@ -70,6 +72,7 @@ export class PaymentInformationComponent
   constructor(
     private paymentInfoService: PaymentInfoService,
     private userService: UserService,
+    private permissionService: PermissionService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -87,7 +90,7 @@ export class PaymentInformationComponent
   ngAfterViewInit(): void {}
 
   // 🔹 Load Payment Info List for Person
-  loadPaymentInfos(isRefreshTable: boolean = false): void {
+  loadPaymentInfos(): void {
     if (!this.personId) return;
 
     const paymentSub = this.paymentInfoService
@@ -101,7 +104,7 @@ export class PaymentInformationComponent
           };
 
           this.cdr.detectChanges();
-          this.reloadEvent.emit(isRefreshTable);
+          this.reloadEvent.emit(true);
         },
         error: () => {
           this.showAlert({
@@ -210,7 +213,7 @@ export class PaymentInformationComponent
         .subscribe({
           next: () => {
             this.showAlert(successAlert);
-            this.loadPaymentInfos(true); // ✅ Reload the list after creation
+            this.loadPaymentInfos(); // ✅ Reload the list after creation
           },
           error: (error) => {
             errorAlert.text = 'No se pudo crear la información de pago.';
@@ -241,6 +244,13 @@ export class PaymentInformationComponent
     };
     this.cdr.detectChanges();
     this.noticeSwal.fire();
+  }
+
+  hasEditPermission(): boolean {
+    return this.permissionService.hasPermission(
+      'personal-profile/my-profile',
+      Permission.EDIT
+    );
   }
 
   ngOnDestroy(): void {
