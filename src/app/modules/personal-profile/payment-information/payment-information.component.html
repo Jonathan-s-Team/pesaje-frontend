@@ -17,7 +17,8 @@
       <!--begin::Toolbar-->
       <div class="d-flex justify-content-end">
         <!--begin::Add payment info-->
-        <button type="button" class="btn btn-primary" data-action="create" (click)="create()">
+        <button *ngIf="hasEditPermission()" type="button" class="btn btn-primary" data-action="create"
+          (click)="create()">
           Agregar Información de Pago
         </button>
         <!--end::Add payment info-->
@@ -28,14 +29,17 @@
   </div>
 
   <div class="card-body pt-0">
-    <app-crud *ngIf="paymentData.length > 0" [datatableConfig]="datatableConfig" (deleteEvent)="delete($event)"
-      (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal">
-    </app-crud>
+    <ng-container *ngIf="hasEditPermission(); else noEdit">
+      <app-crud [datatableConfig]="datatableConfig" route="/personal-profile/my-profile/payment-information"
+        (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal">
+      </app-crud>
+    </ng-container>
 
-    <!-- Show message when no data is available -->
-    <div *ngIf="paymentData.length === 0" class="text-center py-3">
-      <p>No hay información de pago disponible.</p>
-    </div>
+    <ng-template #noEdit>
+      <app-crud [datatableConfig]="datatableConfig" route="/personal-profile/my-profile/payment-information"
+        (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal">
+      </app-crud>
+    </ng-template>
   </div>
 </div>
 

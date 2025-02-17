@@ -15,6 +15,8 @@ import { Config } from 'datatables.net';
 import { PaymentInfoModel } from '../../../shared/models/paymentInfo.model';
 import { PaymentInfoService } from '../services/payment-info.service';
 import { UserService } from '../services/user.service';
+import { PermissionService } from 'src/app/shared/services/permission.service';
+import { Permission } from '../../auth/models/permission.model';
 
 @Component({
   selector: 'app-payment-information',
@@ -36,6 +38,8 @@ export class PaymentInformationComponent
 
   datatableConfig: Config = {
     serverSide: false,
+    paging: true,
+    pageLength: 10,
     data: [], // ✅ Ensure default is an empty array
     columns: [
       {
@@ -68,6 +72,7 @@ export class PaymentInformationComponent
   constructor(
     private paymentInfoService: PaymentInfoService,
     private userService: UserService,
+    private permissionService: PermissionService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -80,13 +85,6 @@ export class PaymentInformationComponent
       }
     });
     this.subscriptions.push(userSub);
-
-    this.reloadEvent.subscribe(() => {
-      console.log(
-        '🔹 DataTable reload event triggered',
-        this.datatableConfig.data
-      );
-    });
   }
 
   ngAfterViewInit(): void {}
@@ -99,13 +97,14 @@ export class PaymentInformationComponent
       .getPaymentInfosByPerson(this.personId)
       .subscribe({
         next: (data) => {
-          this.paymentData = data.length ? data : []; // Ensure it's an array
+          this.paymentData = [...data];
           this.datatableConfig = {
             ...this.datatableConfig,
-            data: this.paymentData,
-          }; // Update datatable config
+            data: [...this.paymentData],
+          };
+
           this.cdr.detectChanges();
-          this.reloadEvent.emit(true); // Reload only if data is available
+          this.reloadEvent.emit(true);
         },
         error: () => {
           this.showAlert({
@@ -138,7 +137,6 @@ export class PaymentInformationComponent
 
   // 🔹 Edit Payment Info
   edit(id: any): void {
-    console.log('🔹 Event received in edit:', id, 'Type:', typeof id);
     const foundItem = this.paymentData.find((item) => item.id === id);
     this.paymentInfoModel = foundItem
       ? { ...foundItem }
@@ -188,9 +186,16 @@ export class PaymentInformationComponent
             const index = this.paymentData.findIndex(
               (item) => item.id === updatedInfo.id
             );
-            if (index > -1) this.paymentData[index] = updatedInfo;
+            if (index > -1) this.paymentData[index] = { ...updatedInfo };
 
             this.showAlert(successAlert);
+
+            this.datatableConfig = {
+              ...this.datatableConfig,
+              data: [...this.paymentData],
+            };
+
+            this.cdr.detectChanges();
             this.reloadEvent.emit(true);
           },
           error: (error) => {
@@ -239,6 +244,13 @@ export class PaymentInformationComponent
     };
     this.cdr.detectChanges();
     this.noticeSwal.fire();
+  }
+
+  hasEditPermission(): boolean {
+    return this.permissionService.hasPermission(
+      'personal-profile/my-profile',
+      Permission.EDIT
+    );
   }
 
   ngOnDestroy(): void {
