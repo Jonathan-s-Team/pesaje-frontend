@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { PermissionModel } from 'src/app/modules/auth/models/permission.model';
 
 @Component({
   selector: 'app-sidebar-menu',

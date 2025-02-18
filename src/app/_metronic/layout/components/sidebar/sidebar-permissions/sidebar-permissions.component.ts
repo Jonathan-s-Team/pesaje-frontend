@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { PermissionModel } from 'src/app/modules/auth/models/permission.model';
+import { IPermission } from 'src/app/modules/auth/interfaces/permission.interface';
 
 @Component({
   selector: 'app-sidebar-permissions',
@@ -7,7 +7,7 @@ import { PermissionModel } from 'src/app/modules/auth/models/permission.model';
   styleUrls: ['./sidebar-permissions.component.scss'],
 })
 export class SidebarPermissionsComponent implements OnInit {
-  @Input() menuOptions: PermissionModel[];
+  @Input() menuOptions: IPermission[];
 
   constructor() {}
 

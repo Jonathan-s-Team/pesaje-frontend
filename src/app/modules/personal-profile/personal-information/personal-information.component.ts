@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { UserService } from '../services/user.service';
 import { UserModel } from '../../auth';
 import { PermissionService } from 'src/app/shared/services/permission.service';
-import { Permission } from '../../auth/models/permission.model';
+import { PermissionEnum } from '../../auth/interfaces/permission.interface';
 
 @Component({
   selector: 'app-personal-information',
@@ -28,7 +28,7 @@ export class PersonalInformationComponent implements OnInit {
   hasEditPermission(): boolean {
     return this.permissionService.hasPermission(
       'personal-profile/my-profile',
-      Permission.EDIT
+      PermissionEnum.EDIT
     );
   }
 }

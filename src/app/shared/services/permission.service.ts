@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from 'src/app/modules/auth';
 import {
-  Permission,
-  PermissionModel,
-} from 'src/app/modules/auth/models/permission.model';
+  IPermission,
+  PermissionEnum,
+} from 'src/app/modules/auth/interfaces/permission.interface';
 
 @Injectable({
   providedIn: 'root', // ✅ This makes the service available across the entire app
 })
 export class PermissionService {
-  permissions: PermissionModel[];
+  permissions: IPermission[];
 
   constructor(private authService: AuthService) {
     this.permissions = this.authService.currentUserValue?.permissions || [];
@@ -18,7 +18,7 @@ export class PermissionService {
   /**
    * Checks if the user has a specific action for a given route.
    */
-  hasPermission(route: string, action: Permission): boolean {
+  hasPermission(route: string, action: PermissionEnum): boolean {
     return this.permissions.some((permission) =>
       permission.suboptions?.some(
         (suboption) =>

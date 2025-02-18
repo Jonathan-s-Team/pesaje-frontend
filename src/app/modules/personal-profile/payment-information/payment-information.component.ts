@@ -12,11 +12,11 @@ import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { Observable, Subscription } from 'rxjs';
 import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
-import { PaymentInfoModel } from '../../../shared/models/paymentInfo.model';
 import { PaymentInfoService } from '../services/payment-info.service';
 import { UserService } from '../services/user.service';
 import { PermissionService } from 'src/app/shared/services/permission.service';
-import { Permission } from '../../auth/models/permission.model';
+import { IPaymentInfo } from 'src/app/shared/interfaces/payment-info.interface';
+import { PermissionEnum } from '../../auth/interfaces/permission.interface';
 
 @Component({
   selector: 'app-payment-information',
@@ -28,8 +28,8 @@ export class PaymentInformationComponent
   isLoading = false;
   private subscriptions: Subscription[] = [];
 
-  paymentData: PaymentInfoModel[] = [];
-  paymentInfoModel: PaymentInfoModel = {} as PaymentInfoModel;
+  paymentData: IPaymentInfo[] = [];
+  paymentInfo: IPaymentInfo = {} as IPaymentInfo;
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
   personId!: string;
 
@@ -138,14 +138,12 @@ export class PaymentInformationComponent
   // 🔹 Edit Payment Info
   edit(id: any): void {
     const foundItem = this.paymentData.find((item) => item.id === id);
-    this.paymentInfoModel = foundItem
-      ? { ...foundItem }
-      : ({} as PaymentInfoModel);
+    this.paymentInfo = foundItem ? { ...foundItem } : ({} as IPaymentInfo);
   }
 
   // 🔹 Create a new Payment Info
   create(): void {
-    this.paymentInfoModel = {} as PaymentInfoModel;
+    this.paymentInfo = {} as IPaymentInfo;
   }
 
   // 🔹 Handle Form Submission
@@ -156,14 +154,14 @@ export class PaymentInformationComponent
 
     if (!this.personId) return;
 
-    this.paymentInfoModel.personId = this.personId;
+    this.paymentInfo.personId = this.personId;
 
     this.isLoading = true;
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: '¡Éxito!',
-      text: this.paymentInfoModel.id
+      text: this.paymentInfo.id
         ? 'Información de pago actualizada correctamente.'
         : 'Información de pago creada correctamente.',
     };
@@ -180,7 +178,7 @@ export class PaymentInformationComponent
 
     const updateFn = () => {
       this.paymentInfoService
-        .updatePaymentInfo(this.paymentInfoModel.id, this.paymentInfoModel)
+        .updatePaymentInfo(this.paymentInfo.id, this.paymentInfo)
         .subscribe({
           next: (updatedInfo) => {
             const index = this.paymentData.findIndex(
@@ -208,23 +206,21 @@ export class PaymentInformationComponent
     };
 
     const createFn = () => {
-      this.paymentInfoService
-        .createPaymentInfo(this.paymentInfoModel)
-        .subscribe({
-          next: () => {
-            this.showAlert(successAlert);
-            this.loadPaymentInfos(); // ✅ Reload the list after creation
-          },
-          error: (error) => {
-            errorAlert.text = 'No se pudo crear la información de pago.';
-            this.showAlert(errorAlert);
-            this.isLoading = false;
-          },
-          complete: completeFn,
-        });
+      this.paymentInfoService.createPaymentInfo(this.paymentInfo).subscribe({
+        next: () => {
+          this.showAlert(successAlert);
+          this.loadPaymentInfos(); // ✅ Reload the list after creation
+        },
+        error: (error) => {
+          errorAlert.text = 'No se pudo crear la información de pago.';
+          this.showAlert(errorAlert);
+          this.isLoading = false;
+        },
+        complete: completeFn,
+      });
     };
 
-    if (this.paymentInfoModel.id) {
+    if (this.paymentInfo.id) {
       updateFn();
     } else {
       createFn();
@@ -249,7 +245,7 @@ export class PaymentInformationComponent
   hasEditPermission(): boolean {
     return this.permissionService.hasPermission(
       'personal-profile/my-profile',
-      Permission.EDIT
+      PermissionEnum.EDIT
     );
   }
 

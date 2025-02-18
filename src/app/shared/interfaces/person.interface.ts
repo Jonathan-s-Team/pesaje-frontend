@@ -1,4 +1,4 @@
-export interface PersonModel {
+export interface IPerson {
   id: string;
   photo?: string;
   names: string;

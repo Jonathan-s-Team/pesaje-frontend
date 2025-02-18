@@ -1,6 +1,6 @@
-import { PersonModel } from './person.model';
+import { IPerson } from './person.interface';
 
-export interface PaymentInfoModel {
+export interface IPaymentInfo {
   id: string;
   bankName: string;
   accountName: string;
@@ -8,7 +8,7 @@ export interface PaymentInfoModel {
   identification: string;
   mobilePhone: string;
   email: string;
-  person: PersonModel;
+  person: IPerson;
   personId: string;
   deletedAt?: Date;
 }

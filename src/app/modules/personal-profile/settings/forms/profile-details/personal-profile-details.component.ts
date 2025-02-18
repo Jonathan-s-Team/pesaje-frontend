@@ -1,17 +1,16 @@
-import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
-import {BehaviorSubject, Subscription} from 'rxjs';
-import {UserService} from "../../../services/user.service";
-import {UserModel} from 'src/app/modules/auth';
-import {ViewChild} from '@angular/core';
-import {NgForm} from '@angular/forms';
-import {UpdateUserDTO} from "../../../interface/UpdateUserDTO";
-import Swal, {SweetAlertOptions} from "sweetalert2";
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { BehaviorSubject, Subscription } from 'rxjs';
+import { UserService } from '../../../services/user.service';
+import { UserModel } from 'src/app/modules/auth';
+import { ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import Swal, { SweetAlertOptions } from 'sweetalert2';
+import { IUpdateUser } from '../../../interfaces/user.interface';
 
 @Component({
   selector: 'app-personal-profile-details',
   templateUrl: './personal-profile-details.component.html',
 })
-
 export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
   @ViewChild('profileForm') profileForm!: NgForm;
   user: UserModel | undefined = undefined;
@@ -19,7 +18,10 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
   isLoading: boolean;
   private unsubscribe: Subscription[] = [];
 
-  constructor(private cdr: ChangeDetectorRef, private userService: UserService) {
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private userService: UserService
+  ) {
     const loadingSubscr = this.isLoading$
       .asObservable()
       .subscribe((res) => (this.isLoading = res));
@@ -27,7 +29,7 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const userSub = this.userService.user$.subscribe(user => {
+    const userSub = this.userService.user$.subscribe((user) => {
       this.user = user;
     });
     this.unsubscribe.push(userSub);
@@ -40,10 +42,10 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
 
     this.isLoading$.next(true);
 
-    const payload: UpdateUserDTO = {
+    const payload: IUpdateUser = {
       username: this.user.username,
       password: this.user.password,
-      roles: this.user.roles?.map(role => role.id),
+      roles: this.user.roles?.map((role) => role.id),
       person: {
         names: this.user.person.names,
         lastNames: this.user.person.lastNames,
@@ -55,8 +57,8 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
         mobilePhone2: this.user.person.mobilePhone2,
         email: this.user.person.email,
         emergencyContactName: this.user.person.emergencyContactName,
-        emergencyContactPhone: this.user.person.emergencyContactPhone
-      }
+        emergencyContactPhone: this.user.person.emergencyContactPhone,
+      },
     };
     console.log(payload);
     setTimeout(() => {
@@ -76,12 +78,16 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
         console.error('Error actualizando usuario:', error);
         this.cdr.detectChanges();
         this.showErrorAlert(error);
-      }
+      },
     });
   }
 
   private getErrorMessage(error: any) {
-    return error.error?.message || error.message || 'Ocurrió  un error inesperado. Por favor verifique los datos e intente nuevamente.';
+    return (
+      error.error?.message ||
+      error.message ||
+      'Ocurrió  un error inesperado. Por favor verifique los datos e intente nuevamente.'
+    );
   }
 
   private showSuccessAlert() {
@@ -92,7 +98,7 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Aceptar',
       confirmButtonColor: '#3085d6',
       timer: 5000,
-      timerProgressBar: true
+      timerProgressBar: true,
     };
     Swal.fire(options);
   }
@@ -107,7 +113,7 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Entendido',
       confirmButtonColor: '#d33',
       showCloseButton: true,
-      focusConfirm: false
+      focusConfirm: false,
     };
     Swal.fire(options);
   }

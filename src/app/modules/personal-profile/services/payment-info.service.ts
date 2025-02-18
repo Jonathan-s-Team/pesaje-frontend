@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { PaymentInfoModel } from 'src/app/shared/models/paymentInfo.model';
+import { IPaymentInfo } from 'src/app/shared/interfaces/payment-info.interface';
 
 const API_PAYMENT_INFO_URL = `${environment.apiUrl}/payment-info`;
 
@@ -17,7 +17,7 @@ export class PaymentInfoService {
   constructor(private http: HttpClient) {}
 
   createPaymentInfo(
-    paymentInfoData: Partial<PaymentInfoModel>
+    paymentInfoData: Partial<IPaymentInfo>
   ): Observable<{ message: string }> {
     this.isLoadingSubject.next(true);
     return this.http
@@ -25,10 +25,10 @@ export class PaymentInfoService {
       .pipe(finalize(() => this.isLoadingSubject.next(false)));
   }
 
-  getPaymentInfosByPerson(personId: string): Observable<PaymentInfoModel[]> {
+  getPaymentInfosByPerson(personId: string): Observable<IPaymentInfo[]> {
     this.isLoadingSubject.next(true);
     return this.http
-      .get<{ paymentInfos: PaymentInfoModel[] }>(
+      .get<{ paymentInfos: IPaymentInfo[] }>(
         `${API_PAYMENT_INFO_URL}?personId=${personId}`
       )
       .pipe(
@@ -37,10 +37,10 @@ export class PaymentInfoService {
       );
   }
 
-  getPaymentInfoById(id: string): Observable<PaymentInfoModel> {
+  getPaymentInfoById(id: string): Observable<IPaymentInfo> {
     this.isLoadingSubject.next(true);
     return this.http
-      .get<{ paymentInfo: PaymentInfoModel }>(`${API_PAYMENT_INFO_URL}/${id}`)
+      .get<{ paymentInfo: IPaymentInfo }>(`${API_PAYMENT_INFO_URL}/${id}`)
       .pipe(
         map((response) => response.paymentInfo), // ✅ Extract object from response
         finalize(() => this.isLoadingSubject.next(false))
@@ -49,11 +49,11 @@ export class PaymentInfoService {
 
   updatePaymentInfo(
     id: string,
-    updateData: Partial<PaymentInfoModel>
-  ): Observable<PaymentInfoModel> {
+    updateData: Partial<IPaymentInfo>
+  ): Observable<IPaymentInfo> {
     this.isLoadingSubject.next(true);
     return this.http
-      .put<{ updatedPaymentInfo: PaymentInfoModel }>(
+      .put<{ updatedPaymentInfo: IPaymentInfo }>(
         `${API_PAYMENT_INFO_URL}/${id}`,
         updateData
       )

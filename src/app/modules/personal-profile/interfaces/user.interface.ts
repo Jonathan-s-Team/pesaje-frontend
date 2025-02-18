@@ -1,4 +1,4 @@
-export interface UpdateUserDTO {
+export interface IUpdateUser {
   username?: string;
   password?: string;
   roles?: string[];
