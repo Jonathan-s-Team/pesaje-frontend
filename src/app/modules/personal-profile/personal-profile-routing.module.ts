@@ -23,7 +23,7 @@ const routes: Routes = [
   },
   {
     path: 'broker',
-    loadChildren: () => import('./user/broker.module').then((m) => m.BrokerModule),
+    loadChildren: () => import('./broker/broker.module').then((m) => m.BrokerModule),
   },
 ];
 
