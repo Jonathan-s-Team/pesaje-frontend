@@ -117,7 +117,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   renderActionColumn(): void {
     const actionColumn = {
       sortable: false,
-      title: 'Actions',
+      title: 'Acciones',
       render: (data: any, type: any, full: any) => {
         const editButton = `
           <button class="btn btn-icon btn-active-light-primary w-30px h-30px me-3" data-action="edit" data-id="${full.id}">
