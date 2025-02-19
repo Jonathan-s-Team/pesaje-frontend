@@ -19,7 +19,7 @@ export class BrokerListingComponent implements OnInit, AfterViewInit, OnDestroy 
   isCollapsed2 = true;
 
   isLoading = false;
-
+  activeTab: string = 'info';
   users: DataTablesResponse;
 
   datatableConfig: Config = {};

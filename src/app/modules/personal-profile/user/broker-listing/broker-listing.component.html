@@ -43,88 +43,41 @@
       <button type="button" class="btn-close" aria-label="Cerrar" (click)="modal.dismiss('Cross click')"></button>
     </div>
     <div class="modal-body">
-      <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
+      <!-- Tabs Navigation -->
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" [ngClass]="{ 'active': activeTab === 'info' }" (click)="activeTab = 'info'">Información del Bróker</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" [ngClass]="{ 'active': activeTab === 'payment' }" (click)="activeTab = 'payment'">Información de Pago</button>
+        </li>
+      </ul>
 
-        <!-- Información del Bróker (No colapsable) -->
-        <div class="fw-bold fs-3 mb-7">
-          Información del Bróker
-        </div>
-
-        <!-- Foto (Actualmente vacía) -->
-        <div class="fv-row mb-7">
-          <label class="fw-semibold fs-6 mb-2">Foto</label>
-          <input type="text" class="form-control form-control-solid" name="photo" [(ngModel)]="userModel.avatar" readonly/>
-        </div>
-
-        <!-- Nombre -->
-        <div class="fv-row mb-7">
-          <label class="required fw-semibold fs-6 mb-2">Nombre</label>
-          <input type="text" class="form-control form-control-solid" name="names" [(ngModel)]="userModel.name" #names="ngModel" required minlength="2"/>
-          <div *ngIf="myForm.submitted && names.invalid" class="invalid-feedback">
-            <div *ngIf="names.errors?.['required']">El nombre es obligatorio</div>
-            <div *ngIf="names.errors?.['minlength']">El nombre debe tener al menos 2 caracteres</div>
+      <div class="tab-content">
+        <!-- Información del Bróker -->
+        <div class="tab-pane fade" [ngClass]="{ 'show active': activeTab === 'info' }">
+          <div class="fw-bold fs-3 mb-7" style="margin-top: 15px">Información del Bróker</div>
+          <div class="fv-row mb-7">
+            <label class="required fw-semibold fs-6 mb-2">Nombre</label>
+            <input type="text" class="form-control form-control-solid" name="names" [(ngModel)]="userModel.avatar" required minlength="2"/>
+          </div>
+          <div class="fv-row mb-7">
+            <label class="required fw-semibold fs-6 mb-2">Apellidos</label>
+            <input type="text" class="form-control form-control-solid" name="lastNames" [(ngModel)]="userModel.name" required/>
           </div>
         </div>
 
-        <!-- Apellidos -->
-        <div class="fv-row mb-7">
-          <label class="required fw-semibold fs-6 mb-2">Apellidos</label>
-          <input type="text" class="form-control form-control-solid" name="lastNames" [(ngModel)]="userModel.email" #lastNames="ngModel" required/>
-          <div *ngIf="myForm.submitted && lastNames.invalid" class="invalid-feedback">
-            <div *ngIf="lastNames.errors?.['required']">Los apellidos son obligatorios</div>
+        <!-- Información de Pago -->
+        <div class="tab-pane fade" [ngClass]="{ 'show active': activeTab === 'payment' }">
+          <div class="fw-bold fs-3 mb-7" style="margin-top: 15px">Información de Pago</div>
+          <div class="fv-row mb-7">
+            <label class="required fw-semibold fs-6 mb-2">Nombre del Banco</label>
+            <input type="text" class="form-control form-control-solid" name="bankName" [(ngModel)]="userModel.id" required/>
           </div>
-        </div>
-
-        <!-- Identificación -->
-        <div class="fv-row mb-7">
-          <label class="required fw-semibold fs-6 mb-2">Identificación</label>
-          <input type="text" class="form-control form-control-solid" name="identification" [(ngModel)]="userModel.id" #identification="ngModel" required pattern="^[0-9]+$"/>
-          <div *ngIf="myForm.submitted && identification.invalid" class="invalid-feedback">
-            <div *ngIf="identification.errors?.['required']">La identificación es obligatoria</div>
-            <div *ngIf="identification.errors?.['pattern']">La identificación debe contener solo números</div>
+          <div class="fv-row mb-7">
+            <label class="required fw-semibold fs-6 mb-2">Número de Cuenta</label>
+            <input type="text" class="form-control form-control-solid" name="accountNumber" [(ngModel)]="userModel.created_at" required/>
           </div>
-        </div>
-
-        <!-- Fecha de Nacimiento -->
-        <div class="fv-row mb-7">
-          <label class="required fw-semibold fs-6 mb-2">Fecha de Nacimiento</label>
-          <input type="date" class="form-control form-control-solid" name="birthDate" [(ngModel)]="userModel.avatar" #birthDate="ngModel" required/>
-          <div *ngIf="myForm.submitted && birthDate.invalid" class="invalid-feedback">
-            <div *ngIf="birthDate.errors?.['required']">La fecha de nacimiento es obligatoria</div>
-          </div>
-        </div>
-
-        <!-- Dirección -->
-        <div class="fv-row mb-7">
-          <label class="fw-semibold fs-6 mb-2">Dirección</label>
-          <input type="text" class="form-control form-control-solid" name="address" [(ngModel)]="userModel.name"/>
-        </div>
-
-        <!-- Teléfonos -->
-        <div class="fv-row mb-7">
-          <label class="fw-semibold fs-6 mb-2">Teléfono</label>
-          <input type="text" class="form-control form-control-solid" name="phone" [(ngModel)]="userModel.avatar"/>
-        </div>
-
-        <div class="fv-row mb-7">
-          <label class="fw-semibold fs-6 mb-2">Celular</label>
-          <input type="text" class="form-control form-control-solid" name="mobilePhone" [(ngModel)]="userModel.avatar"/>
-        </div>
-
-        <div class="fv-row mb-7">
-          <label class="fw-semibold fs-6 mb-2">Celular Secundario</label>
-          <input type="text" class="form-control form-control-solid" name="mobilePhone2" [(ngModel)]="userModel.avatar"/>
-        </div>
-
-        <!-- Contacto de Emergencia -->
-        <div class="fv-row mb-7">
-          <label class="fw-semibold fs-6 mb-2">Contacto de Emergencia</label>
-          <input type="text" class="form-control form-control-solid" name="emergencyContactName" [(ngModel)]="userModel.avatar" required/>
-        </div>
-
-        <div class="fv-row mb-7">
-          <label class="fw-semibold fs-6 mb-2">Teléfono de Emergencia</label>
-          <input type="text" class="form-control form-control-solid" name="emergencyContactPhone" [(ngModel)]="userModel.avatar" required/>
         </div>
       </div>
     </div>
@@ -137,4 +90,3 @@
     </div>
   </form>
 </ng-template>
-
