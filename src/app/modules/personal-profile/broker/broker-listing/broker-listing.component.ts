@@ -9,17 +9,17 @@ import { IRoleModel, RoleService } from 'src/app/_fake/services/role.service';
 import { Config } from 'datatables.net';
 
 @Component({
-  selector: 'app-user-listing',
-  templateUrl: './user-listing.component.html',
-  styleUrls: ['./user-listing.component.scss']
+  selector: 'app-broker-listing',
+  templateUrl: './broker-listing.component.html',
+  styleUrls: ['./broker-listing.component.scss']
 })
-export class UserListingComponent implements OnInit, AfterViewInit, OnDestroy {
+export class BrokerListingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isCollapsed1 = false;
   isCollapsed2 = true;
 
   isLoading = false;
-
+  activeTab: string = 'info';
   users: DataTablesResponse;
 
   datatableConfig: Config = {};
@@ -47,16 +47,17 @@ export class UserListingComponent implements OnInit, AfterViewInit, OnDestroy {
     this.datatableConfig = {
       serverSide: true,
       ajax: (dataTablesParameters: any, callback) => {
+        debugger;
         this.apiService.getUsers(dataTablesParameters).subscribe(resp => {
           callback(resp);
         });
+        debugger;
       },
       columns: [
         {
-          title: 'Name', data: 'name', render: function (data, type, full) {
+          title: 'Nombre Completo', data: 'name', render: function (data, type, full) {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
-
             const initials = data[0].toUpperCase();
             const symbolLabel = `
               <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
@@ -82,7 +83,7 @@ export class UserListingComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         },
         {
-          title: 'Role', data: 'role', render: function (data, type, row) {
+          title: 'Rol', data: 'role', render: function (data, type, row) {
             const roleName = row.roles[0]?.name;
             return roleName || '';
           },
@@ -91,15 +92,13 @@ export class UserListingComponent implements OnInit, AfterViewInit, OnDestroy {
           type: 'string',
         },
         {
-          title: 'Last Login', data: 'last_login_at', render: (data, type, full) => {
-            const date = data || full.created_at;
-            const dateString = moment(date).fromNow();
-            return `<div class="badge badge-light fw-bold">${dateString}</div>`;
+          title: 'Identificación', data: 'identification', render: function (data) {
+            return data ? data : '-';
           }
         },
         {
-          title: 'Joined Date', data: 'created_at', render: function (data) {
-            return moment(data).format('DD MMM YYYY, hh:mm a');;
+          title: 'Teléfono Celular', data: 'phone', render: function (data) {
+            return data ? data : '-';
           }
         }
       ],

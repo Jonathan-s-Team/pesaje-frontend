@@ -3,11 +3,11 @@ import { ActivatedRoute } from '@angular/router';
 import { IUserModel, UserService } from 'src/app/_fake/services/user-service';
 
 @Component({
-  selector: 'app-user-details',
-  templateUrl: './user-details.component.html',
-  styleUrls: ['./user-details.component.scss']
+  selector: 'app-broker-details',
+  templateUrl: './broker-details.component.html',
+  styleUrls: ['./broker-details.component.scss']
 })
-export class UserDetailsComponent implements OnInit, AfterViewInit {
+export class BrokerDetailsComponent implements OnInit, AfterViewInit {
 
   isCollapsed: boolean;
 

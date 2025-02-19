@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { UserListingComponent } from './user-listing/user-listing.component';
+import { BrokerListingComponent } from './broker-listing/broker-listing.component';
 import { RouterModule } from '@angular/router';
-import { UserDetailsComponent } from './user-details/user-details.component';
+import { BrokerDetailsComponent } from './broker-details/broker-details.component';
 import { CrudModule } from 'src/app/modules/crud/crud.module';
 import { SharedModule } from 'src/app/_metronic/shared/shared.module';
 import { NgbCollapseModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
@@ -12,7 +12,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 
 @NgModule({
-  declarations: [UserListingComponent, UserDetailsComponent],
+  declarations: [BrokerListingComponent, BrokerDetailsComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -20,11 +20,11 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     RouterModule.forChild([
       {
         path: '',
-        component: UserListingComponent,
+        component: BrokerListingComponent,
       },
       {
         path: ':id',
-        component: UserDetailsComponent,
+        component: BrokerDetailsComponent,
       },
     ]),
     CrudModule,
@@ -36,4 +36,4 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     SweetAlert2Module.forChild(),
   ]
 })
-export class UserModule { }
+export class BrokerModule { }

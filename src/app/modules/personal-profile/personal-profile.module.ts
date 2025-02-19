@@ -6,7 +6,7 @@ import {CardsModule, DropdownMenusModule, WidgetsModule} from "../../_metronic/p
 import {SharedModule} from "../../_metronic/shared/shared.module";
 import {PersonalInformationComponent} from "./personal-information/personal-information.component";
 import {InlineSVGModule} from "ng-inline-svg-2";
-import {PersonalProfileDetailsComponent} from "./settings/forms/profile-details/personal-profile-details.component";
+import {PersonalProfileDetailsComponent} from "./personal-information/forms/profile-details/personal-profile-details.component";
 import {AccountModule} from "../account/account.module";
 import {FormsModule} from "@angular/forms";
 import {PaymentInformationComponent} from "./payment-information/payment-information.component";

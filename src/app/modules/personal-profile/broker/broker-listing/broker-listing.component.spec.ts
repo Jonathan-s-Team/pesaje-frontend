@@ -1,14 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UserListingComponent } from './user-listing.component';
+import { BrokerListingComponent } from './broker-listing.component';
 
 describe('UserListingComponent', () => {
-  let component: UserListingComponent;
-  let fixture: ComponentFixture<UserListingComponent>;
+  let component: BrokerListingComponent;
+  let fixture: ComponentFixture<BrokerListingComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [UserListingComponent]
+      declarations: [BrokerListingComponent]
     });
     fixture = TestBed.createComponent(v);
     component = fixture.componentInstance;
