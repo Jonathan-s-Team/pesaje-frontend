@@ -64,7 +64,6 @@ export class BrokerListingComponent implements OnInit, AfterViewInit, OnDestroy 
                     next: (brokers) => {
                         this.isLoading = false;
                         this.brokers = brokers ?? [];
-debugger;
                         if (this.brokers.length === 0) {
                             this.swalOptions = {
                                 icon: 'info',
