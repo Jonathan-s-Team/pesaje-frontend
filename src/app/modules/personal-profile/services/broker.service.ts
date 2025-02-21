@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import {IPerson} from "../../../shared/interfaces/person.interface";
 
-const API_BROKER_URL = `${environment.apiUrl}/api/broker`;
+const API_BROKER_URL = `${environment.apiUrl}/broker`;
 
-interface IBroker {
+export interface IBroker {
   person: {
     photo: string;
     names: string;
@@ -38,12 +39,12 @@ export class BrokerService {
       .pipe(finalize(() => this.isLoadingSubject.next(false)));
   }
 
-  getBrokersByUser(userId: string): Observable<IBroker[]> {
+  getBrokersByUser(userId: string): Observable<IPerson[]> {
     this.isLoadingSubject.next(true);
     return this.http
-      .get<{ brokers: IBroker[] }>(`${API_BROKER_URL}?userId=${userId}`)
+      .get<{ok: boolean, data: IPerson[] }>(`${API_BROKER_URL}?userId=${userId}`)
       .pipe(
-        map((response) => response.brokers),
+        map((response) => response.data || []),
         finalize(() => this.isLoadingSubject.next(false))
       );
   }

@@ -57,36 +57,106 @@
         <!-- Información del Bróker -->
         <div class="tab-pane fade" [ngClass]="{ 'show active': activeTab === 'info' }">
           <div class="fw-bold fs-3 mb-7" style="margin-top: 15px">Información del Bróker</div>
-          <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Nombre</label>
-            <input type="text" class="form-control form-control-solid" name="names" [(ngModel)]="userModel.avatar" required minlength="2"/>
-          </div>
-          <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Apellidos</label>
-            <input type="text" class="form-control form-control-solid" name="lastNames" [(ngModel)]="userModel.name" required/>
-          </div>
+            <form #createBrokerForm="ngForm" (ngSubmit)="onSubmit($event, createBrokerForm)">
+                <div class="mb-3">
+                    <label for="names" class="required fw-semibold fs-6 mb-2">Nombres</label>
+                    <input type="text" class="form-control" id="names" name="names" [(ngModel)]="brokerModel.person.names" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="lastNames" class="required fw-semibold fs-6 mb-2">Apellidos</label>
+                    <input type="text" class="form-control" id="lastNames" name="lastNames" [(ngModel)]="brokerModel.person.lastNames" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="identification" class="required fw-semibold fs-6 mb-2">Identificación</label>
+                    <input type="text" class="form-control" id="identification" name="identification" [(ngModel)]="brokerModel.person.identification" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="birthDate" class="required fw-semibold fs-6 mb-2">Fecha de Nacimiento</label>
+                    <input type="date" class="form-control" id="birthDate" name="birthDate" [(ngModel)]="brokerModel.person.birthDate" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="address" class="required fw-semibold fs-6 mb-2">Dirección</label>
+                    <input type="text" class="form-control" id="address" name="address" [(ngModel)]="brokerModel.person.address" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="phone" class="required fw-semibold fs-6 mb-2">Teléfono</label>
+                    <input type="text" class="form-control" id="phone" name="phone" [(ngModel)]="brokerModel.person.phone">
+                </div>
+
+                <div class="mb-3">
+                    <label for="mobilePhone" class="required fw-semibold fs-6 mb-2">Teléfono Celular</label>
+                    <input type="text" class="form-control" id="mobilePhone" name="mobilePhone" [(ngModel)]="brokerModel.person.mobilePhone" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="mobilePhone2" class="required fw-semibold fs-6 mb-2">Teléfono Celular Secundario</label>
+                    <input type="text" class="form-control" id="mobilePhone2" name="mobilePhone2" [(ngModel)]="brokerModel.person.mobilePhone2">
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="required fw-semibold fs-6 mb-2">Correo Electrónico</label>
+                    <input type="email" class="form-control" id="email" name="email" [(ngModel)]="brokerModel.person.email" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="emergencyContactName" class="required fw-semibold fs-6 mb-2">Contacto de Emergencia</label>
+                    <input type="text" class="form-control" id="emergencyContactName" name="emergencyContactName" [(ngModel)]="brokerModel.person.emergencyContactName">
+                </div>
+
+                <div class="mb-3">
+                    <label for="emergencyContactPhone" class="required fw-semibold fs-6 mb-2">Teléfono de Emergencia</label>
+                    <input type="text" class="form-control form-control-solid" id="emergencyContactPhone" name="emergencyContactPhone" [(ngModel)]="brokerModel.person.emergencyContactPhone" required>
+                </div>
+            </form>
         </div>
 
         <!-- Información de Pago -->
-        <div class="tab-pane fade" [ngClass]="{ 'show active': activeTab === 'payment' }">
-          <div class="fw-bold fs-3 mb-7" style="margin-top: 15px">Información de Pago</div>
-          <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Nombre del Banco</label>
-            <input type="text" class="form-control form-control-solid" name="bankName" [(ngModel)]="userModel.id" required/>
+          <div class="tab-pane fade" [ngClass]="{ 'show active': activeTab === 'payment' }">
+              <div class="fw-bold fs-3 mb-7" style="margin-top: 15px">Información de Pago</div>
+
+              <div class="fv-row mb-7">
+                  <label class="required fw-semibold fs-6 mb-2">Nombre del Banco</label>
+                  <input type="text" class="form-control form-control-solid" name="bankName" [(ngModel)]="paymentInfoModel.bankName" required/>
+              </div>
+
+              <div class="fv-row mb-7">
+                  <label class="required fw-semibold fs-6 mb-2">Nombre en la Cuenta</label>
+                  <input type="text" class="form-control form-control-solid" name="accountName" [(ngModel)]="paymentInfoModel.accountName" required/>
+              </div>
+
+              <div class="fv-row mb-7">
+                  <label class="required fw-semibold fs-6 mb-2">Número de Cuenta</label>
+                  <input type="text" class="form-control form-control-solid" name="accountNumber" [(ngModel)]="paymentInfoModel.accountNumber" required/>
+              </div>
+
+              <div class="fv-row mb-7">
+                  <label class="required fw-semibold fs-6 mb-2">Identificación</label>
+                  <input type="text" class="form-control form-control-solid" name="identification" [(ngModel)]="paymentInfoModel.identification" required/>
+              </div>
+
+              <div class="fv-row mb-7">
+                  <label class="required fw-semibold fs-6 mb-2">Teléfono Móvil</label>
+                  <input type="text" class="form-control form-control-solid" name="mobilePhone" [(ngModel)]="paymentInfoModel.mobilePhone" required/>
+              </div>
+
+              <div class="fv-row mb-7">
+                  <label class="required fw-semibold fs-6 mb-2">Correo Electrónico</label>
+                  <input type="email" class="form-control form-control-solid" name="email" [(ngModel)]="paymentInfoModel.email" required/>
+              </div>
           </div>
-          <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Número de Cuenta</label>
-            <input type="text" class="form-control form-control-solid" name="accountNumber" [(ngModel)]="userModel.created_at" required/>
-          </div>
-        </div>
       </div>
     </div>
-    <div class="modal-footer flex-center">
-      <button type="reset" class="btn btn-light me-3" (click)="modal.dismiss('cancel')">Descartar</button>
-      <button type="submit" class="btn btn-primary" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
-        <span class="indicator-label">Enviar</span>
-        <span class="indicator-progress">Por favor, espera... <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
-      </button>
-    </div>
+      <div class="modal-footer flex-center">
+          <button type="reset" class="btn btn-light me-3" (click)="modal.dismiss('cancel')">Descartar</button>
+          <button type="submit" class="btn btn-primary" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+              <span class="indicator-label">Enviar</span>
+              <span class="indicator-progress">Por favor, espera... <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+          </button>
+      </div>
   </form>
 </ng-template>
