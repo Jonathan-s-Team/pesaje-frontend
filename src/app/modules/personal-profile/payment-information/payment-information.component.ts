@@ -14,9 +14,8 @@ import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
 import { PaymentInfoService } from '../services/payment-info.service';
 import { UserService } from '../services/user.service';
-import { PermissionService } from 'src/app/shared/services/permission.service';
-import { IPaymentInfo } from 'src/app/shared/interfaces/payment-info.interface';
-import { PermissionEnum } from '../../auth/interfaces/permission.interface';
+import { IPaymentInfoModel } from 'src/app/shared/interfaces/payment-info.interface';
+import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 
 @Component({
   selector: 'app-payment-information',
@@ -25,11 +24,13 @@ import { PermissionEnum } from '../../auth/interfaces/permission.interface';
 export class PaymentInformationComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
+  PERMISSION_ROUTES = PERMISSION_ROUTES;
+
   isLoading = false;
   private subscriptions: Subscription[] = [];
 
-  paymentData: IPaymentInfo[] = [];
-  paymentInfo: IPaymentInfo = {} as IPaymentInfo;
+  paymentData: IPaymentInfoModel[] = [];
+  paymentInfo: IPaymentInfoModel = {} as IPaymentInfoModel;
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
   personId!: string;
 
@@ -72,7 +73,6 @@ export class PaymentInformationComponent
   constructor(
     private paymentInfoService: PaymentInfoService,
     private userService: UserService,
-    private permissionService: PermissionService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -138,12 +138,12 @@ export class PaymentInformationComponent
   // 🔹 Edit Payment Info
   edit(id: any): void {
     const foundItem = this.paymentData.find((item) => item.id === id);
-    this.paymentInfo = foundItem ? { ...foundItem } : ({} as IPaymentInfo);
+    this.paymentInfo = foundItem ? { ...foundItem } : ({} as IPaymentInfoModel);
   }
 
   // 🔹 Create a new Payment Info
   create(): void {
-    this.paymentInfo = {} as IPaymentInfo;
+    this.paymentInfo = {} as IPaymentInfoModel;
   }
 
   // 🔹 Handle Form Submission
@@ -240,13 +240,6 @@ export class PaymentInformationComponent
     };
     this.cdr.detectChanges();
     this.noticeSwal.fire();
-  }
-
-  hasEditPermission(): boolean {
-    return this.permissionService.hasPermission(
-      'personal-profile/my-profile',
-      PermissionEnum.EDIT
-    );
   }
 
   ngOnDestroy(): void {

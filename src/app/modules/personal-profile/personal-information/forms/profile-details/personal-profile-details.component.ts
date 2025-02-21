@@ -5,7 +5,7 @@ import { UserModel } from 'src/app/modules/auth';
 import { ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
-import { IUpdateUser } from '../../../interfaces/user.interface';
+import { IUpdateUserModel } from '../../../interfaces/user.interface';
 
 @Component({
   selector: 'app-personal-profile-details',
@@ -42,7 +42,7 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
 
     this.isLoading$.next(true);
 
-    const payload: IUpdateUser = {
+    const payload: IUpdateUserModel = {
       username: this.user.username,
       password: this.user.password,
       roles: this.user.roles?.map((role) => role.id),

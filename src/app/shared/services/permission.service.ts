@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from 'src/app/modules/auth';
 import {
-  IPermission,
+  IPermissionModel,
   PermissionEnum,
 } from 'src/app/modules/auth/interfaces/permission.interface';
 
@@ -9,7 +9,7 @@ import {
   providedIn: 'root', // ✅ This makes the service available across the entire app
 })
 export class PermissionService {
-  permissions: IPermission[];
+  permissions: IPermissionModel[];
 
   constructor(private authService: AuthService) {
     this.permissions = this.authService.currentUserValue?.permissions || [];
@@ -25,5 +25,17 @@ export class PermissionService {
           suboption.route === route && suboption.actions.includes(action)
       )
     );
+  }
+
+  canCreate(route: string): boolean {
+    return this.hasPermission(route, PermissionEnum.ADD);
+  }
+
+  canEdit(route: string): boolean {
+    return this.hasPermission(route, PermissionEnum.EDIT);
+  }
+
+  canDelete(route: string): boolean {
+    return this.hasPermission(route, PermissionEnum.DELETE);
   }
 }

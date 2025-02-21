@@ -1,11 +1,11 @@
-export interface IPermission {
+export interface IPermissionModel {
   id: string;
   name: string;
   parentOption?: string;
   route?: string;
   icon?: string;
   actions: PermissionEnum[];
-  suboptions: IPermission[];
+  suboptions: IPermissionModel[];
 }
 
 export enum PermissionEnum {

@@ -1,9 +1,9 @@
 import { AuthModel } from './auth.model';
 import { AddressModel } from './address.model';
 import { SocialNetworksModel } from './social-networks.model';
-import { IPerson } from 'src/app/shared/interfaces/person.interface';
-import { IRole } from '../interfaces/role.interface';
-import { IPermission } from '../interfaces/permission.interface';
+import { IPersonModel } from 'src/app/shared/interfaces/person.interface';
+import { IRoleModel } from '../interfaces/role.interface';
+import { IPermissionModel } from '../interfaces/permission.interface';
 
 export class UserModel extends AuthModel {
   id: string;
@@ -12,7 +12,7 @@ export class UserModel extends AuthModel {
   fullname: string;
   email: string;
   pic: string;
-  roles: IRole[] = [];
+  roles: IRoleModel[] = [];
   occupation: string;
   companyName: string;
   phone: string;
@@ -30,8 +30,8 @@ export class UserModel extends AuthModel {
     sms: boolean;
     phone: boolean;
   };
-  permissions: IPermission[];
-  person: IPerson;
+  permissions: IPermissionModel[];
+  person: IPersonModel;
   // email settings
   emailSettings?: {
     emailNotification: boolean;

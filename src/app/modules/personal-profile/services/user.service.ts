@@ -4,7 +4,7 @@ import { BehaviorSubject, finalize, map, Observable, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { UserModel } from '../../auth/models/user.model';
 import { AuthService } from '../../auth';
-import { IUpdateUser } from '../interfaces/user.interface';
+import { IUpdateUserModel } from '../interfaces/user.interface';
 
 const API_USERS_URL = `${environment.apiUrl}/user`;
 
@@ -56,7 +56,7 @@ export class UserService {
   //   );
   // }
 
-  updateUser(id: string, userData: IUpdateUser): Observable<UserModel> {
+  updateUser(id: string, userData: IUpdateUserModel): Observable<UserModel> {
     this.isLoadingSubject.next(true);
     return this.http
       .put<{ updatedUser: UserModel }>(`${API_USERS_URL}/${id}`, userData)

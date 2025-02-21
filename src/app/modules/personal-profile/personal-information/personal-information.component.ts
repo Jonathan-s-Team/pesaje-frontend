@@ -1,14 +1,15 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { UserService } from '../services/user.service';
 import { UserModel } from '../../auth';
-import { PermissionService } from 'src/app/shared/services/permission.service';
-import { PermissionEnum } from '../../auth/interfaces/permission.interface';
+import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 
 @Component({
   selector: 'app-personal-information',
   templateUrl: './personal-information.component.html',
 })
 export class PersonalInformationComponent implements OnInit {
+  PERMISSION_ROUTES = PERMISSION_ROUTES;
+
   isEditing = false;
   user: UserModel | undefined;
 
@@ -16,19 +17,9 @@ export class PersonalInformationComponent implements OnInit {
     this.isEditing = !this.isEditing;
   }
 
-  constructor(
-    private userService: UserService,
-    private permissionService: PermissionService
-  ) {}
+  constructor(private userService: UserService) {}
 
   ngOnInit() {
     this.user = this.userService.user;
-  }
-
-  hasEditPermission(): boolean {
-    return this.permissionService.hasPermission(
-      'personal-profile/my-profile',
-      PermissionEnum.EDIT
-    );
   }
 }
