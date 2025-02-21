@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import {IPerson} from "../../../shared/interfaces/person.interface";
+import { IPersonModel } from '../../../shared/interfaces/person.interface';
 
 const API_BROKER_URL = `${environment.apiUrl}/broker`;
 
@@ -39,10 +39,12 @@ export class BrokerService {
       .pipe(finalize(() => this.isLoadingSubject.next(false)));
   }
 
-  getBrokersByUser(userId: string): Observable<IPerson[]> {
+  getBrokersByUser(userId: string): Observable<IPersonModel[]> {
     this.isLoadingSubject.next(true);
     return this.http
-      .get<{ok: boolean, data: IPerson[] }>(`${API_BROKER_URL}?userId=${userId}`)
+      .get<{ ok: boolean; data: IPersonModel[] }>(
+        `${API_BROKER_URL}?userId=${userId}`
+      )
       .pipe(
         map((response) => response.data || []),
         finalize(() => this.isLoadingSubject.next(false))
@@ -51,12 +53,10 @@ export class BrokerService {
 
   getBrokerById(id: string): Observable<IBroker> {
     this.isLoadingSubject.next(true);
-    return this.http
-      .get<{ broker: IBroker }>(`${API_BROKER_URL}/${id}`)
-      .pipe(
-        map((response) => response.broker),
-        finalize(() => this.isLoadingSubject.next(false))
-      );
+    return this.http.get<{ broker: IBroker }>(`${API_BROKER_URL}/${id}`).pipe(
+      map((response) => response.broker),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
   }
 
   updateBroker(id: string, updateData: Partial<IBroker>): Observable<IBroker> {
