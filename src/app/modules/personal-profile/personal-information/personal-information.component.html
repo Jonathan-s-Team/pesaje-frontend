@@ -3,7 +3,8 @@
     <div class="card-title m-0">
       <h3 class="fw-bolder m-0">Detalles de Perfil</h3>
     </div>
-    <button *ngIf="hasEditPermission()" (click)="toggleEditMode()" class="btn align-self-center cursor-pointer" [ngClass]="isEditing ? 'btn-danger' : 'btn-primary' ">
+    <button *appCanEdit="PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE" (click)="toggleEditMode()"
+      class="btn align-self-center cursor-pointer" [ngClass]="isEditing ? 'btn-danger' : 'btn-primary' ">
       {{ isEditing ? 'Cancelar' : 'Editar Perfil' }}
     </button>
   </div>

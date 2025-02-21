@@ -1,18 +1,27 @@
-import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {MyProfileComponent} from './my-profile.component';
-import {PersonalProfileRoutingModule} from './personal-profile-routing.module';
-import {CardsModule, DropdownMenusModule, WidgetsModule} from "../../_metronic/partials";
-import {SharedModule} from "../../_metronic/shared/shared.module";
-import {PersonalInformationComponent} from "./personal-information/personal-information.component";
-import {InlineSVGModule} from "ng-inline-svg-2";
-import {PersonalProfileDetailsComponent} from "./personal-information/forms/profile-details/personal-profile-details.component";
-import {AccountModule} from "../account/account.module";
-import {FormsModule} from "@angular/forms";
-import {PaymentInformationComponent} from "./payment-information/payment-information.component";
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MyProfileComponent } from './my-profile.component';
+import { PersonalProfileRoutingModule } from './personal-profile-routing.module';
+import {
+  CardsModule,
+  DropdownMenusModule,
+  WidgetsModule,
+} from '../../_metronic/partials';
+import { SharedModule as SharedModuleMetronic } from '../../_metronic/shared/shared.module';
+import { PersonalInformationComponent } from './personal-information/personal-information.component';
+import { InlineSVGModule } from 'ng-inline-svg-2';
+import {PersonalProfileDetailsComponent} from "./personal-information/forms/profile-details/personal-profile-details.component";import { AccountModule } from '../account/account.module';
+import { FormsModule } from '@angular/forms';
+import { PaymentInformationComponent } from './payment-information/payment-information.component';
 import { CrudModule } from 'src/app/modules/crud/crud.module';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { NgbCollapseModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbCollapseModule,
+  NgbDropdownModule,
+  NgbNavModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -20,15 +29,16 @@ import { NgbCollapseModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule } 
     PersonalInformationComponent,
     PaymentInformationComponent,
     PersonalProfileDetailsComponent,
-    ],
+  ],
   imports: [
     CommonModule,
+    SharedModule,
     PersonalProfileRoutingModule,
     InlineSVGModule,
     DropdownMenusModule,
     WidgetsModule,
     CardsModule,
-    SharedModule,
+    SharedModuleMetronic,
     AccountModule,
     FormsModule,
     CrudModule,
@@ -39,5 +49,4 @@ import { NgbCollapseModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule } 
     NgbTooltipModule,
   ],
 })
-export class PersonalProfileModule {
-}
+export class PersonalProfileModule {}

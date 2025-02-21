@@ -1,4 +1,4 @@
-export interface IUpdateUser {
+export interface IUpdateUserModel {
   username?: string;
   password?: string;
   roles?: string[];

@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { ILayout, LayoutType } from '../../core/configs/config';
 import { LayoutService } from '../../core/layout.service';
 import { AuthService } from 'src/app/modules/auth';
-import { IPermission } from 'src/app/modules/auth/interfaces/permission.interface';
+import { IPermissionModel } from 'src/app/modules/auth/interfaces/permission.interface';
 
 @Component({
   selector: 'app-sidebar',
@@ -40,7 +40,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   toggleType: string;
   toggleState: string;
 
-  menuData: IPermission[] = [];
+  menuData: IPermissionModel[] = [];
 
   constructor(
     private layout: LayoutService,
