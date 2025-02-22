@@ -7,21 +7,21 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { Observable } from 'rxjs';
+import {NgForm} from '@angular/forms';
+import {SwalComponent} from '@sweetalert2/ngx-sweetalert2';
+import {Observable} from 'rxjs';
 import {
   DataTablesResponse,
   IUserModel,
   UserService,
 } from 'src/app/_fake/services/user-service';
-import { SweetAlertOptions } from 'sweetalert2';
-import { Config } from 'datatables.net';
-import { BrokerService, IBroker } from '../../services/broker.service';
-import { IPersonModel } from '../../../../shared/interfaces/person.interface';
-import { AuthService } from '../../../auth';
-import { PaymentInfoService } from '../../services/payment-info.service';
-import { IPaymentInfoModel } from '../../../../shared/interfaces/payment-info.interface';
+import {SweetAlertOptions} from 'sweetalert2';
+import {Config} from 'datatables.net';
+import {BrokerService, IBroker} from '../../services/broker.service';
+import {IPersonModel} from '../../../../shared/interfaces/person.interface';
+import {AuthService} from '../../../auth';
+import {PaymentInfoService} from '../../services/payment-info.service';
+import {IPaymentInfoModel} from '../../../../shared/interfaces/payment-info.interface';
 
 @Component({
   selector: 'app-broker-listing',
@@ -29,9 +29,9 @@ import { IPaymentInfoModel } from '../../../../shared/interfaces/payment-info.in
   styleUrls: ['./broker-listing.component.scss'],
 })
 export class BrokerListingComponent
-  implements OnInit, AfterViewInit, OnDestroy
-{
+  implements OnInit, AfterViewInit, OnDestroy {
   isLoading = false;
+  isEditing = false;
   activeTab: string = 'info';
   users: DataTablesResponse;
 
@@ -39,14 +39,58 @@ export class BrokerListingComponent
 
   // Reload emitter inside datatable
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
-  brokerModel: IBroker;
-  paymentInfoModel: IPaymentInfoModel;
+  brokerModel: IBroker = {
+    deletedAt:'',
+    id: '',
+    person: {
+      photo: '',
+      names: '',
+      lastNames: '',
+      identification: '',
+      birthDate: '',
+      address: '',
+      phone: '',
+      mobilePhone: '',
+      mobilePhone2: '',
+      email: '',
+      emergencyContactName: '',
+      emergencyContactPhone: ''
+    },
+    buyerItBelongs: {
+      id: '',
+      fullName: ''
+    }
+  };
+
+  paymentInfoModel: IPaymentInfoModel = {
+    id: '',
+    bankName: '',
+    accountName: '',
+    accountNumber: '',
+    identification: '',
+    mobilePhone: '',
+    email: '',
+    person: {
+      id: '',
+      names: '',
+      lastNames: '',
+      identification: '',
+      birthDate: new Date(),
+      address: '',
+      phone: '',
+      mobilePhone: '',
+      email: '',
+      emergencyContactName: '',
+      emergencyContactPhone: ''
+    },
+    personId: '',
+    deletedAt: undefined
+  };
 
   brokers: IPersonModel[] = [];
 
   // Single model
-  aUser: Observable<IUserModel>;
-  userModel: IUserModel = { id: 0, name: '', email: '', role: '' };
+  aBroker: Observable<IBroker>;
 
   @ViewChild('noticeSwal')
   noticeSwal!: SwalComponent;
@@ -55,13 +99,14 @@ export class BrokerListingComponent
 
   constructor(
     private brokerService: BrokerService,
-    private apiService: UserService,
     private cdr: ChangeDetectorRef,
     private authService: AuthService,
     private paymentInfoService: PaymentInfoService
-  ) {}
+  ) {
+  }
 
-  ngAfterViewInit(): void {}
+  ngAfterViewInit(): void {
+  }
 
   ngOnInit(): void {
     const userId = this.authService.currentUserValue!.id;
@@ -73,19 +118,6 @@ export class BrokerListingComponent
           next: (brokers) => {
             this.isLoading = false;
             this.brokers = brokers ?? [];
-            if (this.brokers.length === 0) {
-              this.swalOptions = {
-                icon: 'info',
-                title: 'Sin Brókers',
-                text: 'No se encontraron brókers para este usuario.',
-                confirmButtonText: 'Aceptar',
-                customClass: {
-                  confirmButton: 'btn btn-primary',
-                },
-              };
-              this.cdr.detectChanges();
-              this.noticeSwal.fire();
-            }
 
             callback({
               data: this.brokers,
@@ -132,11 +164,11 @@ export class BrokerListingComponent
 
             const nameAndEmail = `
                 <div class="d-flex flex-column" data-action="view" data-id="${
-                  full.id
-                }">
+              full.id
+            }">
                   <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${
-                    data || 'Sin nombre'
-                  } ${full.person.lastNames || ''}</a>
+              data || 'Sin nombre'
+            } ${full.person.lastNames || ''}</a>
                   <span>${full.person.email || 'Sin correo'}</span>
                 </div>
             `;
@@ -167,33 +199,73 @@ export class BrokerListingComponent
         },
         {
           title: 'Comprador',
-          data: 'buyerItBelongs',
+          data: 'buyerItBelongs.fullName',
           render: function (data) {
             return data ? data : '-';
           },
         },
       ],
+      language: {
+        url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
+      },
       createdRow: function (row, data, dataIndex) {
         $('td:eq(0)', row).addClass('d-flex align-items-center');
       },
     };
   }
 
-  delete(id: number) {
-    this.apiService.deleteUser(id).subscribe(() => {
+  delete(id: string) {
+    this.brokerService.deleteBroker(id).subscribe(() => {
       this.reloadEvent.emit(true);
     });
   }
 
-  edit(id: number) {
-    this.aUser = this.apiService.getUser(id);
-    this.aUser.subscribe((user: IUserModel) => {
-      this.userModel = user;
+  originalBrokerModel: IBroker | null = null;
+  originalPaymentInfoModel: IPaymentInfoModel | null = null;
+
+  hasBrokerChanges(): boolean {
+    return JSON.stringify(this.brokerModel) !== JSON.stringify(this.originalBrokerModel);
+  }
+
+  hasPaymentInfoChanges(): boolean {
+    return JSON.stringify(this.paymentInfoModel) !== JSON.stringify(this.originalPaymentInfoModel);
+  }
+
+  edit(id: string) {
+    this.isEditing = true;
+    this.aBroker = this.brokerService.getBrokerById(id);
+    this.aBroker.subscribe((response: IBroker) => {
+      if (response) {
+        this.brokerModel = response;
+        debugger;
+        this.originalBrokerModel = JSON.parse(JSON.stringify(response));
+
+        if (this.brokerModel.person.birthDate) {
+          this.brokerModel.person.birthDate = this.formatDate(this.brokerModel.person.birthDate);
+        }
+
+        this.paymentInfoService.getPaymentInfosByPerson(this.brokerModel.person.id!).subscribe({
+          next: (paymentInfos) => {
+            if (paymentInfos && paymentInfos.length > 0) {
+              this.paymentInfoModel = paymentInfos[0];
+              this.originalPaymentInfoModel = JSON.parse(JSON.stringify(paymentInfos[0]));
+            }
+          },
+          error: (err) => {
+            console.error('Error al cargar información de pago:', err);
+          }
+        });
+      } else {
+        console.error("No se encontró el bróker o no tiene información de persona.");
+      }
     });
   }
 
   create() {
+    this.isEditing = false;
     this.brokerModel = {
+      deletedAt: '',
+      id: '',
       person: {
         photo: '0',
         names: '',
@@ -208,8 +280,30 @@ export class BrokerListingComponent
         emergencyContactName: '',
         emergencyContactPhone: '',
       },
-      buyerItBelongs: this.authService.currentUserValue!.id,
+      buyerItBelongs: {
+        id: this.authService.currentUserValue!.id,
+        fullName: ''
+      }
     };
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  isPaymentInfoComplete(): boolean {
+    return !!(
+      this.paymentInfoModel.bankName &&
+      this.paymentInfoModel.accountName &&
+      this.paymentInfoModel.accountNumber &&
+      this.paymentInfoModel.identification &&
+      this.paymentInfoModel.mobilePhone &&
+      this.paymentInfoModel.email
+    );
   }
 
   onSubmit(event: Event, createBrokerForm: NgForm) {
@@ -220,71 +314,118 @@ export class BrokerListingComponent
     }
 
     this.isLoading = true;
-    this.brokerModel.buyerItBelongs = this.authService.currentUserValue!.id;
+    debugger;
+    this.brokerModel.buyerItBelongs.id = this.authService.currentUserValue!.id;
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: '¡Éxito!',
-      text: '¡Bróker creado exitosamente!',
+      text: this.isEditing ? '¡Bróker actualizado exitosamente!' : '¡Bróker creado exitosamente!',
     };
+
     const errorAlert: SweetAlertOptions = {
       icon: 'error',
       title: '¡Error!',
-      text: 'Hubo un problema al crear el bróker.',
+      text: 'Hubo un problema al guardar los cambios.',
     };
 
     const completeFn = () => {
       this.isLoading = false;
     };
 
-    const createPaymentInfoFn = (personId: string) => {
-      this.paymentInfoModel.person.id = personId;
+    const updatePaymentInfoFn = () => {
+      if (this.hasPaymentInfoChanges()) {
+        this.paymentInfoService.updatePaymentInfo(this.paymentInfoModel.id, this.paymentInfoModel)
+          .subscribe({
+            next: () => {
+              this.showAlert({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: '¡Información de pago actualizada exitosamente!',
+              });
+              this.reloadEvent.emit(true);
+            },
+            error: (error) => {
+              this.showAlert({
+                icon: 'error',
+                title: '¡Error!',
+                text: 'Hubo un problema al actualizar la información de pago.',
+              });
+              this.isLoading = false;
+            },
+          });
+      }
+    };
 
-      this.paymentInfoService
-        .createPaymentInfo(this.paymentInfoModel)
+    const createPaymentInfoFn = (personId: string) => {
+      debugger;
+      if (this.hasPaymentInfoChanges()) {
+        this.paymentInfoModel.person.id = personId;
+        this.paymentInfoService.createPaymentInfo(this.paymentInfoModel)
+          .subscribe({
+            next: () => {
+              this.showAlert({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: '¡Información de pago guardada exitosamente!',
+              });
+              this.reloadEvent.emit(true);
+            },
+            error: (error) => {
+              this.showAlert({
+                icon: 'error',
+                title: '¡Error!',
+                text: 'Hubo un problema al guardar la información de pago.',
+              });
+              this.isLoading = false;
+            },
+          });
+      }
+    };
+
+    if (this.isEditing) {
+      if (this.hasBrokerChanges()) {
+        this.brokerService.updateBroker(this.brokerModel.id!, this.brokerModel)
+          .subscribe({
+            next: () => {
+              this.showAlert(successAlert);
+              this.reloadEvent.emit(true);
+              createBrokerForm.resetForm();
+              this.create();
+              updatePaymentInfoFn();
+            },
+            error: (error) => {
+              errorAlert.text = this.extractText(error.error);
+              this.showAlert(errorAlert);
+              this.isLoading = false;
+            },
+            complete: completeFn,
+          });
+      } else {
+        updatePaymentInfoFn();
+      }
+    } else {
+      this.brokerService.createBroker(this.brokerModel)
         .subscribe({
-          next: () => {
-            this.showAlert({
-              icon: 'success',
-              title: '¡Éxito!',
-              text: '¡Información de pago guardada exitosamente!',
-            });
+          next: (createdBroker) => {
+            this.showAlert(successAlert);
             this.reloadEvent.emit(true);
+            createBrokerForm.resetForm();
+            this.create();
+            if (this.activeTab === 'payment') {
+              createPaymentInfoFn(createdBroker.message);
+            }
           },
           error: (error) => {
-            this.showAlert({
-              icon: 'error',
-              title: '¡Error!',
-              text: 'Hubo un problema al guardar la información de pago.',
-            });
+            errorAlert.text = this.extractText(error.error);
+            this.showAlert(errorAlert);
             this.isLoading = false;
           },
+          complete: completeFn,
         });
-    };
-
-    const createBrokerFn = () => {
-      this.brokerService.createBroker(this.brokerModel).subscribe({
-        next: (createdBroker) => {
-          this.showAlert(successAlert);
-          this.reloadEvent.emit(true);
-          createBrokerForm.resetForm();
-          this.create();
-
-          if (this.activeTab === 'payment') {
-            createPaymentInfoFn(createdBroker.message);
-          }
-        },
-        error: (error) => {
-          errorAlert.text = this.extractText(error.error);
-          this.showAlert(errorAlert);
-          this.isLoading = false;
-        },
-        complete: completeFn,
-      });
-    };
-
-    createBrokerFn();
+    }
   }
+
 
   extractText(obj: any): string {
     var textArray: string[] = [];
@@ -326,6 +467,38 @@ export class BrokerListingComponent
     this.cdr.detectChanges();
     this.noticeSwal.fire();
   }
+  closeModal(modal: any) {
+    modal.dismiss('Cross click');
+    this.resetPaymentInfoModel();
+  }
+
+  resetPaymentInfoModel() {
+    this.paymentInfoModel = {
+      id: '',
+      bankName: '',
+      accountName: '',
+      accountNumber: '',
+      identification: '',
+      mobilePhone: '',
+      email: '',
+      person: {
+        id: '',
+        names: '',
+        lastNames: '',
+        identification: '',
+        birthDate: new Date(),
+        address: '',
+        phone: '',
+        mobilePhone: '',
+        email: '',
+        emergencyContactName: '',
+        emergencyContactPhone: ''
+      },
+      personId: '',
+      deletedAt: undefined
+    };
+  }
+
 
   ngOnDestroy(): void {
     this.reloadEvent.unsubscribe();

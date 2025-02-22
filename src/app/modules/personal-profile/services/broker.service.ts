@@ -8,6 +8,8 @@ import { IPersonModel } from '../../../shared/interfaces/person.interface';
 const API_BROKER_URL = `${environment.apiUrl}/broker`;
 
 export interface IBroker {
+  deletedAt: string;
+  id: string;
   person: {
     photo: string;
     names: string;
@@ -23,7 +25,10 @@ export interface IBroker {
     emergencyContactPhone: string;
     id?: string;
   };
-  buyerItBelongs: string;
+  buyerItBelongs: {
+    id: string;
+    fullName: string;
+  };
 }
 
 @Injectable({ providedIn: 'root' })
@@ -53,8 +58,8 @@ export class BrokerService {
 
   getBrokerById(id: string): Observable<IBroker> {
     this.isLoadingSubject.next(true);
-    return this.http.get<{ broker: IBroker }>(`${API_BROKER_URL}/${id}`).pipe(
-      map((response) => response.broker),
+    return this.http.get<{ ok: boolean; data: IBroker }>(`${API_BROKER_URL}/${id}`).pipe(
+      map((response) => response.data),
       finalize(() => this.isLoadingSubject.next(false))
     );
   }
