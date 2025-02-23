@@ -19,12 +19,20 @@ export class PermissionService {
    * Checks if the user has a specific action for a given route.
    */
   hasPermission(route: string, action: PermissionEnum): boolean {
-    return this.permissions.some((permission) =>
-      permission.suboptions?.some(
-        (suboption) =>
-          suboption.route === route && suboption.actions.includes(action)
-      )
+    return this.permissions.some(
+      (option) =>
+        // ✅ Check parent option
+        (option.route === route && option.actions.includes(action)) ||
+        // ✅ Check suboptions
+        option.suboptions?.some(
+          (suboption) =>
+            suboption.route === route && suboption.actions.includes(action)
+        )
     );
+  }
+
+  canRead(route: string): boolean {
+    return this.hasPermission(route, PermissionEnum.VIEW);
   }
 
   canCreate(route: string): boolean {

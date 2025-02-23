@@ -17,7 +17,7 @@
       <!--begin::Toolbar-->
       <div class="d-flex justify-content-end">
         <!--begin::Add payment info-->
-        <button *appCanCreate="PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE" type="button" class="btn btn-primary"
+        <button *appCanEdit="PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE" type="button" class="btn btn-primary"
           data-action="create" (click)="create()">
           Agregar Información de Pago
         </button>
@@ -30,8 +30,8 @@
 
   <div class="card-body pt-0">
     <app-crud *appCanEdit="PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE" [datatableConfig]="datatableConfig"
-      route="/personal-profile/my-profile/payment-information" (editEvent)="edit($event)" (createEvent)="create()"
-      [reload]="reloadEvent" [modal]="formModal">
+      route="/personal-profile/my-profile/payment-information" (editEvent)="edit($event.toString())"
+      (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal">
     </app-crud>
 
     <!-- Show CRUD without Edit if the user does NOT have Edit Permission -->
