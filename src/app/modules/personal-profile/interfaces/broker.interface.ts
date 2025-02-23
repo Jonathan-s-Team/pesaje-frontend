@@ -17,21 +17,7 @@ export interface IUpdateBrokerModel {
 export interface IReadBrokerModel {
   deletedAt: string;
   id: string;
-  person: {
-    photo: string;
-    names: string;
-    lastNames: string;
-    identification: string;
-    birthDate: string;
-    address: string;
-    phone: string;
-    mobilePhone: string;
-    mobilePhone2: string;
-    email: string;
-    emergencyContactName: string;
-    emergencyContactPhone: string;
-    id?: string;
-  };
+  person: IPersonModel;
   buyerItBelongs: {
     id: string;
     fullName: string;
