@@ -3,33 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { IPersonModel } from '../../../shared/interfaces/person.interface';
+import {
+  ICreateBrokerModel,
+  IReadBrokerModel,
+  IUpdateBrokerModel,
+} from '../interfaces/broker.interface';
 
 const API_BROKER_URL = `${environment.apiUrl}/broker`;
-
-export interface IBroker {
-  deletedAt: string;
-  id: string;
-  person: {
-    photo: string;
-    names: string;
-    lastNames: string;
-    identification: string;
-    birthDate: string;
-    address: string;
-    phone: string;
-    mobilePhone: string;
-    mobilePhone2: string;
-    email: string;
-    emergencyContactName: string;
-    emergencyContactPhone: string;
-    id?: string;
-  };
-  buyerItBelongs: {
-    id: string;
-    fullName: string;
-  };
-}
 
 @Injectable({ providedIn: 'root' })
 export class BrokerService {
@@ -37,17 +17,19 @@ export class BrokerService {
   isloading$ = this.isLoadingSubject.asObservable();
   constructor(private http: HttpClient) {}
 
-  createBroker(brokerData: Partial<IBroker>): Observable<{ message: string }> {
+  createBroker(
+    brokerData: Partial<ICreateBrokerModel>
+  ): Observable<{ message: string }> {
     this.isLoadingSubject.next(true);
     return this.http
       .post<{ message: string }>(`${API_BROKER_URL}`, brokerData)
       .pipe(finalize(() => this.isLoadingSubject.next(false)));
   }
 
-  getBrokersByUser(userId: string): Observable<IPersonModel[]> {
+  getBrokersByUser(userId: string): Observable<IReadBrokerModel[]> {
     this.isLoadingSubject.next(true);
     return this.http
-      .get<{ ok: boolean; data: IPersonModel[] }>(
+      .get<{ ok: boolean; data: IReadBrokerModel[] }>(
         `${API_BROKER_URL}?userId=${userId}`
       )
       .pipe(
@@ -56,18 +38,38 @@ export class BrokerService {
       );
   }
 
-  getBrokerById(id: string): Observable<IBroker> {
-    this.isLoadingSubject.next(true);
-    return this.http.get<{ ok: boolean; data: IBroker }>(`${API_BROKER_URL}/${id}`).pipe(
-      map((response) => response.data),
-      finalize(() => this.isLoadingSubject.next(false))
-    );
-  }
-
-  updateBroker(id: string, updateData: Partial<IBroker>): Observable<IBroker> {
+  getBrokerById(id: string): Observable<IReadBrokerModel> {
     this.isLoadingSubject.next(true);
     return this.http
-      .put<{ updatedBroker: IBroker }>(`${API_BROKER_URL}/${id}`, updateData)
+      .get<{ ok: boolean; data: IReadBrokerModel }>(`${API_BROKER_URL}/${id}`)
+      .pipe(
+        map((response) => response.data),
+        finalize(() => this.isLoadingSubject.next(false))
+      );
+  }
+
+  getAllBrokers(includeDeleted: boolean):Observable<IReadBrokerModel[]>{
+    this.isLoadingSubject.next(true);
+    return this.http
+      .get<{ ok: boolean; data: IReadBrokerModel[] }>(
+        `${API_BROKER_URL}/all?includeDeleted=${includeDeleted}`
+      )
+      .pipe(
+        map((response) => response.data || []),
+        finalize(() => this.isLoadingSubject.next(false))
+      );
+  }
+
+  updateBroker(
+    id: string,
+    updateData: Partial<IUpdateBrokerModel>
+  ): Observable<IUpdateBrokerModel> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .put<{ updatedBroker: IUpdateBrokerModel }>(
+        `${API_BROKER_URL}/${id}`,
+        updateData
+      )
       .pipe(
         map((response) => response.updatedBroker),
         finalize(() => this.isLoadingSubject.next(false))

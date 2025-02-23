@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
 import { PaymentInfoService } from '../services/payment-info.service';
@@ -27,7 +27,7 @@ export class PaymentInformationComponent
   PERMISSION_ROUTES = PERMISSION_ROUTES;
 
   isLoading = false;
-  private subscriptions: Subscription[] = [];
+  private unsubscribe: Subscription[] = [];
 
   paymentData: IPaymentInfoModel[] = [];
   paymentInfo: IPaymentInfoModel = {} as IPaymentInfoModel;
@@ -66,7 +66,7 @@ export class PaymentInformationComponent
       },
     ],
     language: {
-      url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
+      url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
     },
   };
 
@@ -84,7 +84,7 @@ export class PaymentInformationComponent
         this.loadPaymentInfos();
       }
     });
-    this.subscriptions.push(userSub);
+    this.unsubscribe.push(userSub);
   }
 
   ngAfterViewInit(): void {}
@@ -97,7 +97,7 @@ export class PaymentInformationComponent
       .getPaymentInfosByPerson(this.personId)
       .subscribe({
         next: (data) => {
-          this.paymentData = [...data];
+          this.paymentData = data;
           this.datatableConfig = {
             ...this.datatableConfig,
             data: [...this.paymentData],
@@ -114,11 +114,11 @@ export class PaymentInformationComponent
           });
         },
       });
-    this.subscriptions.push(paymentSub);
+    this.unsubscribe.push(paymentSub);
   }
 
   // 🔹 Delete a Payment Info
-  delete(id: any): void {
+  delete(id: string): void {
     const deleteSub = this.paymentInfoService.deletePaymentInfo(id).subscribe({
       next: () => {
         this.paymentData = this.paymentData.filter((item) => item.id !== id);
@@ -132,11 +132,11 @@ export class PaymentInformationComponent
         });
       },
     });
-    this.subscriptions.push(deleteSub);
+    this.unsubscribe.push(deleteSub);
   }
 
   // 🔹 Edit Payment Info
-  edit(id: any): void {
+  edit(id: string): void {
     const foundItem = this.paymentData.find((item) => item.id === id);
     this.paymentInfo = foundItem ? { ...foundItem } : ({} as IPaymentInfoModel);
   }
@@ -243,6 +243,6 @@ export class PaymentInformationComponent
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    this.unsubscribe.forEach((sub) => sub.unsubscribe());
   }
 }
