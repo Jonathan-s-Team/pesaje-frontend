@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 
 export interface PageLink {
   title: string;
-  path: string;
+  path: string | null;
   isActive: boolean;
   isSeparator?: boolean;
 }
@@ -100,51 +100,115 @@ export class PageInfoService {
     this.setBreadcrumbs(bc);
   }
 
+  // public calculateBreadcrumbsInMenu(
+  //   menuId: string
+  // ): Array<PageLink> | undefined {
+  //   const result: Array<PageLink> = [];
+  //   const menu = document.getElementById(menuId);
+  //   if (!menu) {
+  //     return;
+  //   }
+
+  //   const allActiveParents = Array.from<HTMLDivElement>(
+  //     menu.querySelectorAll('div.menu-item')
+  //   ).filter((link) => link.classList.contains('here'));
+
+  //   if (!allActiveParents || allActiveParents.length === 0) {
+  //     return;
+  //   }
+
+  //   allActiveParents.forEach((parent) => {
+  //     const titleSpan = parent.querySelector(
+  //       'span.menu-title'
+  //     ) as HTMLSpanElement | null;
+  //     if (!titleSpan) {
+  //       return;
+  //     }
+
+  //     const title = titleSpan.innerText;
+  //     const path = titleSpan.getAttribute('data-link');
+  //     if (!path) {
+  //       return;
+  //     }
+
+  //     result.push({
+  //       title,
+  //       path,
+  //       isSeparator: false,
+  //       isActive: false,
+  //     });
+  //     // add separator
+  //     result.push({
+  //       title: '',
+  //       path: '',
+  //       isSeparator: true,
+  //       isActive: false,
+  //     });
+  //   });
+
+  //   return result;
+  // }
+
   public calculateBreadcrumbsInMenu(
     menuId: string
   ): Array<PageLink> | undefined {
     const result: Array<PageLink> = [];
     const menu = document.getElementById(menuId);
-    if (!menu) {
-      return;
-    }
 
-    const allActiveParents = Array.from<HTMLDivElement>(
-      menu.querySelectorAll('div.menu-item')
-    ).filter((link) => link.classList.contains('here'));
+    if (!menu) return;
 
-    if (!allActiveParents || allActiveParents.length === 0) {
-      return;
-    }
+    // 🔹 Find the currently active link
+    const activeLink = menu.querySelector(
+      '.menu-link.active'
+    ) as HTMLAnchorElement | null;
+    if (!activeLink) return;
 
-    allActiveParents.forEach((parent) => {
-      const titleSpan = parent.querySelector(
-        'span.menu-title'
+    let currentItem: HTMLElement | null = activeLink.closest('.menu-item');
+
+    const addedPaths = new Set<string>(); // 🔹 Prevents duplicates
+
+    // 🔹 Traverse upwards in the menu hierarchy
+    while (currentItem) {
+      const titleSpan = currentItem.querySelector(
+        '.menu-title'
       ) as HTMLSpanElement | null;
-      if (!titleSpan) {
-        return;
-      }
+      if (!titleSpan) break;
 
-      const title = titleSpan.innerText;
-      const path = titleSpan.getAttribute('data-link');
-      if (!path) {
-        return;
-      }
+      const title = titleSpan.innerText.trim();
+      const path = titleSpan.getAttribute('data-link'); // 🔹 Get path if available
 
-      result.push({
+      // 🔹 Avoid duplicates by checking Set
+      if (addedPaths.has(path || '')) break;
+      addedPaths.add(path || '');
+
+      result.unshift({
         title,
-        path,
+        path: path && path !== '/' ? path : null, // ✅ Prevents navigation if path is missing
         isSeparator: false,
         isActive: false,
       });
-      // add separator
-      result.push({
-        title: '',
-        path: '',
-        isSeparator: true,
-        isActive: false,
+
+      // 🔹 Move to the parent menu item
+      currentItem = currentItem.closest('.menu-item.menu-accordion');
+    }
+
+    // 🔹 Add separators
+    if (result.length > 1) {
+      const breadcrumbWithSeparators: PageLink[] = [];
+      result.forEach((item, index) => {
+        breadcrumbWithSeparators.push(item);
+        if (index < result.length - 1) {
+          breadcrumbWithSeparators.push({
+            title: '',
+            path: null, // ✅ Ensures no navigation on separators
+            isSeparator: true,
+            isActive: false,
+          });
+        }
       });
-    });
+
+      return breadcrumbWithSeparators;
+    }
 
     return result;
   }

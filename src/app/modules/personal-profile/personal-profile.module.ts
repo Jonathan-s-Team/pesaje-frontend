@@ -10,9 +10,9 @@ import {
 import { SharedModule as SharedModuleMetronic } from '../../_metronic/shared/shared.module';
 import { PersonalInformationComponent } from './personal-information/personal-information.component';
 import { InlineSVGModule } from 'ng-inline-svg-2';
-import {PersonalProfileDetailsComponent} from "./personal-information/forms/profile-details/personal-profile-details.component";import { AccountModule } from '../account/account.module';
+import { PersonalProfileDetailsComponent } from './personal-information/forms/profile-details/personal-profile-details.component';
+import { AccountModule } from '../account/account.module';
 import { FormsModule } from '@angular/forms';
-import { PaymentInformationComponent } from './payment-information/payment-information.component';
 import { CrudModule } from 'src/app/modules/crud/crud.module';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import {
@@ -27,7 +27,6 @@ import { SharedModule } from '../shared/shared.module';
   declarations: [
     MyProfileComponent,
     PersonalInformationComponent,
-    PaymentInformationComponent,
     PersonalProfileDetailsComponent,
   ],
   imports: [

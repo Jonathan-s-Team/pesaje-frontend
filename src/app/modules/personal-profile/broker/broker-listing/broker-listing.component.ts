@@ -14,14 +14,15 @@ import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
 import { BrokerService } from '../../services/broker.service';
 import { AuthService } from '../../../auth';
-import { IPaymentInfoModel } from '../../../../shared/interfaces/payment-info.interface';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
 import {
   ICreateBrokerModel,
   IReadBrokerModel,
 } from '../../interfaces/broker.interface';
 import { IRoleModel } from 'src/app/modules/auth/interfaces/role.interface';
-import { IPersonModel } from 'src/app/shared/interfaces/person.interface';
+import { ActivatedRoute, Router } from '@angular/router';
+import { IPaymentInfoModel } from 'src/app/modules/shared/interfaces/payment-info.interface';
+import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
 
 @Component({
   selector: 'app-broker-listing',
@@ -80,8 +81,8 @@ export class BrokerListingComponent
               }">
                 <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${
                   data || 'Sin nombre'
-                } ${full.person.lastNames || ''}</a>
-                <span>${full.person.email || 'Sin correo'}</span>
+                } ${full.person?.lastNames || ''}</a>
+                <span>${full.person?.email || 'Sin correo'}</span>
               </div>
           `;
 
@@ -128,6 +129,8 @@ export class BrokerListingComponent
   constructor(
     private brokerService: BrokerService,
     private authService: AuthService,
+    private router: Router,
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -213,24 +216,8 @@ export class BrokerListingComponent
   }
 
   edit(id: string) {
-    // this.isEditing = true;
-    // this.aBroker = this.brokerService.getBrokerById(id);
-    // this.aBroker.subscribe((response: IReadBrokerModel) => {
-    //   if (response) {
-    //     this.brokerModel = response;
-    //     debugger;
-    //     this.originalBrokerModel = JSON.parse(JSON.stringify(response));
-    //     if (this.brokerModel.person.birthDate) {
-    //       this.brokerModel.person.birthDate = this.formatDate(
-    //         this.brokerModel.person.birthDate
-    //       );
-    //     }
-    //   } else {
-    //     console.error(
-    //       'No se encontró el bróker o no tiene información de persona.'
-    //     );
-    //   }
-    // });
+    const currentUrl = this.router.url;
+    this.router.navigate([`${currentUrl}/${id}`]);
   }
 
   create() {

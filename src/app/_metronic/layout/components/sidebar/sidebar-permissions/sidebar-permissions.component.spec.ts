@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SidebarPermissionsComponent } from '../sidebar-dynamic-menu/sidebar-permissions.component';
 
-import { SidebarMenuComponent } from './sidebar-menu.component';
 
 describe('SidebarMenuComponent', () => {
-  let component: SidebarMenuComponent;
-  let fixture: ComponentFixture<SidebarMenuComponent>;
+  let component: SidebarPermissionsComponent;
+  let fixture: ComponentFixture<SidebarPermissionsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SidebarMenuComponent ]
+      declarations: [ SidebarPermissionsComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SidebarMenuComponent);
+    fixture = TestBed.createComponent(SidebarPermissionsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

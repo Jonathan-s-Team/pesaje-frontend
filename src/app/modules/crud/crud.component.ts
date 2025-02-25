@@ -22,6 +22,7 @@ import { fromEvent } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { SweetAlertOptions } from 'sweetalert2';
 import { Api, Config } from 'datatables.net';
+import { PermissionService } from '../shared/services/permission.service';
 
 @Component({
   selector: 'app-crud',
@@ -32,6 +33,8 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() datatableConfig: Config = {};
 
   @Input() route: string = '/';
+
+  @Input() permissionRoute: string = '/';
 
   // Reload emitter inside datatable
   @Input() reload: EventEmitter<boolean>;
@@ -68,7 +71,8 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private renderer: Renderer2,
     private router: Router,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private permissionService: PermissionService
   ) {}
 
   ngOnInit(): void {
@@ -134,11 +138,17 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
         const buttons = [];
 
-        if (this.editEvent.observed) {
+        if (
+          this.editEvent.observed &&
+          this.permissionService.canEdit(this.permissionRoute)
+        ) {
           buttons.push(editButton);
         }
 
-        if (this.deleteEvent.observed) {
+        if (
+          this.deleteEvent.observed &&
+          this.permissionService.canDelete(this.permissionRoute)
+        ) {
           buttons.push(deleteButton);
         }
 

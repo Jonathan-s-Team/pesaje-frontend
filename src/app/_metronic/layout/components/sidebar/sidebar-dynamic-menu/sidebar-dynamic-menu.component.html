@@ -1,0 +1,43 @@
+<div *ngFor="let option of menuOptions" class="menu-item"
+  [ngClass]="{'menu-accordion': option.suboptions.length > 0, 'parent-option': option.suboptions.length > 0}"
+  [attr.data-kt-menu-trigger]="option.suboptions.length > 0 ? 'click' : null">
+
+  <!-- ✅ If the option has a route, render as a link -->
+  <div *ngIf="option.route">
+    <a *appCanRead="option.route || ''" class="menu-link without-sub" [routerLink]="option.route"
+      routerLinkActive="active">
+
+      <span class="menu-icon" *ngIf="option.icon">
+        <app-keenicon [name]="option.icon" class="fs-2"></app-keenicon>
+      </span>
+
+      <span *ngIf="!option.icon" class="menu-bullet">
+        <span class="bullet bullet-dot"></span>
+      </span>
+
+      <span class="menu-title parent-link" [attr.data-link]="option.route">
+        {{ option.name }}
+      </span>
+    </a>
+  </div>
+
+  <!-- ✅ If the option has suboptions but no route, render as a collapsible menu -->
+  <span *ngIf="!option.route" class="menu-link parent-link" [ngClass]="{'active': isOptionActive(option)}">
+
+    <span class="menu-icon" *ngIf="option.icon">
+      <app-keenicon [name]="option.icon" class="fs-2"></app-keenicon>
+    </span>
+
+    <span *ngIf="!option.icon" class="menu-bullet">
+      <span class="bullet bullet-dot"></span>
+    </span>
+
+    <span class="menu-title">{{ option.name }}</span>
+    <span class="menu-arrow" *ngIf="option.suboptions?.length"></span>
+  </span>
+
+  <!-- ✅ Render suboptions recursively -->
+  <div class="menu-sub menu-sub-accordion" *ngIf="option.suboptions?.length">
+    <app-sidebar-dynamic-menu [menuOptions]="option.suboptions"></app-sidebar-dynamic-menu>
+  </div>
+</div>
