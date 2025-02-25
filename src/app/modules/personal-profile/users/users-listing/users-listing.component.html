@@ -17,7 +17,7 @@
       <!--begin::Toolbar-->
       <div class="d-flex justify-content-end">
         <!--begin::Add bróker-->
-        <button *appCanCreate="PERMISSION_ROUTES.PERSONAL_PROFILE.BROKERS" type="button" class="btn btn-primary"
+        <button *appCanCreate="PERMISSION_ROUTES.PERSONAL_PROFILE.USERS" type="button" class="btn btn-primary"
           data-action="create" (click)="create()">
           Agregar Usuario
         </button>
@@ -29,7 +29,7 @@
   </div>
 
   <div class="card-body pt-0">
-    <app-crud [datatableConfig]="datatableConfig" permissionRoute="{{PERMISSION_ROUTES.PERSONAL_PROFILE.BROKERS}}"
+    <app-crud [datatableConfig]="datatableConfig" permissionRoute="{{PERMISSION_ROUTES.PERSONAL_PROFILE.USERS}}"
       (deleteEvent)="delete($event.toString())" (editEvent)="edit($event.toString())" (createEvent)="create()"
       [reload]="reloadEvent" [modal]="formModal"></app-crud>
   </div>
@@ -49,143 +49,74 @@
         <!-- Campos de usuario -->
         <div class="mb-3">
           <label for="username" class="required fw-semibold fs-6 mb-2">Nombre de Usuario</label>
-          <input
-            type="text"
-            class="form-control"
-            id="username"
-            name="username"
-            [(ngModel)]="userModel.username"
+          <input type="text" class="form-control" id="username" name="username" [(ngModel)]="userModel.username"
             required>
         </div>
         <div class="mb-3">
           <label for="password" class="required fw-semibold fs-6 mb-2">Contraseña</label>
-          <input
-            type="password"
-            class="form-control"
-            id="password"
-            name="password"
-            [(ngModel)]="userModel.password"
+          <input type="password" class="form-control" id="password" name="password" [(ngModel)]="userModel.password"
             required>
         </div>
         <div class="mb-3">
           <label for="roles" class="required fw-semibold fs-6 mb-2">Roles (separados por coma)</label>
-          <input
-            type="text"
-            class="form-control"
-            id="roles"
-            name="roles"
-            [(ngModel)]="userModel.roles"
-            required>
+          <input type="text" class="form-control" id="roles" name="roles" [(ngModel)]="userModel.roles" required>
         </div>
 
         <!-- Campos de persona -->
         <div class="collapse show">
           <div class="mb-3">
             <label for="names" class="required fw-semibold fs-6 mb-2">Nombres</label>
-            <input
-              type="text"
-              class="form-control"
-              id="names"
-              name="names"
-              [(ngModel)]="userModel.person!.names"
+            <input type="text" class="form-control" id="names" name="names" [(ngModel)]="userModel.person!.names"
               required>
           </div>
           <div class="mb-3">
             <label for="lastNames" class="required fw-semibold fs-6 mb-2">Apellidos</label>
-            <input
-              type="text"
-              class="form-control"
-              id="lastNames"
-              name="lastNames"
-              [(ngModel)]="userModel.person!.lastNames"
-              required>
+            <input type="text" class="form-control" id="lastNames" name="lastNames"
+              [(ngModel)]="userModel.person!.lastNames" required>
           </div>
           <div class="mb-3">
             <label for="identification" class="required fw-semibold fs-6 mb-2">Identificación</label>
-            <input
-              type="text"
-              class="form-control"
-              id="identification"
-              name="identification"
-              [(ngModel)]="userModel.person!.identification"
-              required>
+            <input type="text" class="form-control" id="identification" name="identification"
+              [(ngModel)]="userModel.person!.identification" required>
           </div>
           <div class="mb-3">
             <label for="birthDate" class="required fw-semibold fs-6 mb-2">Fecha de Nacimiento</label>
-            <input
-              type="date"
-              class="form-control"
-              id="birthDate"
-              name="birthDate"
-              [(ngModel)]="userModel.person!.birthDate"
-              required>
+            <input type="date" class="form-control" id="birthDate" name="birthDate"
+              [(ngModel)]="userModel.person!.birthDate" required>
           </div>
           <div class="mb-3">
             <label for="address" class="required fw-semibold fs-6 mb-2">Dirección</label>
-            <input
-              type="text"
-              class="form-control"
-              id="address"
-              name="address"
-              [(ngModel)]="userModel.person!.address"
+            <input type="text" class="form-control" id="address" name="address" [(ngModel)]="userModel.person!.address"
               required>
           </div>
           <div class="mb-3">
             <label for="phone" class="required fw-semibold fs-6 mb-2">Teléfono</label>
-            <input
-              type="text"
-              class="form-control"
-              id="phone"
-              name="phone"
-              [(ngModel)]="userModel.person!.phone">
+            <input type="text" class="form-control" id="phone" name="phone" [(ngModel)]="userModel.person!.phone">
           </div>
           <div class="mb-3">
             <label for="mobilePhone" class="required fw-semibold fs-6 mb-2">Teléfono Celular</label>
-            <input
-              type="text"
-              class="form-control"
-              id="mobilePhone"
-              name="mobilePhone"
-              [(ngModel)]="userModel.person!.mobilePhone"
-              required>
+            <input type="text" class="form-control" id="mobilePhone" name="mobilePhone"
+              [(ngModel)]="userModel.person!.mobilePhone" required>
           </div>
           <div class="mb-3">
             <label for="mobilePhone2" class="fw-semibold fs-6 mb-2">Teléfono Celular Secundario</label>
-            <input
-              type="text"
-              class="form-control"
-              id="mobilePhone2"
-              name="mobilePhone2"
+            <input type="text" class="form-control" id="mobilePhone2" name="mobilePhone2"
               [(ngModel)]="userModel.person!.mobilePhone2">
           </div>
           <div class="mb-3">
             <label for="email" class="required fw-semibold fs-6 mb-2">Correo Electrónico</label>
-            <input
-              type="email"
-              class="form-control"
-              id="email"
-              name="email"
-              [(ngModel)]="userModel.person!.email"
+            <input type="email" class="form-control" id="email" name="email" [(ngModel)]="userModel.person!.email"
               required>
           </div>
           <div class="mb-3">
             <label for="emergencyContactName" class="fw-semibold fs-6 mb-2">Contacto de Emergencia</label>
-            <input
-              type="text"
-              class="form-control"
-              id="emergencyContactName"
-              name="emergencyContactName"
+            <input type="text" class="form-control" id="emergencyContactName" name="emergencyContactName"
               [(ngModel)]="userModel.person!.emergencyContactName">
           </div>
           <div class="mb-3">
             <label for="emergencyContactPhone" class="required fw-semibold fs-6 mb-2">Teléfono de Emergencia</label>
-            <input
-              type="text"
-              class="form-control"
-              id="emergencyContactPhone"
-              name="emergencyContactPhone"
-              [(ngModel)]="userModel.person!.emergencyContactPhone"
-              required>
+            <input type="text" class="form-control" id="emergencyContactPhone" name="emergencyContactPhone"
+              [(ngModel)]="userModel.person!.emergencyContactPhone" required>
           </div>
         </div>
       </div>

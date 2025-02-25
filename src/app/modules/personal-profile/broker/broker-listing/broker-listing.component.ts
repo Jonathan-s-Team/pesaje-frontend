@@ -249,9 +249,7 @@ export class BrokerListingComponent
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: '¡Éxito!',
-      text: this.brokerModel.id
-        ? '¡Bróker actualizado exitosamente!'
-        : '¡Bróker creado exitosamente!',
+      text: '¡Bróker creado exitosamente!',
     };
 
     const errorAlert: SweetAlertOptions = {
@@ -263,8 +261,6 @@ export class BrokerListingComponent
     const completeFn = () => {
       this.isLoading = false;
     };
-
-    const updateFn = () => {};
 
     const createFn = () => {
       this.brokerService.createBroker(this.brokerModel).subscribe({
@@ -281,11 +277,7 @@ export class BrokerListingComponent
       });
     };
 
-    if (this.brokerModel.id) {
-      updateFn();
-    } else {
-      createFn();
-    }
+    createFn();
   }
 
   showAlert(swalOptions: SweetAlertOptions) {

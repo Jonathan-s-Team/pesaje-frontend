@@ -52,7 +52,7 @@ export class PaymentInformationComponent
         visible: false,
       },
       {
-        title: 'Cuenta #',
+        title: '# Cuenta',
         data: 'accountNumber',
         render: (data, type, full) =>
           `${full?.bankName} - ${data?.toUpperCase()}`,

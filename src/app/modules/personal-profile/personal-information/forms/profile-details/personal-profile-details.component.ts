@@ -43,14 +43,16 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
     this.isLoading$.next(true);
 
     const payload: IUpdateUserModel = {
+      id: this.user.id,
       username: this.user.username,
       password: this.user.password,
       roles: this.user.roles?.map((role) => role.id),
       person: {
+        id: this.user.person.id,
         names: this.user.person.names,
         lastNames: this.user.person.lastNames,
         identification: this.user.person.identification,
-        birthDate: this.user.person.birthDate.toString(),
+        birthDate: this.user.person.birthDate,
         address: this.user.person.address,
         phone: this.user.person.phone?.toString() ?? '',
         mobilePhone: this.user.person.mobilePhone,
@@ -60,7 +62,7 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
         emergencyContactPhone: this.user.person.emergencyContactPhone,
       },
     };
-    console.log(payload);
+
     setTimeout(() => {
       this.isLoading$.next(false);
       this.cdr.detectChanges();

@@ -2,13 +2,23 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
-  OnInit, ViewChild,
+  OnInit,
+  ViewChild,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BrokerService } from '../../services/broker.service';
-import {IReadBrokerModel, IUpdateBrokerModel} from '../../interfaces/broker.interface';
-import {NgForm} from "@angular/forms";
-import Swal, {SweetAlertOptions} from "sweetalert2";
+import {
+  IReadBrokerModel,
+  IUpdateBrokerModel,
+} from '../../interfaces/broker.interface';
+import { NgForm } from '@angular/forms';
+import Swal, { SweetAlertOptions } from 'sweetalert2';
+import { Observable, Subscription } from 'rxjs';
+import {
+  IReadUsersModel,
+  IUpdateUserModel,
+} from '../../interfaces/user.interface';
+import { UserService } from '../../services/user.service';
 
 type Tabs = 'Details' | 'Payment Info';
 
@@ -17,102 +27,94 @@ type Tabs = 'Details' | 'Payment Info';
   templateUrl: './users-details.component.html',
 })
 export class UsersDetailsComponent implements OnInit, AfterViewInit {
+  @ViewChild('userForm') userForm!: NgForm;
 
-  @ViewChild('brokerForm') brokerForm!: NgForm;
-  isCollapsed: boolean = false;
-  brokerData: IReadBrokerModel = {
-    id: '',
-    deletedAt: '',
-    buyerItBelongs: { id: '', fullName: '' },
-    person: {
-      id: '',
-      names: '',
-      lastNames: '',
-      identification: '',
-      birthDate: new Date(),
-      address: '',
-      phone: '',
-      mobilePhone: '',
-      mobilePhone2: '',
-      email: '',
-      emergencyContactName: '',
-      emergencyContactPhone: ''
-    }
-  };
-  // Broker details object
-  personId: string;
-  isLoading: boolean = true; // Added loading state
-  formattedBirthDate: string = '';
-
-
+  isLoading$: Observable<boolean>;
   activeTab: Tabs = 'Details';
 
+  userData: IReadUsersModel = {} as IReadUsersModel;
+  personId: string;
+  formattedBirthDate: string = '';
+
+  private unsubscribe: Subscription[] = [];
+
   constructor(
-    private brokerService: BrokerService,
+    private userService: UserService,
     private route: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef
-  ) {}
+  ) {
+    this.isLoading$ = this.userService.isLoading$;
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
-      const brokerId = params.get('brokerId');
-      if (brokerId) {
-        this.fetchBrokerDetails(brokerId);
+      const userId = params.get('userId');
+      if (userId) {
+        this.fetchUserDetails(userId);
       }
     });
   }
 
-  fetchBrokerDetails(brokerId: string): void {
-    this.isLoading = true; // Start loading
-    this.brokerService.getBrokerById(brokerId).subscribe({
-      next: (broker) => {
-        this.brokerData = broker;
-        this.personId = broker.person!.id; // Extract personId from broker data
-        if (broker.person.birthDate) {
-          this.formattedBirthDate = new Date(broker.person.birthDate).toISOString().split('T')[0];
+  ngAfterViewInit(): void {}
+
+  fetchUserDetails(userId: string): void {
+    const userSub = this.userService.getUserById(userId).subscribe({
+      next: (user) => {
+        this.userData = {
+          id: user.id,
+          username: user.username,
+          person: user.person,
+          roles: user.roles,
+          deletedAt: user.deletedAt,
+        };
+        this.personId = user.person?.id ?? '';
+
+        if (this.userData.person?.birthDate) {
+          this.formattedBirthDate = new Date(this.userData.person.birthDate)
+            .toISOString()
+            .split('T')[0];
         }
-        this.isLoading = false;
-        this.changeDetectorRef.detectChanges(); // Ensure UI updates
+
+        this.changeDetectorRef.detectChanges();
       },
       error: (err) => {
-        console.error('Error fetching broker details:', err);
-        this.isLoading = false;
+        console.error('Error fetching user details:', err);
       },
     });
+
+    this.unsubscribe.push(userSub);
   }
 
   setActiveTab(tab: Tabs) {
     this.activeTab = tab;
   }
 
-  saveBroker(){
-    if (this.brokerForm.invalid || !this.brokerData) {
+  saveBroker() {
+    if (this.userForm.invalid || !this.userForm) {
       return;
     }
-    this.isLoading = true;
 
-    const payload: IUpdateBrokerModel = {
-      id: this.brokerData.id,
-      deletedAt: this.brokerData.deletedAt,
-      buyerItBelongs: this.brokerData.buyerItBelongs.id,
-      person: this.brokerData.person,
-    }
+    const payload: IUpdateUserModel = {
+      id: this.userData.id,
+      username: this.userData.username,
+      // password: this.userData.password,
+      person: this.userData.person,
+      roles: this.userData.roles.map((role) => role.id),
+    };
 
-    this.brokerService.updateBroker(this.brokerData.id, payload).subscribe({
-      next: ()=> {
-        this.isLoading = false;
-        this.showSuccessAlert()
-      },
-      error: (error) => {
-        this.isLoading = false;
-        console.error('Error updating broker', error);
-        this.showErrorAlert(error);
-      }
-    });
-  }
+    const updateSub = this.userService
+      .updateUser(this.userData.id, payload)
+      .subscribe({
+        next: () => {
+          this.showSuccessAlert();
+        },
+        error: (error) => {
+          console.error('Error updating user', error);
+          this.showErrorAlert(error);
+        },
+      });
 
-  get brokerPerson() {
-    return this.brokerData.person!;
+    this.unsubscribe.push(updateSub);
   }
 
   private showSuccessAlert() {
@@ -131,7 +133,9 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit {
   private showErrorAlert(error: any) {
     const options: SweetAlertOptions = {
       title: 'Error',
-      html: `<strong>${error.message || 'Ocurrió un error inesperado.'}</strong>`,
+      html: `<strong>${
+        error.message || 'Ocurrió un error inesperado.'
+      }</strong>`,
       icon: 'error',
       confirmButtonText: 'Entendido',
       confirmButtonColor: '#d33',
@@ -141,5 +145,7 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit {
     Swal.fire(options);
   }
 
-  ngAfterViewInit(): void {}
+  ngOnDestroy(): void {
+    this.unsubscribe.forEach((sub) => sub.unsubscribe());
+  }
 }

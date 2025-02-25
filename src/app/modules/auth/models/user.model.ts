@@ -52,6 +52,7 @@ export class UserModel extends AuthModel {
       tipsOnMetronicBusinessProducts: boolean;
     };
   };
+  deletedAt?: Date;
 
   setUser(_user: unknown) {
     const user = _user as UserModel;

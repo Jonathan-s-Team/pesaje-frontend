@@ -65,8 +65,8 @@ export class BrokerDetailsComponent
         this.brokerData = broker;
         this.personId = broker.person?.id ?? '';
 
-        if (broker.person?.birthDate) {
-          this.formattedBirthDate = new Date(broker.person.birthDate)
+        if (this.brokerData.person?.birthDate) {
+          this.formattedBirthDate = new Date(this.brokerData.person.birthDate)
             .toISOString()
             .split('T')[0];
         }

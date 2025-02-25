@@ -2,7 +2,6 @@ import { IPersonModel } from '../../shared/interfaces/person.interface';
 
 export interface ICreateBrokerModel {
   deletedAt: string;
-  id: string;
   person: IPersonModel;
   buyerItBelongs: string;
 }

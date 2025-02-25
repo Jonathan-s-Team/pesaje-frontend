@@ -14,25 +14,25 @@ import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
 import { AuthService } from '../../../auth';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
-import {
-  ICreateBrokerModel,
-} from '../../interfaces/broker.interface';
+import { ICreateBrokerModel } from '../../interfaces/broker.interface';
 import { IRoleModel } from 'src/app/modules/auth/interfaces/role.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IPaymentInfoModel } from 'src/app/modules/shared/interfaces/payment-info.interface';
 import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
-import {UserService} from "../../services/user.service";
-import {UserModel} from 'src/app/modules/auth/models/user.model';
-import {IReadUsersModel, IUpdateUserModel} from "../../interfaces/user.interface";
-
+import { UserService } from '../../services/user.service';
+import { UserModel } from 'src/app/modules/auth/models/user.model';
+import { map } from 'rxjs/operators';
+import {
+  ICreateUserModel,
+  IReadUsersModel,
+  IUpdateUserModel,
+} from '../../interfaces/user.interface';
 
 @Component({
   selector: 'app-broker-listing',
   templateUrl: './users-listing.component.html',
 })
-export class UsersListingComponent
-  implements OnInit, AfterViewInit, OnDestroy
-{
+export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
   PERMISSION_ROUTES = PERMISSION_ROUTES;
 
   isLoading = false;
@@ -45,7 +45,10 @@ export class UsersListingComponent
   // Reload emitter inside datatable
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  userModel: IUpdateUserModel = {} as IUpdateUserModel;
+  userModel: ICreateUserModel = {
+    person: {} as IPersonModel,
+  } as ICreateUserModel;
+
   users: IReadUsersModel[] = [];
 
   // Single model
@@ -63,13 +66,15 @@ export class UsersListingComponent
     columns: [
       {
         title: 'Nombre Completo',
-        data: 'id',
+        data: 'person',
         render: function (data, type, full) {
           const colorClasses = ['success', 'info', 'warning', 'danger'];
           const randomColorClass =
             colorClasses[Math.floor(Math.random() * colorClasses.length)];
           const initials =
-            data && data.length > 0 ? data[0].toUpperCase() : '?';
+            data && data.names.length > 0 && data.lastNames.length > 0
+              ? `${data.names[0].toUpperCase()}${data.lastNames[0].toUpperCase()}`
+              : '?';
           const symbolLabel = `
           <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
             ${initials}
@@ -80,10 +85,10 @@ export class UsersListingComponent
               <div class="d-flex flex-column" data-action="view" data-id="${
                 full.id
               }">
-                <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${
-                  data || 'Sin nombre'
-                } ${full.person?.lastNames || ''}</a>
-                <span>${full.person?.email || 'Sin correo'}</span>
+                <div class="text-gray-800 text-hover-primary mb-1">${
+                  data.names || 'Sin nombre'
+                } ${data.lastNames || ''}</div>
+                <span>${data.email || 'Sin correo'}</span>
               </div>
           `;
 
@@ -118,8 +123,10 @@ export class UsersListingComponent
       {
         title: 'Roles',
         data: 'roles',
-        render: function (data) {
-          return data && data.length ? data.join(', ') : '-';
+        render: function (data: IRoleModel[]) {
+          return data && data.length
+            ? data.map((role) => role.name).join(', ')
+            : '-';
         },
       },
     ],
@@ -142,31 +149,11 @@ export class UsersListingComponent
   ngAfterViewInit(): void {}
 
   ngOnInit(): void {
-    this.roles = this.authService.currentUserValue?.roles!;
-
-    this.isOnlyComprador =
-      this.roles.length > 0 &&
-      this.roles.every((role) => role.name === 'Comprador');
-
-    // Agregar la columna "Comprador" solo si el usuario no es solo Comprador
-    /*if (!this.isOnlyComprador) {
-      this.datatableConfig.columns!.push({
-        title: 'Comprador',
-        data: 'buyerItBelongs.fullName',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      });
-    }*/
-
-    this.loadBrokers();
+    this.loadUsers();
   }
 
-  loadBrokers(): void {
-    const userId = this.authService.currentUserValue?.id;
-    if (!userId) return;
-
-    const userObservable = this.userService.getAllUsers(true)
+  loadUsers(): void {
+    const userObservable = this.userService.getAllUsers(true);
 
     const userSub = userObservable.subscribe({
       next: (data) => {
@@ -208,24 +195,15 @@ export class UsersListingComponent
     this.unsubscribe.push(deleteSub);
   }
 
-  originalBrokerModel: UserModel | null = null;
-  originalPaymentInfoModel: IPaymentInfoModel | null = null;
-
-  hasBrokerChanges(): boolean {
-    return (
-      JSON.stringify(this.userModel) !==
-      JSON.stringify(this.originalBrokerModel)
-    );
-  }
-
   edit(id: string) {
     const currentUrl = this.router.url;
     this.router.navigate([`${currentUrl}/${id}`]);
   }
 
   create() {
-    this.userModel = {} as IUpdateUserModel;
-    //this.userModel.person = {} as IPersonModel;
+    this.userModel = {
+      person: {} as IPersonModel, // Ensure person object is initialized
+    };
   }
 
   formatDate(dateString: string): string {
@@ -249,9 +227,7 @@ export class UsersListingComponent
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: '¡Éxito!',
-      text: this.userModel.id
-        ? '¡Bróker actualizado exitosamente!'
-        : '¡Bróker creado exitosamente!',
+      text:'¡Bróker creado exitosamente!',
     };
 
     const errorAlert: SweetAlertOptions = {
@@ -264,7 +240,6 @@ export class UsersListingComponent
       this.isLoading = false;
     };
 
-    const updateFn = () => {};
 
     const createFn = () => {
       this.userService.createUser(this.userModel).subscribe({
@@ -281,11 +256,8 @@ export class UsersListingComponent
       });
     };
 
-    if (this.userModel.id) {
-      updateFn();
-    } else {
-      createFn();
-    }*/
+createFn();
+*/
   }
 
   showAlert(swalOptions: SweetAlertOptions) {
@@ -308,6 +280,7 @@ export class UsersListingComponent
   }
 
   ngOnDestroy(): void {
+    this.unsubscribe.forEach((sub) => sub.unsubscribe());
     this.reloadEvent.unsubscribe();
   }
 }
