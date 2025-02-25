@@ -14,10 +14,9 @@ type Tabs = 'Details' | 'Payment Info';
 
 @Component({
   selector: 'app-broker-details',
-  templateUrl: './broker-details.component.html',
-  styleUrls: ['./broker-details.component.scss'],
+  templateUrl: './users-details.component.html',
 })
-export class BrokerDetailsComponent implements OnInit, AfterViewInit {
+export class UsersDetailsComponent implements OnInit, AfterViewInit {
 
   @ViewChild('brokerForm') brokerForm!: NgForm;
   isCollapsed: boolean = false;

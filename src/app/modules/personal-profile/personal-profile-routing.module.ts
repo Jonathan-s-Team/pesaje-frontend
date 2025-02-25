@@ -28,6 +28,10 @@ const routes: Routes = [
     loadChildren: () =>
       import('./broker/broker.module').then((m) => m.BrokerModule),
   },
+  {
+    path: 'users',
+    loadChildren: () => import('./users/users.module').then((m)=>m.UsersModule),
+  }
 ];
 
 @NgModule({

@@ -16,3 +16,11 @@ export interface IUpdateUserModel {
     mobilePhone2?: string;
   };
 }
+
+export interface IReadUsersModel{
+  deletedAt: string;
+  id: string;
+  person: string;
+  roles: string[];
+  username: string;
+}
