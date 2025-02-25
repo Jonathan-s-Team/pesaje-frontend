@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { IPaymentInfoModel } from 'src/app/shared/interfaces/payment-info.interface';
+import { IPaymentInfoModel } from '../interfaces/payment-info.interface';
 
 const API_PAYMENT_INFO_URL = `${environment.apiUrl}/payment-info`;
 

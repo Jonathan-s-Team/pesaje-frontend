@@ -2,7 +2,8 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { MyProfileComponent } from './my-profile.component';
 import { PersonalInformationComponent } from './personal-information/personal-information.component';
-import { PaymentInformationComponent } from './payment-information/payment-information.component';
+import { PaymentInformationComponent } from '../shared/components/payment-information/payment-information.component';
+import { PersonIdResolver } from './resolvers/person-id.resolver';
 
 const routes: Routes = [
   {
@@ -16,6 +17,7 @@ const routes: Routes = [
       {
         path: 'payment-information',
         component: PaymentInformationComponent,
+        resolve: { personId: PersonIdResolver },
       },
       { path: '', redirectTo: 'personal-information', pathMatch: 'full' },
       { path: '**', redirectTo: 'personal-information', pathMatch: 'full' },
@@ -23,7 +25,8 @@ const routes: Routes = [
   },
   {
     path: 'brokers',
-    loadChildren: () => import('./broker/broker.module').then((m) => m.BrokerModule),
+    loadChildren: () =>
+      import('./broker/broker.module').then((m) => m.BrokerModule),
   },
 ];
 

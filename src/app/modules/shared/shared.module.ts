@@ -3,21 +3,32 @@ import { CommonModule } from '@angular/common';
 import { CanEditDirective } from '../../directives/can-edit.directive';
 import { CanCreateDirective } from '../../directives/can-create.directive';
 import { CanDeleteDirective } from '../../directives/can-delete.directive';
-import { CanNotEditDirective } from 'src/app/directives/can-not-edit.directive';
 import { CanReadDirective } from 'src/app/directives/can-read.directive';
+import { CrudModule } from '../crud/crud.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { PaymentInformationComponent } from './components/payment-information/payment-information.component';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { SharedModule as SharedModuleMetronic } from 'src/app/_metronic/shared/shared.module';
 
 @NgModule({
   declarations: [
+    PaymentInformationComponent,
     CanEditDirective,
-    CanNotEditDirective,
     CanCreateDirective,
     CanDeleteDirective,
     CanReadDirective,
   ],
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    CrudModule,
+    FormsModule,
+    ReactiveFormsModule,
+    SharedModuleMetronic,
+    SweetAlert2Module.forChild(),
+  ],
   exports: [
+    PaymentInformationComponent,
     CanEditDirective,
-    CanNotEditDirective,
     CanCreateDirective,
     CanDeleteDirective,
     CanReadDirective,

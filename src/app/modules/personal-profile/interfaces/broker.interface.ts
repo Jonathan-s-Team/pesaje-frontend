@@ -1,4 +1,4 @@
-import { IPersonModel } from 'src/app/shared/interfaces/person.interface';
+import { IPersonModel } from '../../shared/interfaces/person.interface';
 
 export interface ICreateBrokerModel {
   deletedAt: string;

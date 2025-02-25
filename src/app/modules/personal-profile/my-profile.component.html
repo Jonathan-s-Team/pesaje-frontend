@@ -15,16 +15,8 @@
             symbol symbol-100px symbol-lg-160px symbol-fixed
             position-relative
           ">
-            <img
-              *ngIf="user?.person?.photo"
-              [src]="user?.person?.photo"
-              alt="Foto de perfil"
-            />
-            <img
-              *ngIf="!user?.person?.photo"
-              src="./assets/media/avatars/300-1.jpg"
-              alt="Foto por defecto"
-            />
+            <img *ngIf="user?.person?.photo" [src]="user?.person?.photo" alt="Foto de perfil" />
+            <img *ngIf="!user?.person?.photo" src="./assets/media/avatars/300-1.jpg" alt="Foto por defecto" />
             <div class="
               position-absolute
               translate-middle

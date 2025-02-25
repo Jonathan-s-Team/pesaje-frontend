@@ -27,7 +27,7 @@ import { SharedModule } from '../../shared/shared.module';
         component: BrokerListingComponent,
       },
       {
-        path: ':id',
+        path: ':brokerId',
         component: BrokerDetailsComponent,
       },
     ]),

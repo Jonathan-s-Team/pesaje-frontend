@@ -1,9 +1,9 @@
 import { AuthModel } from './auth.model';
 import { AddressModel } from './address.model';
 import { SocialNetworksModel } from './social-networks.model';
-import { IPersonModel } from 'src/app/shared/interfaces/person.interface';
 import { IRoleModel } from '../interfaces/role.interface';
 import { IPermissionModel } from '../interfaces/permission.interface';
+import { IPersonModel } from '../../shared/interfaces/person.interface';
 
 export class UserModel extends AuthModel {
   id: string;

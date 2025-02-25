@@ -41,6 +41,7 @@ import { ReportsComponent } from './components/toolbar/reports/reports.component
 import { SaasComponent } from './components/toolbar/saas/saas.component';
 import { SharedModule as SharedModuleMetronic } from '../shared/shared.module';
 import { SharedModule } from '../../../app/modules/shared/shared.module';
+import { SidebarDynamicMenuComponent } from './components/sidebar/sidebar-dynamic-menu/sidebar-dynamic-menu.component';
 
 const routes: Routes = [
   {
@@ -66,6 +67,7 @@ const routes: Routes = [
     SidebarLogoComponent,
     SidebarMenuComponent,
     SidebarPermissionsComponent,
+    SidebarDynamicMenuComponent,
     SidebarFooterComponent,
     NavbarComponent,
     AccountingComponent,

@@ -3,8 +3,11 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  Input,
+  OnChanges,
   OnDestroy,
   OnInit,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
@@ -12,17 +15,17 @@ import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { Subscription } from 'rxjs';
 import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
-import { PaymentInfoService } from '../services/payment-info.service';
-import { UserService } from '../services/user.service';
-import { IPaymentInfoModel } from 'src/app/shared/interfaces/payment-info.interface';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
+import { IPaymentInfoModel } from '../../interfaces/payment-info.interface';
+import { PaymentInfoService } from '../../services/payment-info.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-payment-information',
   templateUrl: './payment-information.component.html',
 })
 export class PaymentInformationComponent
-  implements OnInit, AfterViewInit, OnDestroy
+  implements OnInit, AfterViewInit, OnChanges, OnDestroy
 {
   PERMISSION_ROUTES = PERMISSION_ROUTES;
 
@@ -32,8 +35,8 @@ export class PaymentInformationComponent
   paymentData: IPaymentInfoModel[] = [];
   paymentInfo: IPaymentInfoModel = {} as IPaymentInfoModel;
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
-  personId!: string;
 
+  @Input() personId?: string;
   @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
   swalOptions: SweetAlertOptions = {};
 
@@ -72,22 +75,31 @@ export class PaymentInformationComponent
 
   constructor(
     private paymentInfoService: PaymentInfoService,
-    private userService: UserService,
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    // Subscribe to current user to get `personId`
-    const userSub = this.userService.user$.subscribe((user) => {
-      if (user?.person?.id) {
-        this.personId = user.person.id;
-        this.loadPaymentInfos();
-      }
-    });
-    this.unsubscribe.push(userSub);
+    // If personId is not provided as an input, get it from route resolver
+    if (!this.personId) {
+      this.route.data.subscribe((data) => {
+        this.personId = data['personId'];
+        if (this.personId) {
+          this.loadPaymentInfos();
+        }
+      });
+    } else {
+      this.loadPaymentInfos(); // ✅ Load if personId is provided as input
+    }
   }
 
   ngAfterViewInit(): void {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['personId'] && changes['personId'].currentValue) {
+      this.loadPaymentInfos(); // Reload when personId changes
+    }
+  }
 
   // 🔹 Load Payment Info List for Person
   loadPaymentInfos(): void {
