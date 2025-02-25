@@ -2,13 +2,19 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
-  OnInit, ViewChild,
+  OnDestroy,
+  OnInit,
+  ViewChild,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BrokerService } from '../../services/broker.service';
-import {IReadBrokerModel, IUpdateBrokerModel} from '../../interfaces/broker.interface';
-import {NgForm} from "@angular/forms";
-import Swal, {SweetAlertOptions} from "sweetalert2";
+import {
+  IReadBrokerModel,
+  IUpdateBrokerModel,
+} from '../../interfaces/broker.interface';
+import { NgForm } from '@angular/forms';
+import Swal, { SweetAlertOptions } from 'sweetalert2';
+import { Observable, Subscription } from 'rxjs';
 
 type Tabs = 'Details' | 'Payment Info';
 
@@ -17,103 +23,93 @@ type Tabs = 'Details' | 'Payment Info';
   templateUrl: './broker-details.component.html',
   styleUrls: ['./broker-details.component.scss'],
 })
-export class BrokerDetailsComponent implements OnInit, AfterViewInit {
-
+export class BrokerDetailsComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   @ViewChild('brokerForm') brokerForm!: NgForm;
-  isCollapsed: boolean = false;
-  brokerData: IReadBrokerModel = {
-    id: '',
-    deletedAt: '',
-    buyerItBelongs: { id: '', fullName: '' },
-    person: {
-      id: '',
-      names: '',
-      lastNames: '',
-      identification: '',
-      birthDate: new Date(),
-      address: '',
-      phone: '',
-      mobilePhone: '',
-      mobilePhone2: '',
-      email: '',
-      emergencyContactName: '',
-      emergencyContactPhone: ''
-    }
-  };
-  // Broker details object
-  personId: string;
-  isLoading: boolean = true; // Added loading state
+
+  isLoading$: Observable<boolean>;
+  activeTab: Tabs = 'Details';
+
+  brokerData: IReadBrokerModel = {} as IReadBrokerModel;
+  personId: string = '';
   formattedBirthDate: string = '';
 
-
-  activeTab: Tabs = 'Details';
+  /** Stores all active subscriptions */
+  private unsubscribe: Subscription[] = [];
 
   constructor(
     private brokerService: BrokerService,
     private route: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef
-  ) {}
+  ) {
+    this.isLoading$ = this.brokerService.isLoading$;
+  }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
+    const routeSub = this.route.paramMap.subscribe((params) => {
       const brokerId = params.get('brokerId');
       if (brokerId) {
         this.fetchBrokerDetails(brokerId);
       }
     });
+
+    this.unsubscribe.push(routeSub);
   }
 
+  ngAfterViewInit(): void {}
+
   fetchBrokerDetails(brokerId: string): void {
-    this.isLoading = true; // Start loading
-    this.brokerService.getBrokerById(brokerId).subscribe({
+    const brokerSub = this.brokerService.getBrokerById(brokerId).subscribe({
       next: (broker) => {
         this.brokerData = broker;
-        this.personId = broker.person!.id; // Extract personId from broker data
-        if (broker.person.birthDate) {
-          this.formattedBirthDate = new Date(broker.person.birthDate).toISOString().split('T')[0];
+        this.personId = broker.person?.id ?? '';
+
+        if (broker.person?.birthDate) {
+          this.formattedBirthDate = new Date(broker.person.birthDate)
+            .toISOString()
+            .split('T')[0];
         }
-        this.isLoading = false;
-        this.changeDetectorRef.detectChanges(); // Ensure UI updates
+
+        this.changeDetectorRef.detectChanges();
       },
       error: (err) => {
         console.error('Error fetching broker details:', err);
-        this.isLoading = false;
       },
     });
+
+    this.unsubscribe.push(brokerSub);
   }
 
   setActiveTab(tab: Tabs) {
     this.activeTab = tab;
   }
 
-  saveBroker(){
+  saveBroker() {
     if (this.brokerForm.invalid || !this.brokerData) {
       return;
     }
-    this.isLoading = true;
 
     const payload: IUpdateBrokerModel = {
       id: this.brokerData.id,
       deletedAt: this.brokerData.deletedAt,
       buyerItBelongs: this.brokerData.buyerItBelongs.id,
       person: this.brokerData.person,
-    }
+    };
 
-    this.brokerService.updateBroker(this.brokerData.id, payload).subscribe({
-      next: ()=> {
-        this.isLoading = false;
-        this.showSuccessAlert()
-      },
-      error: (error) => {
-        this.isLoading = false;
-        console.error('Error updating broker', error);
-        this.showErrorAlert(error);
-      }
-    });
-  }
+    const updateSub = this.brokerService
+      .updateBroker(this.brokerData.id, payload)
+      .subscribe({
+        next: () => {
+          this.showSuccessAlert();
+        },
+        error: (error) => {
+          console.error('Error updating broker', error);
+          this.showErrorAlert(error);
+        },
+      });
 
-  get brokerPerson() {
-    return this.brokerData.person!;
+    this.unsubscribe.push(updateSub);
   }
 
   private showSuccessAlert() {
@@ -132,7 +128,9 @@ export class BrokerDetailsComponent implements OnInit, AfterViewInit {
   private showErrorAlert(error: any) {
     const options: SweetAlertOptions = {
       title: 'Error',
-      html: `<strong>${error.message || 'Ocurrió un error inesperado.'}</strong>`,
+      html: `<strong>${
+        error.message || 'Ocurrió un error inesperado.'
+      }</strong>`,
       icon: 'error',
       confirmButtonText: 'Entendido',
       confirmButtonColor: '#d33',
@@ -142,5 +140,8 @@ export class BrokerDetailsComponent implements OnInit, AfterViewInit {
     Swal.fire(options);
   }
 
-  ngAfterViewInit(): void {}
+  /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */
+  ngOnDestroy(): void {
+    this.unsubscribe.forEach((sub) => sub.unsubscribe());
+  }
 }

@@ -44,7 +44,10 @@ export class BrokerListingComponent
   // Reload emitter inside datatable
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  brokerModel: ICreateBrokerModel = {} as ICreateBrokerModel;
+  brokerModel: ICreateBrokerModel = {
+    person: {} as IPersonModel,
+  } as ICreateBrokerModel;
+
   brokers: IReadBrokerModel[] = [];
 
   // Single model
@@ -221,8 +224,9 @@ export class BrokerListingComponent
   }
 
   create() {
-    this.brokerModel = {} as ICreateBrokerModel;
-    this.brokerModel.person = {} as IPersonModel;
+    this.brokerModel = {
+      person: {} as IPersonModel, // Ensure person object is initialized
+    } as ICreateBrokerModel;
   }
 
   formatDate(dateString: string): string {
@@ -304,6 +308,7 @@ export class BrokerListingComponent
   }
 
   ngOnDestroy(): void {
+    this.unsubscribe.forEach((sub) => sub.unsubscribe());
     this.reloadEvent.unsubscribe();
   }
 }

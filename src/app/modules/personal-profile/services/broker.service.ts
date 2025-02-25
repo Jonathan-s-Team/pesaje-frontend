@@ -14,7 +14,7 @@ const API_BROKER_URL = `${environment.apiUrl}/broker`;
 @Injectable({ providedIn: 'root' })
 export class BrokerService {
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
-  isloading$ = this.isLoadingSubject.asObservable();
+  isLoading$ = this.isLoadingSubject.asObservable();
   constructor(private http: HttpClient) {}
 
   createBroker(
