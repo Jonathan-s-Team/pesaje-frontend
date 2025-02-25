@@ -17,7 +17,6 @@ export interface IUpdateUserModel {
   };
 }
 
-
 export interface IReadUsersModel{
   deletedAt: string;
   id: string;

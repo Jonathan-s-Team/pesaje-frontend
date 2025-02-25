@@ -23,7 +23,7 @@ import { IPaymentInfoModel } from 'src/app/modules/shared/interfaces/payment-inf
 import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
 import {UserService} from "../../services/user.service";
 import {UserModel} from 'src/app/modules/auth/models/user.model';
-import {IReadUsersModel} from "../../interfaces/user.interface";
+import {IReadUsersModel, IUpdateUserModel} from "../../interfaces/user.interface";
 
 
 @Component({
@@ -45,7 +45,7 @@ export class UsersListingComponent
   // Reload emitter inside datatable
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  brokerModel: ICreateBrokerModel = {} as ICreateBrokerModel;
+  userModel: IUpdateUserModel = {} as IUpdateUserModel;
   users: IReadUsersModel[] = [];
 
   // Single model
@@ -213,7 +213,7 @@ export class UsersListingComponent
 
   hasBrokerChanges(): boolean {
     return (
-      JSON.stringify(this.brokerModel) !==
+      JSON.stringify(this.userModel) !==
       JSON.stringify(this.originalBrokerModel)
     );
   }
@@ -224,8 +224,8 @@ export class UsersListingComponent
   }
 
   create() {
-    this.brokerModel = {} as ICreateBrokerModel;
-    this.brokerModel.person = {} as IPersonModel;
+    this.userModel = {} as IUpdateUserModel;
+    //this.userModel.person = {} as IPersonModel;
   }
 
   formatDate(dateString: string): string {
@@ -237,18 +237,19 @@ export class UsersListingComponent
   }
 
   onSubmit(event: Event, myForm: NgForm) {
+    /*
     if (myForm && myForm.invalid) {
       return;
     }
 
     this.isLoading = true;
 
-    this.brokerModel.buyerItBelongs = this.authService.currentUserValue!.id;
+    this.userModel.buyerItBelongs = this.authService.currentUserValue!.id;
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: '¡Éxito!',
-      text: this.brokerModel.id
+      text: this.userModel.id
         ? '¡Bróker actualizado exitosamente!'
         : '¡Bróker creado exitosamente!',
     };
@@ -266,7 +267,7 @@ export class UsersListingComponent
     const updateFn = () => {};
 
     const createFn = () => {
-      this.userService.createUser(this.brokerModel).subscribe({
+      this.userService.createUser(this.userModel).subscribe({
         next: () => {
           this.showAlert(successAlert);
           this.loadBrokers();
@@ -280,11 +281,11 @@ export class UsersListingComponent
       });
     };
 
-    if (this.brokerModel.id) {
+    if (this.userModel.id) {
       updateFn();
     } else {
       createFn();
-    }
+    }*/
   }
 
   showAlert(swalOptions: SweetAlertOptions) {
