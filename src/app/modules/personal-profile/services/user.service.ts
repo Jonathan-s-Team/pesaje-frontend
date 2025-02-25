@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, finalize, map, Observable, tap } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import { UserModel } from '../../auth/models/user.model';
-import { AuthService } from '../../auth';
-import { IUpdateUserModel } from '../interfaces/user.interface';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {BehaviorSubject, finalize, map, Observable, tap} from 'rxjs';
+import {environment} from 'src/environments/environment';
+import {UserModel} from '../../auth/models/user.model';
+import {AuthService} from '../../auth';
+import {IUpdateUserModel} from '../interfaces/user.interface';
 
 const API_USERS_URL = `${environment.apiUrl}/user`;
 
@@ -46,15 +46,15 @@ export class UserService {
     );
   }
 
-  // createUser(userData: Partial<UserModel>): Observable<UserModel> {
-  //   this.isLoadingSubject.next(true);
-  //   return this.http.post<UserModel>(`${API_USERS_URL}`, userData).pipe(
-  //     tap((newUser) => {
-  //       this.userSubject.next(newUser); // Update stored user
-  //     }),
-  //     finalize(() => this.isLoadingSubject.next(false))
-  //   );
-  // }
+  createUser(userData: Partial<UserModel>): Observable<UserModel> {
+    this.isLoadingSubject.next(true);
+    return this.http.post<UserModel>(`${API_USERS_URL}`, userData).pipe(
+      tap((newUser) => {
+        this.userSubject.next(newUser); // Update stored user
+      }),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
 
   updateUser(id: string, userData: IUpdateUserModel): Observable<UserModel> {
     this.isLoadingSubject.next(true);
@@ -73,5 +73,24 @@ export class UserService {
         }),
         finalize(() => this.isLoadingSubject.next(false))
       );
+  }
+
+  getAllUsers(includeDeleted: boolean): Observable<UserModel[]> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .get<{ ok: boolean; data: UserModel[] }>(
+        `${API_USERS_URL}/all?includeDeleted=${includeDeleted}`
+      )
+      .pipe(
+        map((response) => response.data || []),
+        finalize(() => this.isLoadingSubject.next(false))
+      );
+  }
+
+  deleteUser(id: string): Observable<{ message: string }> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .delete<{ message: string }>(`${API_USERS_URL}/${id}`)
+      .pipe(finalize(() => this.isLoadingSubject.next(false)));
   }
 }

@@ -1,0 +1,133 @@
+<div class="card">
+  <div class="card-header border-0 pt-6">
+    <!--begin::Card title-->
+    <div class="card-title">
+      <!--begin::Search-->
+      <div class="d-flex align-items-center position-relative my-1">
+        <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+        <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
+          placeholder="Buscar Usuarios">
+      </div>
+      <!--end::Search-->
+    </div>
+    <!--begin::Card title-->
+
+    <!--begin::Card toolbar-->
+    <div class="card-toolbar">
+      <!--begin::Toolbar-->
+      <div class="d-flex justify-content-end">
+        <!--begin::Add bróker-->
+        <button *appCanCreate="PERMISSION_ROUTES.PERSONAL_PROFILE.BROKERS" type="button" class="btn btn-primary"
+          data-action="create" (click)="create()">
+          Agregar Usuario
+        </button>
+        <!--end::Add bróker-->
+      </div>
+      <!--end::Toolbar-->
+    </div>
+    <!--end::Card toolbar-->
+  </div>
+
+  <div class="card-body pt-0">
+    <app-crud [datatableConfig]="datatableConfig" permissionRoute="{{PERMISSION_ROUTES.PERSONAL_PROFILE.BROKERS}}"
+      (deleteEvent)="delete($event.toString())" (editEvent)="edit($event.toString())" (createEvent)="create()"
+      [reload]="reloadEvent" [modal]="formModal"></app-crud>
+  </div>
+</div>
+
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>
+
+<ng-template #formModal let-modal>
+  <form #myForm="ngForm" (ngSubmit)="onSubmit($event, myForm)">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Detalles del Usuario</h4>
+      <button type="button" class="btn-close" aria-label="Cerrar" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+      <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
+
+        <!--begin::Payment information form-->
+        <div class="collapse show">
+          <div class="mb-3">
+            <label for="names" class="required fw-semibold fs-6 mb-2">Nombres</label>
+            <input type="text" class="form-control" id="names" name="names" [(ngModel)]="brokerModel.person.names"
+              required>
+          </div>
+
+          <div class="mb-3">
+            <label for="lastNames" class="required fw-semibold fs-6 mb-2">Apellidos</label>
+            <input type="text" class="form-control" id="lastNames" name="lastNames"
+              [(ngModel)]="brokerModel.person.lastNames" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="identification" class="required fw-semibold fs-6 mb-2">Identificación</label>
+            <input type="text" class="form-control" id="identification" name="identification"
+              [(ngModel)]="brokerModel.person.identification" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="birthDate" class="required fw-semibold fs-6 mb-2">Fecha de Nacimiento</label>
+            <input type="date" class="form-control" id="birthDate" name="birthDate"
+              [(ngModel)]="brokerModel.person.birthDate" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="address" class="required fw-semibold fs-6 mb-2">Dirección</label>
+            <input type="text" class="form-control" id="address" name="address" [(ngModel)]="brokerModel.person.address"
+              required>
+          </div>
+
+          <div class="mb-3">
+            <label for="phone" class="required fw-semibold fs-6 mb-2">Teléfono</label>
+            <input type="text" class="form-control" id="phone" name="phone" [(ngModel)]="brokerModel.person.phone">
+          </div>
+
+          <div class="mb-3">
+            <label for="mobilePhone" class="required fw-semibold fs-6 mb-2">Teléfono Celular</label>
+            <input type="text" class="form-control" id="mobilePhone" name="mobilePhone"
+              [(ngModel)]="brokerModel.person.mobilePhone" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="mobilePhone2" class="required fw-semibold fs-6 mb-2">Teléfono Celular Secundario</label>
+            <input type="text" class="form-control" id="mobilePhone2" name="mobilePhone2"
+              [(ngModel)]="brokerModel.person.mobilePhone2">
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="required fw-semibold fs-6 mb-2">Correo Electrónico</label>
+            <input type="email" class="form-control" id="email" name="email" [(ngModel)]="brokerModel.person.email"
+              required>
+          </div>
+
+          <div class="mb-3">
+            <label for="emergencyContactName" class="required fw-semibold fs-6 mb-2">Contacto de Emergencia</label>
+            <input type="text" class="form-control" id="emergencyContactName" name="emergencyContactName"
+              [(ngModel)]="brokerModel.person.emergencyContactName">
+          </div>
+
+          <div class="mb-3">
+            <label for="emergencyContactPhone" class="required fw-semibold fs-6 mb-2">Teléfono de Emergencia</label>
+            <input type="text" class="form-control form-control-solid" id="emergencyContactPhone"
+              name="emergencyContactPhone" [(ngModel)]="brokerModel.person.emergencyContactPhone" required>
+          </div>
+        </div>
+        <!--end::Payment information form-->
+      </div>
+    </div>
+    <div class="modal-footer flex-center">
+      <button type="reset" class="btn btn-light me-3" (click)="modal.dismiss('cancel')">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+        <span class="indicator-label">Guardar</span>
+        <span class="indicator-progress">
+          Por favor, espera... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+        </span>
+      </button>
+    </div>
+  </form>
+
+</ng-template>
