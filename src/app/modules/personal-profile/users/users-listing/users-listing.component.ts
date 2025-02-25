@@ -23,6 +23,7 @@ import { IPaymentInfoModel } from 'src/app/modules/shared/interfaces/payment-inf
 import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
 import {UserService} from "../../services/user.service";
 import {UserModel} from 'src/app/modules/auth/models/user.model';
+import {IReadUsersModel} from "../../interfaces/user.interface";
 
 
 @Component({
@@ -45,7 +46,7 @@ export class UsersListingComponent
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
   brokerModel: ICreateBrokerModel = {} as ICreateBrokerModel;
-  users: UserModel[] = [];
+  users: IReadUsersModel[] = [];
 
   // Single model
   // aBroker: Observable<IReadBrokerModel>;
@@ -62,7 +63,7 @@ export class UsersListingComponent
     columns: [
       {
         title: 'Nombre Completo',
-        data: 'person.names',
+        data: 'id',
         render: function (data, type, full) {
           const colorClasses = ['success', 'info', 'warning', 'danger'];
           const randomColorClass =
@@ -98,23 +99,27 @@ export class UsersListingComponent
       },
       {
         title: 'Nombre de Usuario',
-        data: 'person.identification',
+        data: 'username',
         render: function (data) {
           return data ? data : '-';
         },
       },
       {
         title: 'Estado',
-        data: 'person.mobilePhone',
+        data: 'deletedAt',
         render: function (data) {
-          return data ? data : '-';
+          if (data) {
+            return `<span class="badge bg-danger">Inactivo</span>`;
+          } else {
+            return `<span class="badge bg-success">Activo</span>`;
+          }
         },
       },
       {
         title: 'Roles',
-        data: 'person.mobilePhone',
+        data: 'roles',
         render: function (data) {
-          return data ? data : '-';
+          return data && data.length ? data.join(', ') : '-';
         },
       },
     ],
