@@ -4,7 +4,7 @@ import {BehaviorSubject, finalize, map, Observable, tap} from 'rxjs';
 import {environment} from 'src/environments/environment';
 import {UserModel} from '../../auth/models/user.model';
 import {AuthService} from '../../auth';
-import {IReadUsersModel, IUpdateUserModel} from '../interfaces/user.interface';
+import {ICreateUserModel, IReadUsersModel, IUpdateUserModel} from '../interfaces/user.interface';
 
 const API_USERS_URL = `${environment.apiUrl}/user`;
 
@@ -46,11 +46,11 @@ export class UserService {
     );
   }
 
-  createUser(userData: Partial<UserModel>): Observable<UserModel> {
+  createUser(userData: ICreateUserModel): Observable<UserModel> {
     this.isLoadingSubject.next(true);
     return this.http.post<UserModel>(`${API_USERS_URL}`, userData).pipe(
       tap((newUser) => {
-        this.userSubject.next(newUser); // Update stored user
+        this.userSubject.next(newUser);
       }),
       finalize(() => this.isLoadingSubject.next(false))
     );
