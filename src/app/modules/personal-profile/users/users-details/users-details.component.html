@@ -235,7 +235,7 @@
                         [value]="role.id"
                         (change)="onRoleChange($event)"
                         [checked]="selectedRoles.includes(role.id)"
-                        id="role-{{ role.id }}">
+                        id="{{ role.id }}">
                       <label class="form-check-label" for="role-{{ role.id }}">{{ role.name }}</label>
                     </div>
                     <div *ngIf="userForm.submitted && selectedRoles.length === 0" class="fv-plugins-message-container invalid-feedback">
