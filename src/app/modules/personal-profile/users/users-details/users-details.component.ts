@@ -6,11 +6,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BrokerService } from '../../services/broker.service';
-import {
-  IReadBrokerModel,
-  IUpdateBrokerModel,
-} from '../../interfaces/broker.interface';
 import { NgForm } from '@angular/forms';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { Observable, Subscription } from 'rxjs';
@@ -19,11 +14,13 @@ import {
   IUpdateUserModel,
 } from '../../interfaces/user.interface';
 import { UserService } from '../../services/user.service';
+import { IRoleModel } from 'src/app/modules/auth/interfaces/role.interface';
+import { RoleService } from 'src/app/modules/shared/services/role.service';
 
 type Tabs = 'Details' | 'Payment Info';
 
 @Component({
-  selector: 'app-broker-details',
+  selector: 'app-user-details',
   templateUrl: './users-details.component.html',
 })
 export class UsersDetailsComponent implements OnInit, AfterViewInit {
@@ -36,17 +33,22 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit {
   personId: string;
   formattedBirthDate: string = '';
 
+  availableRoles: IRoleModel[] = [];
+  selectedRoles: string[] = [];
+
   private unsubscribe: Subscription[] = [];
 
   constructor(
     private userService: UserService,
     private route: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private roleService: RoleService,
   ) {
     this.isLoading$ = this.userService.isLoading$;
   }
 
   ngOnInit(): void {
+    this.loadRoles();
     this.route.paramMap.subscribe((params) => {
       const userId = params.get('userId');
       if (userId) {
@@ -74,6 +76,7 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit {
             .toISOString()
             .split('T')[0];
         }
+        this.selectedRoles = this.userData.roles ? this.userData.roles.map(role => role.id) : [];
 
         this.changeDetectorRef.detectChanges();
       },
@@ -85,37 +88,59 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit {
     this.unsubscribe.push(userSub);
   }
 
+  loadRoles(): void {
+    const rolesSub = this.roleService.getRoles().subscribe({
+      next: (roles) => {
+        this.availableRoles = roles;
+        this.changeDetectorRef.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error al cargar roles', err);
+      },
+    });
+    this.unsubscribe.push(rolesSub);
+  }
+
   setActiveTab(tab: Tabs) {
     this.activeTab = tab;
   }
 
-  saveBroker() {
-    if (this.userForm.invalid || !this.userForm) {
+  saveUser(): void {
+    if (!this.userForm || this.userForm.invalid) {
       return;
     }
 
     const payload: IUpdateUserModel = {
       id: this.userData.id,
       username: this.userData.username,
-      // password: this.userData.password,
       person: this.userData.person,
-      roles: this.userData.roles.map((role) => role.id),
+      roles: this.selectedRoles,
     };
 
-    const updateSub = this.userService
-      .updateUser(this.userData.id, payload)
-      .subscribe({
-        next: () => {
-          this.showSuccessAlert();
-        },
-        error: (error) => {
-          console.error('Error updating user', error);
-          this.showErrorAlert(error);
-        },
-      });
-
+    const updateSub = this.userService.updateUser(this.userData.id, payload).subscribe({
+      next: () => {
+        this.showSuccessAlert();
+      },
+      error: (error) => {
+        console.error('Error updating user', error);
+        this.showErrorAlert(error);
+      },
+    });
     this.unsubscribe.push(updateSub);
   }
+
+  onRoleChange(event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    const roleId = checkbox.value;
+    if (checkbox.checked) {
+      if (!this.selectedRoles.includes(roleId)) {
+        this.selectedRoles.push(roleId);
+      }
+    } else {
+      this.selectedRoles = this.selectedRoles.filter(id => id !== roleId);
+    }
+  }
+
 
   private showSuccessAlert() {
     const options: SweetAlertOptions = {
