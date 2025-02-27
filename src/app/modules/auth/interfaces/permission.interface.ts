@@ -9,8 +9,8 @@ export interface IPermissionModel {
 }
 
 export enum PermissionEnum {
-  VIEW = 'View',
-  EDIT = 'Edit',
-  ADD = 'Add',
-  DELETE = 'Delete',
+  VIEW = 'VIEW',
+  EDIT = 'EDIT',
+  ADD = 'ADD',
+  DELETE = 'DELETE',
 }
