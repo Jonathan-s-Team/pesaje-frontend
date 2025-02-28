@@ -12,22 +12,22 @@ import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { Subscription } from 'rxjs';
 import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
-import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
 import { IRoleModel } from 'src/app/modules/auth/interfaces/role.interface';
-import { Router } from '@angular/router';
 import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
-import { UserService } from '../../services/user.service';
+import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 import {
   ICreateUserModel,
   IReadUsersModel,
-} from '../../interfaces/user.interface';
-import { RoleService } from '../../../shared/services/role.service';
+} from 'src/app/modules/personal-profile/interfaces/user.interface';
+import { UserService } from 'src/app/modules/personal-profile/services/user.service';
+import { RoleService } from 'src/app/modules/shared/services/role.service';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-broker-listing',
-  templateUrl: './users-listing.component.html',
+  selector: 'app-size-price',
+  templateUrl: './size-price.component.html',
 })
-export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
+export class SizePriceComponent implements OnInit, AfterViewInit, OnDestroy {
   PERMISSION_ROUTES = PERMISSION_ROUTES;
 
   isLoading = false;
