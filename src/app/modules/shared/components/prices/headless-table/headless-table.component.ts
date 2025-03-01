@@ -9,10 +9,10 @@ import {
 import { IReadSizePriceModel } from '../../../interfaces/size-price.interface';
 
 @Component({
-  selector: 'app-whole-table',
-  templateUrl: './whole-table.component.html',
+  selector: 'app-headless-table',
+  templateUrl: './headless-table.component.html',
 })
-export class WholeTableComponent implements OnInit, OnDestroy {
+export class HeadlessTableComponent implements OnInit, OnDestroy {
   isLoading$: Observable<boolean>;
 
   form: FormGroup;
@@ -33,28 +33,44 @@ export class WholeTableComponent implements OnInit, OnDestroy {
   }
 
   loadSizes(): void {
-    const sizesSub = this.sizeService.getSizes(SizeTypeEnum.WHOLE).subscribe({
-      next: (sizes) => {
-        this.sizes = sizes;
+    const sizesSub = this.sizeService
+      .getSizes(SizeTypeEnum.HEADLESS)
+      .subscribe({
+        next: (sizes) => {
+          this.sizes = sizes;
 
-        this.sizes.forEach((size) => {
-          // Add size price to array
-          this.sizePrices.push({ size, price: 0 });
+          this.sizes.forEach((size) => {
+            // Add size price to array
+            this.sizePrices.push({ size, price: 0 });
 
-          // Add form controls with validation
-          this.form.addControl(
-            size.id,
-            new FormControl('', [
-              Validators.required,
-              Validators.pattern(/^\d+(\.\d{1,2})?$/), // Allow only numbers with max 2 decimals
-            ])
-          );
-        });
-      },
-      error: (err) => {
-        console.error('Error al cargar tallas', err);
-      },
-    });
+            // Add form controls with validation
+            this.form.addControl(
+              `cola-a-${size.id}`,
+              new FormControl('', [
+                Validators.required,
+                Validators.pattern(/^\d+(\.\d{1,2})?$/), // Allow only numbers with max 2 decimals
+              ])
+            );
+            this.form.addControl(
+              `cola-a--${size.id}`,
+              new FormControl('', [
+                Validators.required,
+                Validators.pattern(/^\d+(\.\d{1,2})?$/), // Allow only numbers with max 2 decimals
+              ])
+            );
+            this.form.addControl(
+              `cola-b-${size.id}`,
+              new FormControl('', [
+                Validators.required,
+                Validators.pattern(/^\d+(\.\d{1,2})?$/), // Allow only numbers with max 2 decimals
+              ])
+            );
+          });
+        },
+        error: (err) => {
+          console.error('Error al cargar tallas', err);
+        },
+      });
 
     this.unsubscribe.push(sizesSub);
   }

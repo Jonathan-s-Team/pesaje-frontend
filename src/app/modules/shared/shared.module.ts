@@ -10,11 +10,13 @@ import { PaymentInformationComponent } from './components/payment-information/pa
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { SharedModule as SharedModuleMetronic } from 'src/app/_metronic/shared/shared.module';
 import { WholeTableComponent } from './components/prices/whole-table/whole-table.component';
+import { HeadlessTableComponent } from './components/prices/headless-table/headless-table.component';
 
 @NgModule({
   declarations: [
     PaymentInformationComponent,
     WholeTableComponent,
+    HeadlessTableComponent,
     CanEditDirective,
     CanCreateDirective,
     CanDeleteDirective,
@@ -31,6 +33,7 @@ import { WholeTableComponent } from './components/prices/whole-table/whole-table
   exports: [
     PaymentInformationComponent,
     WholeTableComponent,
+    HeadlessTableComponent,
     CanEditDirective,
     CanCreateDirective,
     CanDeleteDirective,

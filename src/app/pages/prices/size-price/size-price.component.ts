@@ -30,6 +30,35 @@ import { Router } from '@angular/router';
 export class SizePriceComponent implements OnInit, AfterViewInit, OnDestroy {
   PERMISSION_ROUTES = PERMISSION_ROUTES;
 
+  months = [
+    { label: 'Enero', value: '01' },
+    { label: 'Febrero', value: '02' },
+    { label: 'Marzo', value: '03' },
+    { label: 'Abril', value: '04' },
+    { label: 'Mayo', value: '05' },
+    { label: 'Junio', value: '06' },
+    { label: 'Julio', value: '07' },
+    { label: 'Agosto', value: '08' },
+    { label: 'Septiembre', value: '09' },
+    { label: 'Octubre', value: '10' },
+    { label: 'Noviembre', value: '11' },
+    { label: 'Diciembre', value: '12' },
+  ];
+
+  years: number[] = [];
+
+  companies = ['Edpacific', 'Prodex']; // Load from service later
+
+  selectedMonth = '';
+  selectedYear = '';
+  selectedCompany = '';
+
+  isAdding = false;
+
+  newMonth = '';
+  newYear = '';
+  newCompany = '';
+
   isLoading = false;
 
   roles: IRoleModel[];
@@ -144,6 +173,9 @@ export class SizePriceComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.loadYears();
+    this.loadCompanies();
+
     this.loadUsers();
     this.loadRoles();
   }
@@ -295,6 +327,47 @@ export class SizePriceComponent implements OnInit, AfterViewInit, OnDestroy {
     );
     this.cdr.detectChanges();
     this.noticeSwal.fire();
+  }
+
+  loadYears() {
+    const currentYear = new Date().getFullYear();
+    this.years = Array.from({ length: 10 }, (_, i) => currentYear - i);
+  }
+
+  loadCompanies() {
+    // Simulate API call to get companies
+    setTimeout(() => {
+      this.companies = ['Edpacific', 'Prodex', 'Another Company'];
+    }, 1000);
+  }
+
+  search() {
+    console.log('Searching with:', {
+      month: this.selectedMonth,
+      year: this.selectedYear,
+      company: this.selectedCompany,
+    });
+  }
+
+  toggleAddPeriod() {
+    this.isAdding = !this.isAdding;
+    if (!this.isAdding) {
+      // Reset form fields when canceling
+      this.newMonth = '';
+      this.newYear = '';
+      this.newCompany = '';
+    }
+  }
+
+  savePeriod() {
+    console.log('Saving new period:', {
+      month: this.newMonth,
+      year: this.newYear,
+      company: this.newCompany,
+    });
+
+    // Normally, you'd make an API call to save the record.
+    this.toggleAddPeriod(); // Hide form after saving
   }
 
   ngOnDestroy(): void {
