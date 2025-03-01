@@ -175,6 +175,18 @@
           </div>
 
           <div class="mb-3">
+            <label for="phone" class="fw-semibold fs-6 mb-2">Teléfono Fijo</label>
+            <input
+              type="text"
+              class="form-control"
+              id="phone"
+              name="phone"
+              [(ngModel)]="userModel.person!.phone"
+              required
+              #phone="ngModel">
+          </div>
+
+          <div class="mb-3">
             <label for="mobilePhone" class="required fw-semibold fs-6 mb-2">Teléfono Celular</label>
             <input
               type="text"
@@ -211,13 +223,19 @@
           </div>
 
           <div class="mb-3">
-            <label for="emergencyContactName" class="fw-semibold fs-6 mb-2">Contacto de Emergencia</label>
+            <label for="emergencyContactName" class="required fw-semibold fs-6 mb-2">Contacto de Emergencia</label>
             <input
               type="text"
               class="form-control"
               id="emergencyContactName"
               name="emergencyContactName"
-              [(ngModel)]="userModel.person!.emergencyContactName">
+              [(ngModel)]="userModel.person!.emergencyContactName"
+            required
+            #emergencyContactName="ngModel">
+            <div *ngIf="(myForm.submitted || emergencyContactName.dirty || emergencyContactName.touched) && emergencyContactName.errors?.['required']"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>El correo nombre de contacto de emergecia es obligatorio.</div>
+            </div>
           </div>
 
           <div class="mb-3">
