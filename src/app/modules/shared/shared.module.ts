@@ -9,10 +9,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PaymentInformationComponent } from './components/payment-information/payment-information.component';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { SharedModule as SharedModuleMetronic } from 'src/app/_metronic/shared/shared.module';
+import { WholeTableComponent } from './components/prices/whole-table/whole-table.component';
 
 @NgModule({
   declarations: [
     PaymentInformationComponent,
+    WholeTableComponent,
     CanEditDirective,
     CanCreateDirective,
     CanDeleteDirective,
@@ -28,6 +30,7 @@ import { SharedModule as SharedModuleMetronic } from 'src/app/_metronic/shared/s
   ],
   exports: [
     PaymentInformationComponent,
+    WholeTableComponent,
     CanEditDirective,
     CanCreateDirective,
     CanDeleteDirective,
