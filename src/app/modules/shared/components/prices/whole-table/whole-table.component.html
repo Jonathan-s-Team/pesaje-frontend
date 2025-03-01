@@ -2,7 +2,6 @@
 <div class="card-header border-0 pt-5">
   <h3 class="card-title align-items-start flex-column">
     <span class="card-label fw-bolder fs-3 mb-1">Entero</span>
-    <span class="text-muted mt-1 fw-bold fs-7">Over 100 pending files</span>
   </h3>
 </div>
 <!-- end::Header -->
@@ -40,7 +39,12 @@
               <div class="input-group">
                 <span class="input-group-text">$</span>
                 <input type="text" class="form-control form-control-sm text-end" [formControlName]="size.id"
-                  (blur)="formatPrice(size.id)" placeholder="0.00" />
+                  (blur)="formatPrice(size.id)" (keypress)="validateNumber($event)" placeholder="0.00" />
+              </div>
+              <!-- Show validation error -->
+              <div *ngIf="form.controls[size.id]?.invalid && form.controls[size.id]?.touched"
+                class="text-danger small mt-1">
+                Ingrese un número válido
               </div>
             </td>
           </tr>

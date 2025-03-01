@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { SizeService } from '../../../services/size.service';
 import { Observable, Subscription } from 'rxjs';
 import {
@@ -45,8 +45,14 @@ export class WholeTableComponent implements OnInit, OnDestroy {
           // Add size price to array
           this.sizePrices.push({ size, price: 0 });
 
-          // ✅ Add control to FormGroup (before rendering)
-          this.form.addControl(size.id, new FormControl(0));
+          // Add form controls with validation
+          this.form.addControl(
+            size.id,
+            new FormControl('', [
+              Validators.required,
+              Validators.pattern(/^\d+(\.\d{1,2})?$/), // Allow only numbers with max 2 decimals
+            ])
+          );
         });
       },
       error: (err) => {
@@ -58,8 +64,22 @@ export class WholeTableComponent implements OnInit, OnDestroy {
   }
 
   formatPrice(id: string) {
-    const value = parseFloat(this.form.controls[id].value).toFixed(2);
-    this.form.controls[id].setValue(value);
+    let value = this.form.controls[id].value;
+
+    // Ensure value is a number and format to 2 decimal places
+    if (!isNaN(value) && value !== null && value !== '') {
+      this.form.controls[id].setValue(parseFloat(value).toFixed(2));
+    }
+  }
+
+  validateNumber(event: KeyboardEvent) {
+    const pattern = /^[0-9.]$/;
+    const inputChar = event.key;
+
+    // Prevent input if not a number or dot
+    if (!pattern.test(inputChar)) {
+      event.preventDefault();
+    }
   }
 
   ngOnDestroy(): void {
