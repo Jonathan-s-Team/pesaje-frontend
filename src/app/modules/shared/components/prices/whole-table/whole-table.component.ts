@@ -78,6 +78,23 @@ export class WholeTableComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * 👉 This method marks all form controls as touched to show validation errors.
+   */
+  triggerValidation() {
+    Object.keys(this.form.controls).forEach((key) => {
+      this.form.controls[key].markAsTouched();
+    });
+  }
+
+  clearValidationErrors() {
+    Object.keys(this.form.controls).forEach((key) => {
+      this.form.controls[key].setErrors(null); // Clear validation errors
+      this.form.controls[key].markAsPristine(); // Mark as untouched
+      this.form.controls[key].markAsUntouched();
+    });
+  }
+
   ngOnDestroy(): void {
     this.unsubscribe.forEach((sub) => sub.unsubscribe());
   }

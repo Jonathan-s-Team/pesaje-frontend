@@ -6,5 +6,7 @@ export interface IReadSizeModel {
 
 export enum SizeTypeEnum {
   WHOLE = 'WHOLE',
-  HEADLESS = 'HEADLESS',
+  'TAIL-A' = 'TAIL-A',
+  'TAIL-A-' = 'TAIL-A-',
+  'TAIL-B' = 'TAIL-B',
 }

@@ -15,7 +15,7 @@ export class SizeService {
   isLoading$ = this.isLoadingSubject.asObservable();
   constructor(private http: HttpClient) {}
 
-  getSizes(type: SizeTypeEnum): Observable<IReadSizeModel[]> {
+  getSizes(type: string): Observable<IReadSizeModel[]> {
     this.isLoadingSubject.next(true);
 
     const params = new HttpParams().set('type', type); // ✅ Add query param

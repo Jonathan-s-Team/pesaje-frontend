@@ -14,7 +14,7 @@
           <div class="d-flex">
             <!-- Company Selector -->
             <div class="w-150px me-3 position-relative">
-              <select class="form-select form-select-sm" [(ngModel)]="selectedCompany">
+              <select class="form-select form-select-sm" [(ngModel)]="selectedCompany" (change)="onCompanyChange()">
                 <option value="" disabled selected>Seleccione una empresa</option>
                 <option *ngFor="let company of companies" [value]="company.id">
                   {{ company.name }}
@@ -27,27 +27,14 @@
 
             <!-- Month Selector -->
             <div class="w-150px me-3 position-relative">
-              <select class="form-select form-select-sm" [(ngModel)]="selectedMonth">
-                <option value="" disabled selected>Seleccione un mes</option>
-                <option *ngFor="let month of months" [value]="month.value">
-                  {{ month.label }}
+              <select class="form-select form-select-sm" [(ngModel)]="selectedPeriod">
+                <option value="" disabled selected>Seleccione un periodo</option>
+                <option *ngFor="let period of existingPeriods" [value]="period.id">
+                  {{ period.name }}
                 </option>
               </select>
-              <small *ngIf="showErrors && !selectedMonth" class="text-danger small mt-1 position-absolute">
+              <small *ngIf="showErrors && !selectedPeriod" class="text-danger small mt-1 position-absolute">
                 Debe seleccionar un mes
-              </small>
-            </div>
-
-            <!-- Year Selector -->
-            <div class="w-120px me-3 position-relative">
-              <select class="form-select form-select-sm" [(ngModel)]="selectedYear">
-                <option value="" disabled selected>Seleccione un año</option>
-                <option *ngFor="let year of years" [value]="year">
-                  {{ year }}
-                </option>
-              </select>
-              <small *ngIf="showErrors && !selectedYear" class="text-danger small mt-1 position-absolute">
-                Debe seleccionar un año
               </small>
             </div>
 
@@ -149,3 +136,6 @@
   <!-- end::Col -->
 </div>
 <!-- end::Row -->
+
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>

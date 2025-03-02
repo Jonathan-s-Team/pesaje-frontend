@@ -6,14 +6,12 @@ export interface IReadSizePriceModel {
 }
 
 export interface ICreateSizePriceModel {
-  period: string;
-  size: IReadSizeModel;
+  sizeId: string;
   price: Number;
 }
 
 export interface IUpdateSizePriceModel {
   id: string;
-  period: string;
-  size: IReadSizeModel;
+  sizeId: string;
   price: Number;
 }

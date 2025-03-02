@@ -18,8 +18,7 @@ export class HeadlessTableComponent implements OnInit, OnDestroy {
   form: FormGroup;
 
   sizes: IReadSizeModel[] = [];
-
-  sizePrices: IReadSizePriceModel[] = [];
+  uniqueSizes: IReadSizeModel[] = [];
 
   private unsubscribe: Subscription[] = [];
 
@@ -34,15 +33,23 @@ export class HeadlessTableComponent implements OnInit, OnDestroy {
 
   loadSizes(): void {
     const sizesSub = this.sizeService
-      .getSizes(SizeTypeEnum.HEADLESS)
+      .getSizes(
+        [
+          SizeTypeEnum['TAIL-A'],
+          SizeTypeEnum['TAIL-A-'],
+          SizeTypeEnum['TAIL-B'],
+        ].join(',')
+      )
       .subscribe({
         next: (sizes) => {
-          this.sizes = sizes;
+          // ✅ Remove duplicate sizes based on 'id'
+          this.uniqueSizes = Array.from(
+            new Map(sizes.map((item) => [item.size, item])).values()
+          );
+
+          this.sizes = sizes; // ✅ Only unique IDs remain
 
           this.sizes.forEach((size) => {
-            // Add size price to array
-            this.sizePrices.push({ size, price: 0 });
-
             // Add form controls with validation
             this.form.addControl(
               `cola-a-${size.id}`,
@@ -92,6 +99,23 @@ export class HeadlessTableComponent implements OnInit, OnDestroy {
     if (!pattern.test(inputChar)) {
       event.preventDefault();
     }
+  }
+
+  /**
+   * 👉 This method marks all form controls as touched to show validation errors.
+   */
+  triggerValidation() {
+    Object.keys(this.form.controls).forEach((key) => {
+      this.form.controls[key].markAsTouched();
+    });
+  }
+
+  clearValidationErrors() {
+    Object.keys(this.form.controls).forEach((key) => {
+      this.form.controls[key].setErrors(null); // Clear validation errors
+      this.form.controls[key].markAsPristine(); // Mark as untouched
+      this.form.controls[key].markAsUntouched();
+    });
   }
 
   ngOnDestroy(): void {

@@ -261,7 +261,6 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
       text: 'No se pudo crear el usuario.',
     };
 
-    console.log(userPayload);
     this.userService.createUser(userPayload as any).subscribe({
       next: () => {
         this.showAlert(successAlert);
