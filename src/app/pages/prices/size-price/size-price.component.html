@@ -45,7 +45,8 @@
           </div>
 
           <!-- Add Period Button (Fixed Size) -->
-          <button class="btn btn-success btn-sm" (click)="toggleAddPeriod()" style="min-width: 150px;">
+          <button *appCanCreate="PERMISSION_ROUTES.PRICES" class="btn btn-success btn-sm" (click)="toggleAddPeriod()"
+            style="min-width: 150px;">
             Agregar Periodo
           </button>
         </div>
@@ -60,61 +61,54 @@
           <h5 class="fw-bolder my-2">Nuevo Periodo</h5>
         </div>
 
-        <form [formGroup]="periodForm">
-          <div class="d-flex align-items-center justify-content-between">
-            <div class="d-flex justify-content-between">
-              <!-- Company Input -->
-              <div class="w-150px me-3 position-relative">
-                <select class="form-select form-select-sm" formControlName="company">
-                  <option value="" disabled>Seleccione una empresa</option>
-                  <option *ngFor="let company of companies" [value]="company.id">{{ company.name }}</option>
-                </select>
-                <small *ngIf="periodForm.controls['company'].invalid && periodForm.controls['company'].touched"
-                  class="text-danger small mt-1 position-absolute">
-                  Debe seleccionar una empresa
-                </small>
-              </div>
-
-              <!-- Month Input -->
-              <div class="w-150px me-3 position-relative">
-                <select class="form-select form-select-sm" formControlName="month">
-                  <option value="" disabled>Seleccione un mes</option>
-                  <option *ngFor="let month of months" [value]="month.value">{{ month.label }}</option>
-                </select>
-                <small *ngIf="periodForm.controls['month'].invalid && periodForm.controls['month'].touched"
-                  class="text-danger small mt-1 position-absolute">
-                  Debe seleccionar un mes
-                </small>
-              </div>
-
-              <!-- Year Input -->
-              <div class="w-120px me-3 position-relative">
-                <select class="form-select form-select-sm" formControlName="year">
-                  <option value="" disabled>Seleccione un año</option>
-                  <option *ngFor="let year of years" [value]="year">{{ year }}</option>
-                </select>
-                <small *ngIf="periodForm.controls['year'].invalid && periodForm.controls['year'].touched"
-                  class="text-danger small mt-1 position-absolute">
-                  Debe seleccionar un año
-                </small>
-              </div>
-
-              <!-- Save Button -->
-              <div class="d-flex align-items-center">
-                <button class="btn btn-primary btn-sm me-3" (click)="savePeriod()">
-                  Guardar
-                </button>
-              </div>
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex justify-content-between">
+            <!-- Company Input -->
+            <div class="w-150px me-3 position-relative">
+              <select class="form-select form-select-sm" [(ngModel)]="selectedCompany">
+                <option value="" disabled>Seleccione una empresa</option>
+                <option *ngFor="let company of companies" [value]="company.id">{{ company.name }}</option>
+              </select>
+              <small *ngIf="showErrors && !selectedCompany" class="text-danger small mt-1 position-absolute">
+                Debe seleccionar una empresa
+              </small>
             </div>
 
-            <!-- Cancel Button (Aligned with dropdowns) -->
-            <button class="btn btn-danger btn-sm" (click)="toggleAddPeriod()">Cancelar</button>
+            <!-- Month Input -->
+            <div class="w-150px me-3 position-relative">
+              <select class="form-select form-select-sm" [(ngModel)]="selectedMonth">
+                <option value="" disabled>Seleccione un mes</option>
+                <option *ngFor="let month of months" [value]="month.value">{{ month.label }}</option>
+              </select>
+              <small *ngIf="showErrors && !selectedMonth" class="text-danger small mt-1 position-absolute">
+                Debe seleccionar un mes
+              </small>
+            </div>
+
+            <!-- Year Input -->
+            <div class="w-120px me-3 position-relative">
+              <select class="form-select form-select-sm" [(ngModel)]="selectedYear">
+                <option value="" disabled>Seleccione un año</option>
+                <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+              </select>
+              <small *ngIf="showErrors && !selectedYear" class="text-danger small mt-1 position-absolute">
+                Debe seleccionar un año
+              </small>
+            </div>
+
+            <!-- Save Button -->
+            <div class="d-flex align-items-center">
+              <button class="btn btn-primary btn-sm me-3" (click)="savePeriod()">
+                Guardar
+              </button>
+            </div>
           </div>
-        </form>
+
+          <!-- Cancel Button (Aligned with dropdowns) -->
+          <button class="btn btn-danger btn-sm" (click)="toggleAddPeriod()">Cancelar</button>
+        </div>
       </div>
     </div>
-
-
   </div>
   <!-- end::Col -->
 </div>
@@ -125,13 +119,13 @@
 
   <!-- begin::Col -->
   <div class="col-xl-6">
-    <app-whole-table class="card card-xl-stretch mb-xl-8"></app-whole-table>
+    <app-whole-table class="card card-xl-stretch mb-xl-8" [sizePrices]="wholeSizePrices"></app-whole-table>
   </div>
   <!-- end::Col -->
 
   <!-- begin::Col -->
   <div class="col-xl-6">
-    <app-headless-table class="card card-xl-stretch mb-xl-8"></app-headless-table>
+    <app-headless-table class="card card-xl-stretch mb-xl-8" [sizePrices]="headlessSizePrices"></app-headless-table>
   </div>
   <!-- end::Col -->
 </div>

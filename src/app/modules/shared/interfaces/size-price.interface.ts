@@ -2,16 +2,16 @@ import { IReadSizeModel } from './size.interface';
 
 export interface IReadSizePriceModel {
   size: IReadSizeModel;
-  price: Number;
+  price: number;
 }
 
 export interface ICreateSizePriceModel {
   sizeId: string;
-  price: Number;
+  price: number;
 }
 
 export interface IUpdateSizePriceModel {
   id: string;
   sizeId: string;
-  price: Number;
+  price: number;
 }

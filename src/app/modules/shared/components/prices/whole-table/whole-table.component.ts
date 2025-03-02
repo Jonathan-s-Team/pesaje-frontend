@@ -1,4 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { SizeService } from '../../../services/size.service';
 import { Observable, Subscription } from 'rxjs';
@@ -7,23 +14,27 @@ import {
   SizeTypeEnum,
 } from '../../../interfaces/size.interface';
 import { IReadSizePriceModel } from '../../../interfaces/size-price.interface';
+import { FormUtilsService } from 'src/app/utils/form-utils.service';
 
 @Component({
   selector: 'app-whole-table',
   templateUrl: './whole-table.component.html',
 })
-export class WholeTableComponent implements OnInit, OnDestroy {
+export class WholeTableComponent implements OnInit, OnChanges, OnDestroy {
+  @Input() sizePrices: IReadSizePriceModel[] = [];
+
   isLoading$: Observable<boolean>;
 
   form: FormGroup;
 
   sizes: IReadSizeModel[] = [];
 
-  sizePrices: IReadSizePriceModel[] = [];
-
   private unsubscribe: Subscription[] = [];
 
-  constructor(private sizeService: SizeService) {
+  constructor(
+    private sizeService: SizeService,
+    private formUtils: FormUtilsService
+  ) {
     this.form = new FormGroup({});
     this.isLoading$ = this.sizeService.isLoading$;
   }
@@ -32,15 +43,21 @@ export class WholeTableComponent implements OnInit, OnDestroy {
     this.loadSizes();
   }
 
+  /**
+   * 👉 Detects when `sizePrices` input changes and updates the form.
+   */
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['sizePrices'] && !changes['sizePrices'].firstChange) {
+      this.updateFormControls();
+    }
+  }
+
   loadSizes(): void {
     const sizesSub = this.sizeService.getSizes(SizeTypeEnum.WHOLE).subscribe({
       next: (sizes) => {
         this.sizes = sizes;
 
         this.sizes.forEach((size) => {
-          // Add size price to array
-          this.sizePrices.push({ size, price: 0 });
-
           // Add form controls with validation
           this.form.addControl(
             size.id,
@@ -59,40 +76,54 @@ export class WholeTableComponent implements OnInit, OnDestroy {
     this.unsubscribe.push(sizesSub);
   }
 
-  formatPrice(id: string) {
-    let value = this.form.controls[id].value;
+  /**
+   * 👉 Updates form controls based on `sizePrices` changes.
+   */
+  updateFormControls(): void {
+    if (!this.sizePrices?.length) return;
 
-    // Ensure value is a number and format to 2 decimal places
-    if (!isNaN(value) && value !== null && value !== '') {
-      this.form.controls[id].setValue(parseFloat(value).toFixed(2));
-    }
+    // ✅ Preserve existing values if possible
+    const newFormControls: { [key: string]: FormControl } = {};
+    this.sizePrices.forEach(({ size, price }) => {
+      newFormControls[size.id] = new FormControl(price || '', [
+        Validators.required,
+        Validators.pattern(/^\d+(\.\d{1,2})?$/),
+      ]);
+    });
+
+    // ✅ Replace entire form group to avoid stale controls
+    this.form = new FormGroup(newFormControls);
   }
 
-  validateNumber(event: KeyboardEvent) {
-    const pattern = /^[0-9.]$/;
-    const inputChar = event.key;
-
-    // Prevent input if not a number or dot
-    if (!pattern.test(inputChar)) {
-      event.preventDefault();
+  /**
+   * 👉 Formats price input value
+   */
+  formatPrice(id: string) {
+    const control = this.form.get(id);
+    if (control) {
+      this.formUtils.formatPrice(control); // ✅ Use utility function
     }
   }
 
   /**
-   * 👉 This method marks all form controls as touched to show validation errors.
+   * 👉 Validates numeric input (prevents invalid characters)
    */
-  triggerValidation() {
-    Object.keys(this.form.controls).forEach((key) => {
-      this.form.controls[key].markAsTouched();
-    });
+  validateNumber(event: KeyboardEvent) {
+    this.formUtils.validateNumber(event); // ✅ Use utility function
   }
 
+  /**
+   * 👉 Triggers validation messages for all inputs
+   */
+  triggerValidation() {
+    this.formUtils.triggerValidation(this.form); // ✅ Use utility function
+  }
+
+  /**
+   * 👉 Clears validation errors and resets form state
+   */
   clearValidationErrors() {
-    Object.keys(this.form.controls).forEach((key) => {
-      this.form.controls[key].setErrors(null); // Clear validation errors
-      this.form.controls[key].markAsPristine(); // Mark as untouched
-      this.form.controls[key].markAsUntouched();
-    });
+    this.formUtils.clearValidationErrors(this.form); // ✅ Use utility function
   }
 
   ngOnDestroy(): void {

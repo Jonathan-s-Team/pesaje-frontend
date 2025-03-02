@@ -40,25 +40,15 @@ export class PeriodService {
       );
   }
 
-  getPeriodById(id: string): Observable<IReadPeriodModel[]> {
+  getPeriodById(id: string): Observable<IReadPeriodModel> {
     this.isLoadingSubject.next(true);
     return this.http
-      .get<{ data: IReadPeriodModel[] }>(`${API_PERIOD_URL}/${id}`)
+      .get<{ data: IReadPeriodModel }>(`${API_PERIOD_URL}/${id}`)
       .pipe(
         map((response) => response.data), // ✅ Extract array from response
         finalize(() => this.isLoadingSubject.next(false))
       );
   }
-
-  // getPaymentInfoById(id: string): Observable<IPaymentInfoModel> {
-  //   this.isLoadingSubject.next(true);
-  //   return this.http
-  //     .get<{ paymentInfo: IPaymentInfoModel }>(`${API_PAYMENT_INFO_URL}/${id}`)
-  //     .pipe(
-  //       map((response) => response.paymentInfo), // ✅ Extract object from response
-  //       finalize(() => this.isLoadingSubject.next(false))
-  //     );
-  // }
 
   // updatePaymentInfo(
   //   id: string,
