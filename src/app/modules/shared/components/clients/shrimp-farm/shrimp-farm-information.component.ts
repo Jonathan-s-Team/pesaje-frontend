@@ -52,19 +52,23 @@ export class ShrimpFarmInformationComponent
         visible: false,
       },
       {
-        title: '# Cuenta',
-        data: 'accountNumber',
-        render: (data, type, full) =>
-          `${full?.bankName} - ${data?.toUpperCase()}`,
-      },
-      {
-        title: 'Nombre',
-        data: 'accountName',
+        title: 'Identificador',
+        data: 'identifier',
         render: (data) => `${data?.toUpperCase()}`,
       },
       {
-        title: 'Identificación',
-        data: 'identification',
+        title: 'Hectareas',
+        data: 'numberHectares',
+        render: (data) => `${data?.toUpperCase()}`,
+      },
+      {
+        title: 'Lugar',
+        data: 'place',
+        render: (data) => `${data?.toUpperCase()}`,
+      },
+      {
+        title: 'Metodo de Transporte',
+        data: 'transportationMethod',
         render: (data) => `${data?.toUpperCase()}`,
       },
     ],

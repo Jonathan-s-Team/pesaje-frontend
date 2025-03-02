@@ -6,7 +6,7 @@
       <div class="d-flex align-items-center position-relative my-1">
         <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
         <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
-               placeholder="Buscar Información de Pago">
+               placeholder="Buscar Camaronera">
       </div>
       <!--end::Search-->
     </div>
@@ -19,7 +19,7 @@
         <!--begin::Add payment info-->
         <button *appCanEdit="PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE" type="button" class="btn btn-primary"
                 data-action="create" (click)="create()">
-          Agregar Información de Pago
+          Agregar Camaronera
         </button>
         <!--end::Add payment info-->
       </div>
@@ -41,7 +41,7 @@
 <ng-template #formModal let-modal>
   <form #myForm="ngForm" (ngSubmit)="onSubmit($event, myForm)">
     <div class="modal-header">
-      <h4 class="modal-title" id="modal-basic-title">Detalles de Información de Pago</h4>
+      <h4 class="modal-title" id="modal-basic-title">Detalles de Camaronera</h4>
       <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
     </div>
     <div class="modal-body">
