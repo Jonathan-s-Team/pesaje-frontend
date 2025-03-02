@@ -7,31 +7,27 @@ import {
   ViewChild,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BrokerService } from '../../services/broker.service';
-import {
-  IReadBrokerModel,
-  IUpdateBrokerModel,
-} from '../../interfaces/broker.interface';
 import { NgForm } from '@angular/forms';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { Observable, Subscription } from 'rxjs';
-import {IReadClientModel} from "../../../modules/shared/interfaces/client.interface";
+import {ICreateUpdateClientModel, IReadClientModel} from "../../../modules/shared/interfaces/client.interface";
+import {ClientService} from "../../../modules/shared/services/client.service";
 
 type Tabs = 'Details' | 'Payment Info';
 
 @Component({
-  selector: 'app-user-details',
+  selector: 'app-client-details',
   templateUrl: './client-details.component.html',
 })
 export class ClientDetailsComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
-  @ViewChild('brokerForm') brokerForm!: NgForm;
+  @ViewChild('clientForm') clientForm!: NgForm;
 
   isLoading$: Observable<boolean>;
   activeTab: Tabs = 'Details';
 
-  userData: IReadClientModel = {} as IReadClientModel;
+  clientData: IReadClientModel = {} as IReadClientModel;
   personId: string = '';
   formattedBirthDate: string = '';
 
@@ -39,18 +35,18 @@ export class ClientDetailsComponent
   private unsubscribe: Subscription[] = [];
 
   constructor(
-    private brokerService: BrokerService,
+    private clientService: ClientService,
     private route: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef
   ) {
-    this.isLoading$ = this.brokerService.isLoading$;
+    this.isLoading$ = this.clientService.isLoading$;
   }
 
   ngOnInit(): void {
     const routeSub = this.route.paramMap.subscribe((params) => {
-      const brokerId = params.get('brokerId');
-      if (brokerId) {
-        this.fetchBrokerDetails(brokerId);
+      const clientId = params.get('clientId');
+      if (clientId) {
+        this.fetchBrokerDetails(clientId);
       }
     });
 
@@ -59,14 +55,14 @@ export class ClientDetailsComponent
 
   ngAfterViewInit(): void {}
 
-  fetchBrokerDetails(brokerId: string): void {
-    const brokerSub = this.brokerService.getBrokerById(brokerId).subscribe({
-      next: (broker) => {
-        this.userData = broker;
-        this.personId = broker.person?.id ?? '';
+  fetchBrokerDetails(clientId: string): void {
+    const clientSub = this.clientService.getClientById(clientId).subscribe({
+      next: (client) => {
+        this.clientData = client;
+        this.personId = client.person?.id ?? '';
 
-        if (this.userData.person?.birthDate) {
-          this.formattedBirthDate = new Date(this.userData.person.birthDate)
+        if (this.clientData.person?.birthDate) {
+          this.formattedBirthDate = new Date(this.clientData.person.birthDate)
             .toISOString()
             .split('T')[0];
         }
@@ -78,7 +74,7 @@ export class ClientDetailsComponent
       },
     });
 
-    this.unsubscribe.push(brokerSub);
+    this.unsubscribe.push(clientSub);
   }
 
   setActiveTab(tab: Tabs) {
@@ -86,19 +82,17 @@ export class ClientDetailsComponent
   }
 
   saveBroker() {
-    if (this.brokerForm.invalid || !this.userData) {
+    if (this.clientForm.invalid || !this.clientData) {
       return;
     }
 
-    const payload: IUpdateBrokerModel = {
-      id: this.userData.id,
-      deletedAt: this.userData.deletedAt,
-      buyerItBelongs: this.userData.buyerItBelongs.id,
-      person: this.userData.person,
+    const payload: ICreateUpdateClientModel = {
+      buyerItBelongs: this.clientData.buyerItBelongs,
+      person: this.clientData.person,
     };
 
-    const updateSub = this.brokerService
-      .updateBroker(this.userData.id, payload)
+    const updateSub = this.clientService
+      .updateClient(this.clientData.id, payload)
       .subscribe({
         next: () => {
           this.showSuccessAlert();
