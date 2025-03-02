@@ -6,4 +6,5 @@ export const PERMISSION_ROUTES = {
       BROKERS: 'personal-profile/brokers',
     },
     CLIENTS: '/clients',
+    PRICES: '/prices',
   };

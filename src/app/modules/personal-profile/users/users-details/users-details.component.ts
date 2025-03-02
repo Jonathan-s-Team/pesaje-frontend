@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -23,7 +24,7 @@ type Tabs = 'Details' | 'Payment Info';
   selector: 'app-user-details',
   templateUrl: './users-details.component.html',
 })
-export class UsersDetailsComponent implements OnInit, AfterViewInit {
+export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('userForm') userForm!: NgForm;
 
   isLoading$: Observable<boolean>;
@@ -42,7 +43,7 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit {
     private userService: UserService,
     private route: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
-    private roleService: RoleService,
+    private roleService: RoleService
   ) {
     this.isLoading$ = this.userService.isLoading$;
   }
@@ -76,7 +77,9 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit {
             .toISOString()
             .split('T')[0];
         }
-        this.selectedRoles = this.userData.roles ? this.userData.roles.map(role => role.id) : [];
+        this.selectedRoles = this.userData.roles
+          ? this.userData.roles.map((role) => role.id)
+          : [];
 
         this.changeDetectorRef.detectChanges();
       },
@@ -117,15 +120,17 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit {
       roles: this.selectedRoles,
     };
 
-    const updateSub = this.userService.updateUser(this.userData.id, payload).subscribe({
-      next: () => {
-        this.showSuccessAlert();
-      },
-      error: (error) => {
-        console.error('Error updating user', error);
-        this.showErrorAlert(error);
-      },
-    });
+    const updateSub = this.userService
+      .updateUser(this.userData.id, payload)
+      .subscribe({
+        next: () => {
+          this.showSuccessAlert();
+        },
+        error: (error) => {
+          console.error('Error updating user', error);
+          this.showErrorAlert(error);
+        },
+      });
     this.unsubscribe.push(updateSub);
   }
 
@@ -137,10 +142,9 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit {
         this.selectedRoles.push(roleId);
       }
     } else {
-      this.selectedRoles = this.selectedRoles.filter(id => id !== roleId);
+      this.selectedRoles = this.selectedRoles.filter((id) => id !== roleId);
     }
   }
-
 
   private showSuccessAlert() {
     const options: SweetAlertOptions = {
