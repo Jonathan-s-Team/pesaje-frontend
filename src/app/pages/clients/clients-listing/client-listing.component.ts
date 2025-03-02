@@ -244,7 +244,7 @@ export class ClientListingComponent
 
     this.isLoading = true;
 
-    this.clientModel.buyerItBelongs = this.authService.currentUserValue!.id;
+    this.clientModel.buyerItBelongs[0] = this.authService.currentUserValue!.id;
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',

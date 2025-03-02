@@ -2,7 +2,7 @@ import {IPersonModel} from "./person.interface";
 
 export interface ICreateUpdateClientModel {
   person: IPersonModel;
-  buyerItBelongs: string;
+  buyerItBelongs: string[];
 }
 
 export interface IReadClientModel {
