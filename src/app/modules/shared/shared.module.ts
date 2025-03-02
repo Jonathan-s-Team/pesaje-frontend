@@ -11,6 +11,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { SharedModule as SharedModuleMetronic } from 'src/app/_metronic/shared/shared.module';
 import { WholeTableComponent } from './components/prices/whole-table/whole-table.component';
 import { HeadlessTableComponent } from './components/prices/headless-table/headless-table.component';
+import {ShrimpFarmInformationComponent} from "./components/clients/shrimp-farm/shrimp-farm-information.component";
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { HeadlessTableComponent } from './components/prices/headless-table/headl
     CanCreateDirective,
     CanDeleteDirective,
     CanReadDirective,
+    ShrimpFarmInformationComponent,
   ],
   imports: [
     CommonModule,
@@ -38,6 +40,7 @@ import { HeadlessTableComponent } from './components/prices/headless-table/headl
     CanCreateDirective,
     CanDeleteDirective,
     CanReadDirective,
+    ShrimpFarmInformationComponent,
   ], // ✅ Export so all modules can use them
 })
 export class SharedModule {}

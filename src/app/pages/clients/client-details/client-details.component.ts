@@ -87,7 +87,7 @@ export class ClientDetailsComponent
     }
 
     const payload: ICreateUpdateClientModel = {
-      buyerItBelongs: this.clientData.buyerItBelongs,
+      buyersItBelongs: this.clientData.buyerItBelongs,
       person: this.clientData.person,
     };
 

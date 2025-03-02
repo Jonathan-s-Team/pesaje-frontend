@@ -103,7 +103,7 @@
                   <label class="col-lg-4 col-form-label required fw-bold fs-6">Fecha de Nacimiento</label>
                   <div class="col-lg-8 fv-row">
                     <input type="date" class="form-control form-control-lg form-control-solid" name="birthDate"
-                      [(ngModel)]="formattedBirthDate" (ngModelChange)="brokerData.person.birthDate = $event"
+                      [(ngModel)]="formattedBirthDate" (ngModelChange)="clientData.person.birthDate = $event"
                       #birthDate="ngModel" required>
                     <div
                       *ngIf="(clientForm.submitted || birthDate.dirty || birthDate.touched) && birthDate.errors?.['required']"
