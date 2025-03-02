@@ -22,6 +22,12 @@
         </a>
       </li>
       <li class="nav-item">
+        <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Shrimp Farms' }"
+           (click)="setActiveTab('Shrimp Farms')" role="tab">
+          Camaroneras
+        </a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Payment Info' }"
           (click)="setActiveTab('Payment Info')" role="tab">
           Informaciòn de pago
@@ -207,6 +213,7 @@
                           <div>Debe tener al menos 3 caracteres.</div>
                         </div>
                       </div>
+
                       <!-- Teléfono del contacto -->
                       <div class="col-lg-6 fv-row">
                         <input type="tel" class="form-control form-control-lg form-control-solid"
@@ -224,6 +231,7 @@
                           <div>Ingrese un número de teléfono válido.</div>
                         </div>
                       </div>
+
                     </div>
                   </div>
                 </div>
@@ -246,6 +254,11 @@
       </div>
       <!-- end::Details -->
 
+      <!-- begin::Shrimp farms Info -->
+      <div class="tab-pane" [ngClass]="{ active: activeTab === 'Shrimp Farms' }">
+        <app-shrimp-farm-information [personId]="personId" />
+      </div>
+      <!-- end::Shrimp farms Info -->
       <!-- begin::Payment Info -->
       <div class="tab-pane" [ngClass]="{ active: activeTab === 'Payment Info' }">
         <app-payment-information [personId]="personId" />

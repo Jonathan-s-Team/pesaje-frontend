@@ -13,7 +13,7 @@ import { Observable, Subscription } from 'rxjs';
 import {ICreateUpdateClientModel, IReadClientModel} from "../../../modules/shared/interfaces/client.interface";
 import {ClientService} from "../../../modules/shared/services/client.service";
 
-type Tabs = 'Details' | 'Payment Info';
+type Tabs = 'Details' | 'Shrimp Farms' | 'Payment Info' ;
 
 @Component({
   selector: 'app-client-details',
