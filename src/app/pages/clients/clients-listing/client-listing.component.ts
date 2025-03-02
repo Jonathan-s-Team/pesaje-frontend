@@ -44,7 +44,8 @@ export class ClientListingComponent
 
   clientModel: ICreateUpdateClientModel = {
     person: {} as IPersonModel,
-  } as ICreateUpdateClientModel;
+    buyersItBelongs: []
+  };
 
   clients: IReadClientModel[] = [];
 
@@ -131,7 +132,6 @@ export class ClientListingComponent
     private clientService: ClientService,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {
   }
@@ -157,10 +157,10 @@ export class ClientListingComponent
       });
     }
 
-    this.loadBrokers();
+    this.loadUsers();
   }
 
-  loadBrokers(): void {
+  loadUsers(): void {
     const userId = this.authService.currentUserValue?.id;
     if (!userId) return;
 
@@ -225,7 +225,7 @@ export class ClientListingComponent
 
   create() {
     this.clientModel = {
-      person: {} as IPersonModel, // Ensure person object is initialized
+      person: {} as IPersonModel,
     } as ICreateUpdateClientModel;
   }
 
@@ -243,8 +243,7 @@ export class ClientListingComponent
     }
 
     this.isLoading = true;
-
-    this.clientModel.buyerItBelongs[0] = this.authService.currentUserValue!.id;
+    this.clientModel.buyersItBelongs = [this.authService.currentUserValue!.id];
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
@@ -263,10 +262,11 @@ export class ClientListingComponent
     };
 
     const createFn = () => {
+      debugger
       this.clientService.createClient(this.clientModel).subscribe({
         next: () => {
           this.showAlert(successAlert);
-          this.loadBrokers();
+          this.loadUsers();
         },
         error: (error) => {
           errorAlert.text = 'No se pudo crear el cliente.';

@@ -56,7 +56,7 @@ const Routing: Routes = [
     loadChildren: () => import('./permission/permission.module').then((m) => m.PermissionModule),
   },
   {
-    path: 'apps/clients',
+    path: 'clients',
     loadChildren: () => import('./clients/client.module').then((m) => m.ClientModule),
   },
   {
