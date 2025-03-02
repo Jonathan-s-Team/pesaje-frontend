@@ -27,7 +27,7 @@
 
             <!-- Month Selector -->
             <div class="w-150px me-3 position-relative">
-              <select class="form-select form-select-sm" [(ngModel)]="selectedPeriod">
+              <select class="form-select form-select-sm" [(ngModel)]="selectedPeriod" (change)="onPeriodChange()">
                 <option value="" disabled selected>Seleccione un periodo</option>
                 <option *ngFor="let period of existingPeriods" [value]="period.id">
                   {{ period.name }}

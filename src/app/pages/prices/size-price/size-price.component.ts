@@ -114,6 +114,13 @@ export class SizePriceComponent implements OnInit, OnDestroy {
         console.error('Error al cargar periodos:', err);
       },
     });
+
+    this.selectedPeriod = '';
+    this.resetTableForms();
+  }
+
+  onPeriodChange() {
+    this.resetTableForms();
   }
 
   search() {
@@ -137,6 +144,14 @@ export class SizePriceComponent implements OnInit, OnDestroy {
           ) || []),
         ];
 
+        if (this.wholeTableComponent) {
+          this.wholeTableComponent.disableForm();
+        }
+
+        if (this.headlessTableComponent) {
+          this.headlessTableComponent.disableForm();
+        }
+
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -154,17 +169,23 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     this.selectedPeriod = '';
     this.showErrors = false;
 
+    this.resetTableForms();
+
+    this.cdr.detectChanges();
+  }
+
+  resetTableForms() {
     if (this.wholeTableComponent) {
       this.wholeTableComponent.clearValidationErrors();
       this.wholeTableComponent.form.reset();
+      this.wholeTableComponent.enableForm();
     }
 
     if (this.headlessTableComponent) {
       this.headlessTableComponent.clearValidationErrors();
       this.headlessTableComponent.form.reset();
+      this.headlessTableComponent.enableForm();
     }
-
-    this.cdr.detectChanges();
   }
 
   savePeriod() {
@@ -227,10 +248,35 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   ): ICreateSizePriceModel[] {
     if (!component?.sizes || !component.form) return [];
 
-    return component.sizes.map((size) => ({
-      sizeId: size.id, // ✅ Explicitly define sizeId
-      price: +component.form.value[size.id] || 0, // Convert to number safely
-    }));
+    return component.sizes.reduce<ICreateSizePriceModel[]>((acc, size) => {
+      let controlKey: string;
+
+      switch (size.type) {
+        case SizeTypeEnum['TAIL-A']:
+          controlKey = `cola-a-${size.id}`;
+          break;
+        case SizeTypeEnum['TAIL-A-']:
+          controlKey = `cola-a--${size.id}`;
+          break;
+        case SizeTypeEnum['TAIL-B']:
+          controlKey = `cola-b-${size.id}`;
+          break;
+        default:
+          controlKey = size.id; // Default case for WholeTableComponent
+      }
+
+      const price = component.form.controls[controlKey]?.value ?? 0;
+
+      // Ensure only valid prices are pushed
+      if (!isNaN(price)) {
+        acc.push({
+          sizeId: size.id,
+          price: +price, // Convert safely
+        });
+      }
+
+      return acc;
+    }, []);
   }
 
   showAlert(swalOptions: SweetAlertOptions) {

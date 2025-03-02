@@ -21,6 +21,8 @@ import { FormUtilsService } from 'src/app/utils/form-utils.service';
   templateUrl: './headless-table.component.html',
 })
 export class HeadlessTableComponent implements OnInit, OnChanges, OnDestroy {
+  SizeTypeEnum = SizeTypeEnum;
+
   @Input() sizePrices: IReadSizePriceModel[] = [];
 
   isLoading$: Observable<boolean>;
@@ -28,7 +30,12 @@ export class HeadlessTableComponent implements OnInit, OnChanges, OnDestroy {
   form: FormGroup;
 
   sizes: IReadSizeModel[] = [];
-  uniqueSizes: IReadSizeModel[] = [];
+  headlessSizes: {
+    size: string;
+    idColaA: string;
+    idColaA_: string;
+    idColaB: string;
+  }[] = [];
 
   private unsubscribe: Subscription[] = [];
 
@@ -64,36 +71,68 @@ export class HeadlessTableComponent implements OnInit, OnChanges, OnDestroy {
       )
       .subscribe({
         next: (sizes) => {
-          // ✅ Remove duplicate sizes based on 'id'
-          this.uniqueSizes = Array.from(
-            new Map(sizes.map((item) => [item.size, item])).values()
-          );
+          if (!sizes.length) return;
 
-          this.sizes = sizes; // ✅ Only unique IDs remain
+          // ✅ Extract unique sizes and map them efficiently
+          const sizeMap = new Map<string, any>();
 
-          this.sizes.forEach((size) => {
-            // Add form controls with validation
-            this.form.addControl(
-              `cola-a-${size.id}`,
-              new FormControl('', [
-                Validators.required,
-                Validators.pattern(/^\d+(\.\d{1,2})?$/), // Allow only numbers with max 2 decimals
-              ])
-            );
-            this.form.addControl(
-              `cola-a--${size.id}`,
-              new FormControl('', [
-                Validators.required,
-                Validators.pattern(/^\d+(\.\d{1,2})?$/), // Allow only numbers with max 2 decimals
-              ])
-            );
-            this.form.addControl(
-              `cola-b-${size.id}`,
-              new FormControl('', [
-                Validators.required,
-                Validators.pattern(/^\d+(\.\d{1,2})?$/), // Allow only numbers with max 2 decimals
-              ])
-            );
+          sizes.forEach((size) => {
+            const key = size.size;
+
+            if (!sizeMap.has(key)) {
+              sizeMap.set(key, {
+                size: key,
+                idColaA: '',
+                idColaA_: '',
+                idColaB: '',
+              });
+            }
+
+            const entry = sizeMap.get(key);
+
+            switch (size.type) {
+              case SizeTypeEnum['TAIL-A']:
+                entry.idColaA = size.id;
+                break;
+              case SizeTypeEnum['TAIL-A-']:
+                entry.idColaA_ = size.id;
+                break;
+              case SizeTypeEnum['TAIL-B']:
+                entry.idColaB = size.id;
+                break;
+            }
+          });
+
+          this.headlessSizes = Array.from(sizeMap.values());
+
+          // ✅ Store unique sizes
+          this.sizes = sizes;
+
+          // ✅ Initialize form controls in one pass
+          this.sizes.forEach(({ id, type }) => {
+            let controlName: string | null = null;
+
+            switch (type) {
+              case SizeTypeEnum['TAIL-A']:
+                controlName = `cola-a-${id}`;
+                break;
+              case SizeTypeEnum['TAIL-A-']:
+                controlName = `cola-a--${id}`;
+                break;
+              case SizeTypeEnum['TAIL-B']:
+                controlName = `cola-b-${id}`;
+                break;
+            }
+
+            if (controlName) {
+              this.form.addControl(
+                controlName,
+                new FormControl('', [
+                  Validators.required,
+                  Validators.pattern(/^\d+(\.\d{1,2})?$/), // Allow only numbers with max 2 decimals
+                ])
+              );
+            }
           });
         },
         error: (err) => {
@@ -110,20 +149,16 @@ export class HeadlessTableComponent implements OnInit, OnChanges, OnDestroy {
   updateFormControls(): void {
     if (!this.sizePrices?.length) return;
 
-    // ✅ Preserve existing values if possible
-    const newFormControls: { [key: string]: FormControl } = {};
+    // ✅ Preserve existing form and only update missing controls
     this.sizePrices.forEach(({ size, price }) => {
-      this.ensureFormControlExists(newFormControls, `cola-a-${size.id}`, price);
-      this.ensureFormControlExists(
-        newFormControls,
-        `cola-a--${size.id}`,
-        price
-      );
-      this.ensureFormControlExists(newFormControls, `cola-b-${size.id}`, price);
+      this.ensureFormControlExists(`cola-a-${size.id}`, price);
+      this.ensureFormControlExists(`cola-a--${size.id}`, price);
+      this.ensureFormControlExists(`cola-b-${size.id}`, price);
     });
 
-    // ✅ Replace entire form group to avoid stale controls
-    this.form = new FormGroup(newFormControls);
+    // ✅ Mark controls as touched and force validation recheck
+    this.form.markAllAsTouched();
+    this.form.updateValueAndValidity();
   }
 
   /**
@@ -160,15 +195,32 @@ export class HeadlessTableComponent implements OnInit, OnChanges, OnDestroy {
   /**
    * 👉 Ensures a form control exists and updates its value.
    */
-  private ensureFormControlExists(
-    controls: { [key: string]: FormControl },
-    controlName: string,
-    value: number
-  ): void {
-    controls[controlName] = new FormControl(value || '', [
-      Validators.required,
-      Validators.pattern(/^\d+(\.\d{1,2})?$/), // Allow only numbers with max 2 decimals
-    ]);
+  private ensureFormControlExists(controlName: string, value: number): void {
+    if (!this.form.controls[controlName]) {
+      this.form.addControl(
+        controlName,
+        new FormControl(value || '', [
+          Validators.required,
+          Validators.pattern(/^\d+(\.\d{1,2})?$/), // Allow only numbers with max 2 decimals
+        ])
+      );
+    } else {
+      this.form.controls[controlName].setValue(value || '');
+    }
+  }
+
+  /**
+   * 👉 Disables all form controls (used when loading period data)
+   */
+  disableForm() {
+    this.formUtils.disableAllControls(this.form);
+  }
+
+  /**
+   * 👉 Enables all form controls (used when adding a new period)
+   */
+  enableForm() {
+    this.formUtils.enableAllControls(this.form);
   }
 
   ngOnDestroy(): void {

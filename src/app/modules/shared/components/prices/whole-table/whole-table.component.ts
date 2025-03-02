@@ -82,17 +82,28 @@ export class WholeTableComponent implements OnInit, OnChanges, OnDestroy {
   updateFormControls(): void {
     if (!this.sizePrices?.length) return;
 
-    // ✅ Preserve existing values if possible
-    const newFormControls: { [key: string]: FormControl } = {};
     this.sizePrices.forEach(({ size, price }) => {
-      newFormControls[size.id] = new FormControl(price || '', [
-        Validators.required,
-        Validators.pattern(/^\d+(\.\d{1,2})?$/),
-      ]);
+      const control = this.form.get(size.id);
+
+      if (control) {
+        control.setValue(price || '');
+      } else {
+        this.form.addControl(
+          size.id,
+          new FormControl(price || '', [
+            Validators.required,
+            Validators.pattern(/^\d+(\.\d{1,2})?$/),
+          ])
+        );
+      }
     });
 
-    // ✅ Replace entire form group to avoid stale controls
-    this.form = new FormGroup(newFormControls);
+    // ✅ Remove obsolete controls (cleanup)
+    Object.keys(this.form.controls).forEach((key) => {
+      if (!this.sizePrices.some(({ size }) => size.id === key)) {
+        this.form.removeControl(key);
+      }
+    });
   }
 
   /**
@@ -124,6 +135,20 @@ export class WholeTableComponent implements OnInit, OnChanges, OnDestroy {
    */
   clearValidationErrors() {
     this.formUtils.clearValidationErrors(this.form); // ✅ Use utility function
+  }
+
+  /**
+   * 👉 Disables all form controls (used when loading period data)
+   */
+  disableForm() {
+    this.formUtils.disableAllControls(this.form);
+  }
+
+  /**
+   * 👉 Enables all form controls (used when adding a new period)
+   */
+  enableForm() {
+    this.formUtils.enableAllControls(this.form);
   }
 
   ngOnDestroy(): void {
