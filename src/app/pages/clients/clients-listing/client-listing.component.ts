@@ -112,13 +112,6 @@ export class ClientListingComponent
           return data ? data : '-';
         },
       },
-      // {
-      //   title: 'Comprador',
-      //   data: 'buyerItBelongs.fullName',
-      //   render: function (data) {
-      //     return data ? data : '-';
-      //   },
-      // },
     ],
     language: {
       url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
@@ -145,17 +138,6 @@ export class ClientListingComponent
     this.isOnlyBuyer =
       this.roles.length > 0 &&
       this.roles.every((role) => role.name === 'Comprador');
-
-    // Agregar la columna "Comprador" solo si el usuario no es solo Comprador
-    if (!this.isOnlyBuyer) {
-      this.datatableConfig.columns!.push({
-        title: 'Comprador',
-        data: 'buyerItBelongs.fullName',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      });
-    }
 
     this.loadUsers();
   }

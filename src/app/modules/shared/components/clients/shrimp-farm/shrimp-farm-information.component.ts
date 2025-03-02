@@ -17,8 +17,8 @@ import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 import { ActivatedRoute } from '@angular/router';
-import {IPaymentInfoModel} from "../../../interfaces/payment-info.interface";
-import {PaymentInfoService} from "../../../services/payment-info.service";
+import {IReadShrimpFarmModel} from "../../../interfaces/shrimp-farm.interface";
+import {ShrimpFarmService} from "../../../services/shrimp-farm.service";
 
 @Component({
   selector: 'app-shrimp-farm-information',
@@ -32,8 +32,8 @@ export class ShrimpFarmInformationComponent
   isLoading = false;
   private unsubscribe: Subscription[] = [];
 
-  paymentData: IPaymentInfoModel[] = [];
-  paymentInfo: IPaymentInfoModel = {} as IPaymentInfoModel;
+  shrimpFarmData: IReadShrimpFarmModel[] = [];
+  shrimpFarmInfo: IReadShrimpFarmModel = {} as IReadShrimpFarmModel;
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
   @Input() personId?: string;
@@ -78,7 +78,7 @@ export class ShrimpFarmInformationComponent
   };
 
   constructor(
-    private paymentInfoService: PaymentInfoService,
+    private shrimpFarmService: ShrimpFarmService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {}
@@ -109,14 +109,14 @@ export class ShrimpFarmInformationComponent
   loadPaymentInfos(): void {
     if (!this.personId) return;
 
-    const paymentSub = this.paymentInfoService
-      .getPaymentInfosByPerson(this.personId)
+    const paymentSub = this.shrimpFarmService
+      .getFarmsByClient(this.personId)
       .subscribe({
         next: (data) => {
-          this.paymentData = data;
+          this.shrimpFarmData = data;
           this.datatableConfig = {
             ...this.datatableConfig,
-            data: [...this.paymentData],
+            data: [...this.shrimpFarmData],
           };
 
           this.cdr.detectChanges();
@@ -135,9 +135,9 @@ export class ShrimpFarmInformationComponent
 
   // 🔹 Delete a Payment Info
   delete(id: string): void {
-    const deleteSub = this.paymentInfoService.deletePaymentInfo(id).subscribe({
+    const deleteSub = this.shrimpFarmService.deleteShrimpFarm(id).subscribe({
       next: () => {
-        this.paymentData = this.paymentData.filter((item) => item.id !== id);
+        this.shrimpFarmData = this.shrimpFarmData.filter((item) => item.id !== id);
         this.reloadEvent.emit(true);
       },
       error: () => {
@@ -153,13 +153,13 @@ export class ShrimpFarmInformationComponent
 
   // 🔹 Edit Payment Info
   edit(id: string): void {
-    const foundItem = this.paymentData.find((item) => item.id === id);
-    this.paymentInfo = foundItem ? { ...foundItem } : ({} as IPaymentInfoModel);
+    const foundItem = this.shrimpFarmData.find((item) => item.id === id);
+    this.shrimpFarmInfo = foundItem ? { ...foundItem } : ({} as IReadShrimpFarmModel);
   }
 
   // 🔹 Create a new Payment Info
   create(): void {
-    this.paymentInfo = {} as IPaymentInfoModel;
+    this.shrimpFarmInfo = {} as IReadShrimpFarmModel;
   }
 
   // 🔹 Handle Form Submission
@@ -170,14 +170,14 @@ export class ShrimpFarmInformationComponent
 
     if (!this.personId) return;
 
-    this.paymentInfo.personId = this.personId;
+    this.shrimpFarmInfo.id = this.personId;
 
     this.isLoading = true;
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: '¡Éxito!',
-      text: this.paymentInfo.id
+      text: this.shrimpFarmInfo.id
         ? 'Información de pago actualizada correctamente.'
         : 'Información de pago creada correctamente.',
     };
@@ -193,20 +193,20 @@ export class ShrimpFarmInformationComponent
     };
 
     const updateFn = () => {
-      this.paymentInfoService
-        .updatePaymentInfo(this.paymentInfo.id, this.paymentInfo)
+      this.shrimpFarmService
+        .updateShrimpFarm(this.shrimpFarmInfo.id, this.shrimpFarmInfo)
         .subscribe({
           next: (updatedInfo) => {
-            const index = this.paymentData.findIndex(
+            const index = this.shrimpFarmData.findIndex(
               (item) => item.id === updatedInfo.id
             );
-            if (index > -1) this.paymentData[index] = { ...updatedInfo };
+            if (index > -1) this.shrimpFarmData[index] = { ...updatedInfo };
 
             this.showAlert(successAlert);
 
             this.datatableConfig = {
               ...this.datatableConfig,
-              data: [...this.paymentData],
+              data: [...this.shrimpFarmData],
             };
 
             this.cdr.detectChanges();
@@ -222,7 +222,7 @@ export class ShrimpFarmInformationComponent
     };
 
     const createFn = () => {
-      this.paymentInfoService.createPaymentInfo(this.paymentInfo).subscribe({
+      this.shrimpFarmService.createShrimpFarm(this.shrimpFarmInfo).subscribe({
         next: () => {
           this.showAlert(successAlert);
           this.loadPaymentInfos(); // ✅ Reload the list after creation
@@ -236,7 +236,7 @@ export class ShrimpFarmInformationComponent
       });
     };
 
-    if (this.paymentInfo.id) {
+    if (this.shrimpFarmInfo.id) {
       updateFn();
     } else {
       createFn();

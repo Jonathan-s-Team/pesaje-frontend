@@ -7,7 +7,10 @@ export interface ICreateUpdateClientModel {
 
 export interface IReadClientModel {
   person: IPersonModel;
-  buyerItBelongs: string[];
+  buyersItBelongs: {
+    id: string;
+    fullName: string;
+  }[];
   createdBy: string;
   deletedBy: string;
   id: string;

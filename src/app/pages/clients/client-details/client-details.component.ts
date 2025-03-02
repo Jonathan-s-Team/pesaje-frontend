@@ -12,6 +12,7 @@ import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { Observable, Subscription } from 'rxjs';
 import {ICreateUpdateClientModel, IReadClientModel} from "../../../modules/shared/interfaces/client.interface";
 import {ClientService} from "../../../modules/shared/services/client.service";
+import {UserService} from "../../../modules/personal-profile/services/user.service";
 
 type Tabs = 'Details' | 'Shrimp Farms' | 'Payment Info' ;
 
@@ -37,7 +38,8 @@ export class ClientDetailsComponent
   constructor(
     private clientService: ClientService,
     private route: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private userService: UserService
   ) {
     this.isLoading$ = this.clientService.isLoading$;
   }
@@ -56,6 +58,8 @@ export class ClientDetailsComponent
   ngAfterViewInit(): void {}
 
   fetchBrokerDetails(clientId: string): void {
+    const userObservable = this.userService.getAllUsers(true);
+
     const clientSub = this.clientService.getClientById(clientId).subscribe({
       next: (client) => {
         this.clientData = client;
@@ -87,7 +91,7 @@ export class ClientDetailsComponent
     }
 
     const payload: ICreateUpdateClientModel = {
-      buyersItBelongs: this.clientData.buyerItBelongs,
+      buyersItBelongs: this.clientData.buyersItBelongs.map(buyer => buyer.id),
       person: this.clientData.person,
     };
 
