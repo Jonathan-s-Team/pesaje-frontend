@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {BehaviorSubject, finalize, map, Observable, tap} from 'rxjs';
 import {environment} from 'src/environments/environment';
 import {UserModel} from '../../auth/models/user.model';
@@ -75,12 +75,14 @@ export class UserService {
       );
   }
 
-  getAllUsers(includeDeleted: boolean): Observable<IReadUsersModel[]> {
+  getAllUsers(includeDeleted: boolean, role?: string): Observable<IReadUsersModel[]> {
     this.isLoadingSubject.next(true);
+    let params = new HttpParams().set('includeDeleted', includeDeleted.toString());
+    if (role) {
+      params = params.set('role', role);
+    }
     return this.http
-      .get<{ ok: boolean; users: IReadUsersModel[] }>(
-        `${API_USERS_URL}/?includeDeleted=${includeDeleted}`
-      )
+      .get<{ ok: boolean; users: IReadUsersModel[] }>(`${API_USERS_URL}/`, { params })
       .pipe(
         map((response) => response.users || []),
         finalize(() => this.isLoadingSubject.next(false))

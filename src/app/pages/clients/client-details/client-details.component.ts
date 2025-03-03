@@ -13,6 +13,7 @@ import { Observable, Subscription } from 'rxjs';
 import {ICreateUpdateClientModel, IReadClientModel} from "../../../modules/shared/interfaces/client.interface";
 import {ClientService} from "../../../modules/shared/services/client.service";
 import {UserService} from "../../../modules/personal-profile/services/user.service";
+import {IReadUsersModel} from "../../../modules/personal-profile/interfaces/user.interface";
 
 type Tabs = 'Details' | 'Shrimp Farms' | 'Payment Info' ;
 
@@ -32,6 +33,14 @@ export class ClientDetailsComponent
   personId: string = '';
   formattedBirthDate: string = '';
 
+  /** Propiedades para el multi-select de usuarios */
+  buyers: IReadUsersModel[] = [];
+  filteredBuyers: IReadUsersModel[] = [];
+  selectedUserIds: string[] = [];
+
+  /** Propiedad para el filtro del buscador*/
+  buyerFilter: string = '';
+
   /** Stores all active subscriptions */
   private unsubscribe: Subscription[] = [];
 
@@ -45,21 +54,29 @@ export class ClientDetailsComponent
   }
 
   ngOnInit(): void {
+    const userSub = this.userService.getAllUsers(true, 'Comprador').subscribe({
+      next: (users: IReadUsersModel[]) => {
+        this.buyers = users;
+        this.filteredBuyers = users;
+      },
+      error: (error) => {
+        console.error('Error fetching users:', error);
+      }
+    });
+    this.unsubscribe.push(userSub);
+
     const routeSub = this.route.paramMap.subscribe((params) => {
       const clientId = params.get('clientId');
       if (clientId) {
-        this.fetchBrokerDetails(clientId);
+        this.fetchClientDetails(clientId);
       }
     });
-
     this.unsubscribe.push(routeSub);
   }
 
   ngAfterViewInit(): void {}
 
-  fetchBrokerDetails(clientId: string): void {
-    const userObservable = this.userService.getAllUsers(true);
-
+  fetchClientDetails(clientId: string): void {
     const clientSub = this.clientService.getClientById(clientId).subscribe({
       next: (client) => {
         this.clientData = client;
@@ -74,7 +91,7 @@ export class ClientDetailsComponent
         this.changeDetectorRef.detectChanges();
       },
       error: (err) => {
-        console.error('Error fetching broker details:', err);
+        console.error('Error fetching clients details:', err);
       },
     });
 
@@ -85,7 +102,7 @@ export class ClientDetailsComponent
     this.activeTab = tab;
   }
 
-  saveBroker() {
+  saveClient() {
     if (this.clientForm.invalid || !this.clientData) {
       return;
     }
@@ -108,6 +125,17 @@ export class ClientDetailsComponent
       });
 
     this.unsubscribe.push(updateSub);
+  }
+
+  filterBuyers(): void {
+    if (!this.buyerFilter) {
+      this.filteredBuyers = this.buyers;
+      return;
+    }
+    const filterValue = this.buyerFilter.toLowerCase();
+    this.filteredBuyers = this.buyers.filter(buyer =>
+      buyer.person.names.toLowerCase().includes(filterValue)
+    );
   }
 
   private showSuccessAlert() {

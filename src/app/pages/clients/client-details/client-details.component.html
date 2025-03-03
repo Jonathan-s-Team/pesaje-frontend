@@ -231,8 +231,22 @@
                           <div>Ingrese un número de teléfono válido.</div>
                         </div>
                       </div>
-
                     </div>
+                  </div>
+                </div>
+
+                <!-- Multi-select de Compradores -->
+                <div class="row mb-6">
+                  <label class="col-lg-4 col-form-label fw-bold fs-6">Compradores</label>
+                  <div class="col-lg-8">
+                    <mat-form-field appearance="fill" class="w-100">
+                      <mat-label>Seleccionar Compradores</mat-label>
+                      <mat-select multiple [(ngModel)]="selectedUserIds" name="selectedUserIds">
+                        <mat-option *ngFor="let buyer of buyers" [value]="buyer.id">
+                          {{ buyer.person.names }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
                   </div>
                 </div>
 
@@ -240,7 +254,7 @@
 
               <!-- Botón para guardar -->
               <div class="card-footer d-flex justify-content-end py-6 px-9">
-                <button type="button" class="btn btn-primary" [disabled]="isLoading$|async" (click)="saveBroker()">
+                <button type="button" class="btn btn-primary" [disabled]="isLoading$|async" (click)="saveClient()">
                   <span *ngIf="!(isLoading$|async)">Guardar Cambios</span>
                   <span *ngIf="isLoading$|async" class="indicator-progress">
                     Por favor, espere...
