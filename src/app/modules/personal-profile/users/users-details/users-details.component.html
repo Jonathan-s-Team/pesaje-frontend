@@ -15,6 +15,13 @@
         flex-nowrap
       " role="tablist">
 
+      <!-- 🔹 Back Button Tab -->
+      <li class="nav-item">
+        <a class="nav-link cursor-pointer" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i> <!-- FontAwesome icon -->
+        </a>
+      </li>
+
       <li class="nav-item">
         <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Details' }"
           (click)="setActiveTab('Details')" role="tab">

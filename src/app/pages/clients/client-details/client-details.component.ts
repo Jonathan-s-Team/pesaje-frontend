@@ -6,16 +6,19 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { Observable, Subscription } from 'rxjs';
-import {ICreateUpdateClientModel, IReadClientModel} from "../../../modules/shared/interfaces/client.interface";
-import {ClientService} from "../../../modules/shared/services/client.service";
-import {UserService} from "../../../modules/personal-profile/services/user.service";
-import {IReadUsersModel} from "../../../modules/personal-profile/interfaces/user.interface";
+import {
+  ICreateUpdateClientModel,
+  IReadClientModel,
+} from '../../../modules/shared/interfaces/client.interface';
+import { ClientService } from '../../../modules/shared/services/client.service';
+import { UserService } from '../../../modules/personal-profile/services/user.service';
+import { IReadUsersModel } from '../../../modules/personal-profile/interfaces/user.interface';
 
-type Tabs = 'Details' | 'Shrimp Farms' | 'Payment Info' ;
+type Tabs = 'Details' | 'Shrimp Farms' | 'Payment Info';
 
 @Component({
   selector: 'app-client-details',
@@ -34,35 +37,24 @@ export class ClientDetailsComponent
   clientId: string = '';
   formattedBirthDate: string = '';
 
-  /** Propiedades para el multi-select de usuarios */
+  /** Propiedades para el multi-select de compradores */
   buyers: IReadUsersModel[] = [];
-  filteredBuyers: IReadUsersModel[] = [];
-  selectedUserIds: string[] = [];
+  selectedBuyers: IReadUsersModel[] = [];
 
   /** Stores all active subscriptions */
   private unsubscribe: Subscription[] = [];
 
   constructor(
     private clientService: ClientService,
+    private userService: UserService,
     private route: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef,
-    private userService: UserService
+    private router: Router,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     this.isLoading$ = this.clientService.isLoading$;
   }
 
   ngOnInit(): void {
-    const userSub = this.userService.getAllUsers(true, 'Comprador').subscribe({
-      next: (users: IReadUsersModel[]) => {
-        this.buyers = users;
-        this.filteredBuyers = users;
-      },
-      error: (error) => {
-        console.error('Error fetching users:', error);
-      }
-    });
-    this.unsubscribe.push(userSub);
-
     const routeSub = this.route.paramMap.subscribe((params) => {
       const clientId = params.get('clientId');
       if (clientId) {
@@ -78,7 +70,7 @@ export class ClientDetailsComponent
     const clientSub = this.clientService.getClientById(clientId).subscribe({
       next: (client) => {
         this.clientData = client;
-        this.personId = client.person?.id ?? '';
+        this.personId = this.clientData.person?.id ?? '';
         this.clientId = this.clientData.id ?? '';
 
         if (this.clientData.person?.birthDate) {
@@ -87,16 +79,42 @@ export class ClientDetailsComponent
             .split('T')[0];
         }
 
-        this.selectedUserIds = (client.buyersItBelongs || []).map(buyer =>
-          typeof buyer === 'string' ? buyer : buyer.id
-        );        this.changeDetectorRef.detectChanges();
+        // 🔹 Load buyers only if they haven't been fetched before
+        if (!this.buyers.length) {
+          this.loadBuyers();
+        } else {
+          this.processSelectedBuyers();
+        }
+
+        this.changeDetectorRef.detectChanges();
       },
       error: (err) => {
-        console.error('Error fetching clients details:', err);
+        console.error('Error fetching client details:', err);
       },
     });
 
     this.unsubscribe.push(clientSub);
+  }
+
+  loadBuyers(): void {
+    if (this.buyers.length) {
+      // If buyers are already loaded, process selected ones without fetching again
+      this.processSelectedBuyers();
+      return;
+    }
+
+    const userSub = this.userService.getAllUsers(true, 'Comprador').subscribe({
+      next: (users: IReadUsersModel[]) => {
+        this.buyers = users;
+        this.processSelectedBuyers(); // Process selected buyers separately
+        this.changeDetectorRef.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error fetching users:', error);
+      },
+    });
+
+    this.unsubscribe.push(userSub);
   }
 
   setActiveTab(tab: Tabs) {
@@ -109,7 +127,7 @@ export class ClientDetailsComponent
     }
 
     const payload: ICreateUpdateClientModel = {
-      buyersItBelongs: this.selectedUserIds,
+      buyersItBelongs: this.selectedBuyers.map((buyer) => buyer.id),
       person: this.clientData.person,
     };
 
@@ -128,23 +146,21 @@ export class ClientDetailsComponent
     this.unsubscribe.push(updateSub);
   }
 
-  compareBuyerIds(value1: any, value2: any): boolean {
-    return value1 === value2;
+  goBack(): void {
+    this.router.navigate(['clients']);
   }
 
-  getSelectedBuyerNames(): string {
-    if (!this.selectedUserIds || !this.selectedUserIds.length || !this.buyers) {
-      return '';
-    }
-    const names = this.selectedUserIds
-      .map(id => {
-        const buyer = this.buyers.find(b => b.id === id);
-        return buyer ? buyer.person.names : '';
-      })
-      .filter(name => name !== '');
-    return names.join(', ');
-  }
+  private processSelectedBuyers(): void {
+    // 🔹 Extract selected buyer IDs from the client data
+    const selectedBuyerIds = new Set(
+      (this.clientData?.buyersItBelongs as string[]) ?? []
+    );
 
+    // 🔹 Separate selected buyers from the rest
+    this.selectedBuyers = this.buyers.filter((buyer) =>
+      selectedBuyerIds.has(buyer.id)
+    );
+  }
 
   private showSuccessAlert() {
     const options: SweetAlertOptions = {

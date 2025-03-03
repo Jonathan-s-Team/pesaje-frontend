@@ -23,6 +23,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IPaymentInfoModel } from 'src/app/modules/shared/interfaces/payment-info.interface';
 import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
 import { ClientService } from '../../../modules/shared/services/client.service';
+import { UserService } from 'src/app/modules/personal-profile/services/user.service';
+import { IReadUsersModel } from 'src/app/modules/personal-profile/interfaces/user.interface';
 
 @Component({
   selector: 'app-client-listing',
@@ -36,6 +38,9 @@ export class ClientListingComponent
   isLoading = false;
   isOnlyBuyer = false;
 
+  buyers: IReadUsersModel[];
+  selectedBuyers: IReadUsersModel[] = [];
+
   roles: IRoleModel[];
 
   private unsubscribe: Subscription[] = [];
@@ -43,7 +48,7 @@ export class ClientListingComponent
   // Reload emitter inside datatable
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  clientModel: ICreateUpdateClientModel = {
+  createClientModel: ICreateUpdateClientModel = {
     person: {} as IPersonModel,
     buyersItBelongs: [],
   };
@@ -125,6 +130,7 @@ export class ClientListingComponent
   constructor(
     private clientService: ClientService,
     private authService: AuthService,
+    private userService: UserService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -139,6 +145,19 @@ export class ClientListingComponent
       this.roles.every((role) => role.name === 'Comprador');
 
     this.loadUsers();
+    this.loadBuyers();
+  }
+
+  loadBuyers() {
+    const userSub = this.userService.getAllUsers(true, 'Comprador').subscribe({
+      next: (users: IReadUsersModel[]) => {
+        this.buyers = users;
+      },
+      error: (error) => {
+        console.error('Error fetching users:', error);
+      },
+    });
+    this.unsubscribe.push(userSub);
   }
 
   loadUsers(): void {
@@ -189,33 +208,15 @@ export class ClientListingComponent
     this.unsubscribe.push(deleteSub);
   }
 
-  originalBrokerModel: IReadClientModel | null = null;
-  originalPaymentInfoModel: IPaymentInfoModel | null = null;
-
-  hasBrokerChanges(): boolean {
-    return (
-      JSON.stringify(this.clientModel) !==
-      JSON.stringify(this.originalBrokerModel)
-    );
-  }
-
   edit(id: string) {
     const currentUrl = this.router.url;
     this.router.navigate([`${currentUrl}/${id}`]);
   }
 
   create() {
-    this.clientModel = {
+    this.createClientModel = {
       person: {} as IPersonModel,
     } as ICreateUpdateClientModel;
-  }
-
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
   }
 
   onSubmit(event: Event, myForm: NgForm) {
@@ -224,7 +225,16 @@ export class ClientListingComponent
     }
 
     this.isLoading = true;
-    this.clientModel.buyersItBelongs = [this.authService.currentUserValue!.id];
+
+    if (this.isOnlyBuyer) {
+      this.createClientModel.buyersItBelongs = [
+        this.authService.currentUserValue!.id,
+      ];
+    } else {
+      this.createClientModel.buyersItBelongs = this.selectedBuyers.map(
+        (buyer) => buyer.id
+      );
+    }
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
@@ -243,7 +253,7 @@ export class ClientListingComponent
     };
 
     const createFn = () => {
-      this.clientService.createClient(this.clientModel).subscribe({
+      this.clientService.createClient(this.createClientModel).subscribe({
         next: () => {
           this.showAlert(successAlert);
           this.loadUsers();

@@ -12,11 +12,9 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { SharedModule } from '../../modules/shared/shared.module';
-import {ClientListingComponent} from "./clients-listing/client-listing.component";
-import {ClientDetailsComponent} from "./client-details/client-details.component";
-import {MatFormField, MatFormFieldModule } from "@angular/material/form-field";
-import {MatOption, MatSelect, MatSelectModule } from "@angular/material/select";
-import { MatInputModule } from '@angular/material/input';
+import { ClientListingComponent } from './clients-listing/client-listing.component';
+import { ClientDetailsComponent } from './client-details/client-details.component';
+import { MaterialModule } from 'src/app/material.module';
 
 @NgModule({
   declarations: [ClientListingComponent, ClientDetailsComponent],
@@ -42,12 +40,7 @@ import { MatInputModule } from '@angular/material/input';
     NgbCollapseModule,
     NgbTooltipModule,
     SweetAlert2Module.forChild(),
-    MatFormField,
-    MatSelect,
-    MatOption,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatInputModule,
+    MaterialModule,
   ],
 })
 export class ClientModule {}

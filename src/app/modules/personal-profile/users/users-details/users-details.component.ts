@@ -6,7 +6,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { Observable, Subscription } from 'rxjs';
@@ -42,6 +42,7 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private userService: UserService,
     private route: ActivatedRoute,
+    private router: Router,
     private changeDetectorRef: ChangeDetectorRef,
     private roleService: RoleService
   ) {
@@ -144,6 +145,10 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.selectedRoles = this.selectedRoles.filter((id) => id !== roleId);
     }
+  }
+
+  goBack(): void {
+    this.router.navigate(['personal-profile', 'users']);
   }
 
   private showSuccessAlert() {
