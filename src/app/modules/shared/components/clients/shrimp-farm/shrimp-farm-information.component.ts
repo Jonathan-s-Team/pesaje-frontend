@@ -10,14 +10,14 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { Subscription } from 'rxjs';
-import { SweetAlertOptions } from 'sweetalert2';
-import { Config } from 'datatables.net';
-import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
-import { ActivatedRoute } from '@angular/router';
-import {IReadShrimpFarmModel} from "../../../interfaces/shrimp-farm.interface";
+import {NgForm} from '@angular/forms';
+import {SwalComponent} from '@sweetalert2/ngx-sweetalert2';
+import {Subscription} from 'rxjs';
+import {SweetAlertOptions} from 'sweetalert2';
+import {Config} from 'datatables.net';
+import {PERMISSION_ROUTES} from 'src/app/constants/routes.constants';
+import {ActivatedRoute} from '@angular/router';
+import {ICreateUpdateShrimpFarmModel, IReadShrimpFarmModel} from "../../../interfaces/shrimp-farm.interface";
 import {ShrimpFarmService} from "../../../services/shrimp-farm.service";
 
 @Component({
@@ -25,18 +25,19 @@ import {ShrimpFarmService} from "../../../services/shrimp-farm.service";
   templateUrl: './shrimp-farm-information.component.html',
 })
 export class ShrimpFarmInformationComponent
-  implements OnInit, AfterViewInit, OnChanges, OnDestroy
-{
+  implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   PERMISSION_ROUTES = PERMISSION_ROUTES;
 
   isLoading = false;
   private unsubscribe: Subscription[] = [];
 
   shrimpFarmData: IReadShrimpFarmModel[] = [];
-  shrimpFarmInfo: IReadShrimpFarmModel = {} as IReadShrimpFarmModel;
+  shrimpFarmInfo:
+    | ICreateUpdateShrimpFarmModel
+    | Partial<IReadShrimpFarmModel> = {} as ICreateUpdateShrimpFarmModel;
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  @Input() personId?: string;
+  @Input() clientId?: string;
   @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
   swalOptions: SweetAlertOptions = {};
 
@@ -54,22 +55,22 @@ export class ShrimpFarmInformationComponent
       {
         title: 'Identificador',
         data: 'identifier',
-        render: (data) => `${data?.toUpperCase()}`,
+        render: (data) => `${data}`,
       },
       {
         title: 'Hectareas',
         data: 'numberHectares',
-        render: (data) => `${data?.toUpperCase()}`,
+        render: (data) => `${data}`,
       },
       {
         title: 'Lugar',
         data: 'place',
-        render: (data) => `${data?.toUpperCase()}`,
+        render: (data) => `${data}`,
       },
       {
         title: 'Metodo de Transporte',
         data: 'transportationMethod',
-        render: (data) => `${data?.toUpperCase()}`,
+        render: (data) => `${data}`,
       },
     ],
     language: {
@@ -81,36 +82,38 @@ export class ShrimpFarmInformationComponent
     private shrimpFarmService: ShrimpFarmService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     // If personId is not provided as an input, get it from route resolver
-    if (!this.personId) {
+    if (!this.clientId) {
       this.route.data.subscribe((data) => {
-        this.personId = data['personId'];
-        if (this.personId) {
-          this.loadPaymentInfos();
+        this.clientId = data['personId'];
+        if (this.clientId) {
+          this.loadShrimpFarmInfos();
         }
       });
     } else {
-      this.loadPaymentInfos(); // ✅ Load if personId is provided as input
+      this.loadShrimpFarmInfos(); // ✅ Load if personId is provided as input
     }
   }
 
-  ngAfterViewInit(): void {}
+  ngAfterViewInit(): void {
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['personId'] && changes['personId'].currentValue) {
-      this.loadPaymentInfos(); // Reload when personId changes
+      this.loadShrimpFarmInfos(); // Reload when personId changes
     }
   }
 
-  // 🔹 Load Payment Info List for Person
-  loadPaymentInfos(): void {
-    if (!this.personId) return;
+  // 🔹 Load Shrimp Farm Info List for Person
+  loadShrimpFarmInfos(): void {
+    if (!this.clientId) return;
 
     const paymentSub = this.shrimpFarmService
-      .getFarmsByClient(this.personId)
+      .getFarmsByClient(this.clientId)
       .subscribe({
         next: (data) => {
           this.shrimpFarmData = data;
@@ -126,14 +129,14 @@ export class ShrimpFarmInformationComponent
           this.showAlert({
             icon: 'error',
             title: 'Error',
-            text: 'No se pudo cargar la información de pago.',
+            text: 'No se pudo cargar la camaronera.',
           });
         },
       });
     this.unsubscribe.push(paymentSub);
   }
 
-  // 🔹 Delete a Payment Info
+  // 🔹 Delete a Shrimp Farm Info
   delete(id: string): void {
     const deleteSub = this.shrimpFarmService.deleteShrimpFarm(id).subscribe({
       next: () => {
@@ -144,42 +147,40 @@ export class ShrimpFarmInformationComponent
         this.showAlert({
           icon: 'error',
           title: 'Error',
-          text: 'No se pudo eliminar la información de pago.',
+          text: 'No se pudo eliminar la camaronera.',
         });
       },
     });
     this.unsubscribe.push(deleteSub);
   }
 
-  // 🔹 Edit Payment Info
-  edit(id: string): void {
-    const foundItem = this.shrimpFarmData.find((item) => item.id === id);
-    this.shrimpFarmInfo = foundItem ? { ...foundItem } : ({} as IReadShrimpFarmModel);
+  // 🔹 Edit Shrimp Farm Info
+  edit(shrimpFarmId: string): void {
+    const foundItem = this.shrimpFarmData.find((item) => item.id === shrimpFarmId);
+    this.shrimpFarmInfo = foundItem ? {...foundItem} : ({} as IReadShrimpFarmModel);
   }
 
-  // 🔹 Create a new Payment Info
+  // 🔹 Create a new Shrimp Farm Info
   create(): void {
     this.shrimpFarmInfo = {} as IReadShrimpFarmModel;
   }
 
   // 🔹 Handle Form Submission
-  onSubmit(event: Event, myForm: NgForm): void {
+  onSubmit(event: Event, myForm: NgForm, modal: any): void {
     if (myForm && myForm.invalid) {
       return;
     }
 
-    if (!this.personId) return;
+    if (!this.clientId) return;
 
-    this.shrimpFarmInfo.id = this.personId;
-
-    this.isLoading = true;
+    const isUpdate = !!(this.shrimpFarmInfo as any).id;
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: '¡Éxito!',
-      text: this.shrimpFarmInfo.id
-        ? 'Información de pago actualizada correctamente.'
-        : 'Información de pago creada correctamente.',
+      text: isUpdate
+        ? 'Información de camaronera actualizada correctamente.'
+        : 'Información de camaronera creada correctamente.',
     };
 
     const errorAlert: SweetAlertOptions = {
@@ -192,54 +193,60 @@ export class ShrimpFarmInformationComponent
       this.isLoading = false;
     };
 
-    const updateFn = () => {
+    if (isUpdate) {
+      const {
+        identifier,
+        numberHectares,
+        place,
+        transportationMethod,
+        distanceToGate,
+        timeFromPedernales,
+      } = this.shrimpFarmInfo as IReadShrimpFarmModel;
+
+      const payload: ICreateUpdateShrimpFarmModel = {
+        identifier,
+        numberHectares,
+        place,
+        transportationMethod,
+        distanceToGate,
+        timeFromPedernales,
+      };
+
+      this.isLoading = true;
       this.shrimpFarmService
-        .updateShrimpFarm(this.shrimpFarmInfo.id, this.shrimpFarmInfo)
+        .updateShrimpFarm((this.shrimpFarmInfo as any).id, payload)
         .subscribe({
           next: (updatedInfo) => {
-            const index = this.shrimpFarmData.findIndex(
-              (item) => item.id === updatedInfo.id
-            );
-            if (index > -1) this.shrimpFarmData[index] = { ...updatedInfo };
-
+            modal.dismiss('update success');
             this.showAlert(successAlert);
-
-            this.datatableConfig = {
-              ...this.datatableConfig,
-              data: [...this.shrimpFarmData],
-            };
-
-            this.cdr.detectChanges();
-            this.reloadEvent.emit(true);
+            this.loadShrimpFarmInfos();
           },
-          error: (error) => {
-            errorAlert.text = 'No se pudo actualizar la información de pago.';
+          error: () => {
+            errorAlert.text = 'No se pudo actualizar la camaronera.';
             this.showAlert(errorAlert);
             this.isLoading = false;
           },
           complete: completeFn,
         });
-    };
-
-    const createFn = () => {
-      this.shrimpFarmService.createShrimpFarm(this.shrimpFarmInfo).subscribe({
-        next: () => {
-          this.showAlert(successAlert);
-          this.loadPaymentInfos(); // ✅ Reload the list after creation
-        },
-        error: (error) => {
-          errorAlert.text = 'No se pudo crear la información de pago.';
-          this.showAlert(errorAlert);
-          this.isLoading = false;
-        },
-        complete: completeFn,
-      });
-    };
-
-    if (this.shrimpFarmInfo.id) {
-      updateFn();
     } else {
-      createFn();
+      (this.shrimpFarmInfo as ICreateUpdateShrimpFarmModel).client = this.clientId;
+      this.isLoading = true;
+      this.shrimpFarmService
+        .createShrimpFarm(this.shrimpFarmInfo as ICreateUpdateShrimpFarmModel)
+        .subscribe({
+          next: () => {
+            // Cerrar el modal y recargar la lista
+            modal.dismiss('create success');
+            this.showAlert(successAlert);
+            this.loadShrimpFarmInfos();
+          },
+          error: () => {
+            errorAlert.text = 'No se pudo crear la camaronera.';
+            this.showAlert(errorAlert);
+            this.isLoading = false;
+          },
+          complete: completeFn,
+        });
     }
   }
 

@@ -16,12 +16,12 @@
     <div class="card-toolbar">
       <!--begin::Toolbar-->
       <div class="d-flex justify-content-end">
-        <!--begin::Add payment info-->
+        <!--begin::Add shrimp farm info-->
         <button *appCanEdit="PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE" type="button" class="btn btn-primary"
                 data-action="create" (click)="create()">
           Agregar Camaronera
         </button>
-        <!--end::Add payment info-->
+        <!--end::Add shrimp farm info-->
       </div>
       <!--end::Toolbar-->
     </div>
@@ -39,71 +39,122 @@
 </swal>
 
 <ng-template #formModal let-modal>
-  <form #myForm="ngForm" (ngSubmit)="onSubmit($event, myForm)">
+  <form #myForm="ngForm" (ngSubmit)="onSubmit($event, myForm, modal)">
     <div class="modal-header">
       <h4 class="modal-title" id="modal-basic-title">Detalles de Camaronera</h4>
       <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
     </div>
     <div class="modal-body">
       <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
-        <!--begin::Notice-->
-        <!-- <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-9 p-6">
-          <app-keenicon name="information" class="fs-2tx text-primary me-4"></app-keenicon>
-          <div class="d-flex flex-stack flex-grow-1">
-            <div class="fw-semibold">
-              <div class="fs-6 text-gray-700">Actualizar la información de pago puede requerir una auditoría de
-                privacidad. Para más información, revisa nuestra <a href="#">Política de Privacidad</a></div>
-            </div>
-          </div>
-        </div> -->
-        <!--end::Notice-->
-
-        <!--begin::Payment information form-->
+        <!-- begin::Shrimp Farm Information Form -->
         <div class="collapse show">
+          <!-- Identificador -->
           <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Nombre del Banco</label>
-            <input type="text" class="form-control form-control-solid" name="bankName"
-                   [(ngModel)]="shrimpFarmInfo.identifier" #bankName="ngModel" required minlength="3" />
-            <div *ngIf="myForm.submitted && myForm.invalid"
+            <label class="required fw-semibold fs-6 mb-2">Identificador</label>
+            <input type="text"
+                   class="form-control form-control-solid"
+                   name="identifier"
+                   [(ngModel)]="shrimpFarmInfo.identifier"
+                   #identifier="ngModel"
+                   required
+                   minlength="3" />
+            <div *ngIf="myForm.submitted && identifier.invalid"
                  class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div *ngIf="bankName.errors?.['required']">El nombre del banco es obligatorio.</div>
-              <div *ngIf="bankName.errors?.['minlength']">Debe tener al menos 3 caracteres.</div>
+              <div *ngIf="identifier.errors?.['required']">El identificador es obligatorio.</div>
+              <div *ngIf="identifier.errors?.['minlength']">Debe tener al menos 3 caracteres.</div>
             </div>
           </div>
 
+          <!-- Hectáreas -->
           <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Nombre de la Cuenta</label>
-            <input type="text" class="form-control form-control-solid" name="accountName"
-                   [(ngModel)]="shrimpFarmInfo.numberHectares" #accountName="ngModel" required minlength="3" />
-            <div *ngIf="myForm.submitted && myForm.invalid"
+            <label class="required fw-semibold fs-6 mb-2">Hectáreas</label>
+            <input type="number"
+                   class="form-control form-control-solid"
+                   name="numberHectares"
+                   [(ngModel)]="shrimpFarmInfo.numberHectares"
+                   #numberHectares="ngModel"
+                   required
+                   min="1" />
+            <div *ngIf="myForm.submitted && numberHectares.invalid"
                  class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div *ngIf="accountName.errors?.['required']">El nombre de la cuenta es obligatorio.</div>
-              <div *ngIf="accountName.errors?.['minlength']">Debe tener al menos 3 caracteres.</div>
+              <div *ngIf="numberHectares.errors?.['required']">Las hectáreas son obligatorias.</div>
+              <div *ngIf="numberHectares.errors?.['min']">Debe ser al menos 1.</div>
             </div>
           </div>
 
+          <!-- Lugar -->
           <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Número de Cuenta</label>
-            <input type="text" class="form-control form-control-solid" name="accountNumber"
-                   [(ngModel)]="shrimpFarmInfo.place" #accountNumber="ngModel" required pattern="\d+" />
-            <div *ngIf="myForm.submitted && myForm.invalid"
+            <label class="required fw-semibold fs-6 mb-2">Lugar</label>
+            <input type="text"
+                   class="form-control form-control-solid"
+                   name="place"
+                   [(ngModel)]="shrimpFarmInfo.place"
+                   #place="ngModel"
+                   required
+                   minlength="3" />
+            <div *ngIf="myForm.submitted && place.invalid"
                  class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div *ngIf="accountNumber.errors?.['required']">El número de cuenta es obligatorio.</div>
-              <div *ngIf="accountNumber.errors?.['pattern']">El número de cuenta debe contener solo dígitos.</div>
+              <div *ngIf="place.errors?.['required']">El lugar es obligatorio.</div>
+              <div *ngIf="place.errors?.['minlength']">Debe tener al menos 3 caracteres.</div>
             </div>
           </div>
 
+          <!-- Metodo de Transporte -->
           <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Identificación</label>
-            <input type="text" class="form-control form-control-solid" name="identification"
-                   [(ngModel)]="shrimpFarmInfo.transportationMethod" #identification="ngModel" required />
-            <div *ngIf="myForm.submitted && myForm.invalid"
+            <label class="required fw-semibold fs-6 mb-2">Método de Transporte</label>
+            <input type="text"
+                   class="form-control form-control-solid"
+                   name="transportationMethod"
+                   [(ngModel)]="shrimpFarmInfo.transportationMethod"
+                   #transportationMethod="ngModel"
+                   required
+                   minlength="3" />
+            <div *ngIf="myForm.submitted && transportationMethod.invalid"
                  class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div *ngIf="identification.errors?.['required']">La identificación es obligatoria.</div>
+              <div *ngIf="transportationMethod.errors?.['required']">El método de transporte es obligatorio.</div>
+              <div *ngIf="transportationMethod.errors?.['minlength']">Debe tener al menos 3 caracteres.</div>
             </div>
           </div>
+
+          <!-- Distancia a la Puerta -->
+          <div class="fv-row mb-7">
+            <label class="required fw-semibold fs-6 mb-2">Distancia a la Puerta</label>
+            <input type="number"
+                   class="form-control form-control-solid"
+                   name="distanceToGate"
+                   [(ngModel)]="shrimpFarmInfo.distanceToGate"
+                   #distanceToGate="ngModel"
+                   required
+                   min="0"
+                   step="0.1" />
+            <div *ngIf="myForm.submitted && distanceToGate.invalid"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="distanceToGate.errors?.['required']">La distancia a la puerta es obligatoria.</div>
+              <div *ngIf="distanceToGate.errors?.['min']">Debe ser un valor positivo.</div>
+            </div>
+          </div>
+
+          <!-- Tiempo desde Pedernales -->
+          <div class="fv-row mb-7">
+            <label class="required fw-semibold fs-6 mb-2">Tiempo desde Pedernales</label>
+            <input type="number"
+                   class="form-control form-control-solid"
+                   name="timeFromPedernales"
+                   [(ngModel)]="shrimpFarmInfo.timeFromPedernales"
+                   #timeFromPedernales="ngModel"
+                   required
+                   min="0" />
+            <div *ngIf="myForm.submitted && timeFromPedernales.invalid"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div *ngIf="timeFromPedernales.errors?.['required']">El tiempo desde Pedernales es obligatorio.</div>
+              <div *ngIf="timeFromPedernales.errors?.['min']">Debe ser un valor positivo.</div>
+            </div>
+          </div>
+
+          <!-- Campo oculto para el cliente (personId) -->
+          <input type="hidden" name="client" [ngModel]="clientId" />
         </div>
-        <!--end::Payment information form-->
+        <!-- end::Shrimp Farm Information Form -->
       </div>
     </div>
     <div class="modal-footer flex-center">

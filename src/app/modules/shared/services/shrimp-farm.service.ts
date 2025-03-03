@@ -24,12 +24,12 @@ export class ShrimpFarmService {
   }
 
   updateShrimpFarm(
-    id: string,
+    shrimpFarmId: string,
     updateData: Partial<ICreateUpdateShrimpFarmModel>
   ): Observable<IReadShrimpFarmModel> {
     this.isLoadingSubject.next(true);
     return this.http
-      .put<{ updatedFarm: IReadShrimpFarmModel }>(`${API_SHRIMP_FARM_URL}/${id}`, updateData)
+      .put<{ updatedFarm: IReadShrimpFarmModel }>(`${API_SHRIMP_FARM_URL}/${shrimpFarmId}`, updateData)
       .pipe(
         map(response => response.updatedFarm),
         finalize(() => this.isLoadingSubject.next(false))
