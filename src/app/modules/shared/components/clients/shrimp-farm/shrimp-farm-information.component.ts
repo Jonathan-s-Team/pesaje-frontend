@@ -20,7 +20,7 @@ import {ActivatedRoute} from '@angular/router';
 import {
   IUpdateShrimpFarmModel,
   IReadShrimpFarmModel,
-  ICreateShrimpFarmModel
+  ICreateShrimpFarmModel, TransportationMethodEnum
 } from "../../../interfaces/shrimp-farm.interface";
 import {ShrimpFarmService} from "../../../services/shrimp-farm.service";
 
@@ -38,6 +38,8 @@ export class ShrimpFarmInformationComponent
   shrimpFarmData: IReadShrimpFarmModel[] = [];
   shrimpFarmInfo: IReadShrimpFarmModel = {} as IReadShrimpFarmModel;
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
+
+  transportationMethods = Object.values(TransportationMethodEnum);
 
   @Input() clientId?: string;
   @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
@@ -72,7 +74,7 @@ export class ShrimpFarmInformationComponent
       {
         title: 'Metodo de Transporte',
         data: 'transportationMethod',
-        render: (data) => `${data}`,
+        render: (data, type, row) => this.getTranslatedTransportationMethod(data).toUpperCase(),
       },
     ],
     language: {
@@ -253,6 +255,13 @@ export class ShrimpFarmInformationComponent
     }
   }
 
+  getTranslatedTransportationMethod(method: TransportationMethodEnum): string {
+    const translations: { [key in TransportationMethodEnum]: string } = {
+      [TransportationMethodEnum.CAR]: "Carro",
+      [TransportationMethodEnum.CARBOAT]: "Carro y Bote",
+    };
+    return translations[method] || method;
+  }
 
   // 🔹 Show SweetAlert Message
   showAlert(swalOptions: SweetAlertOptions): void {
