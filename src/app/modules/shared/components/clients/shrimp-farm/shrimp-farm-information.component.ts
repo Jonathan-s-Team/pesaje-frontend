@@ -10,26 +10,28 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import {NgForm} from '@angular/forms';
-import {SwalComponent} from '@sweetalert2/ngx-sweetalert2';
-import {Subscription} from 'rxjs';
-import {SweetAlertOptions} from 'sweetalert2';
-import {Config} from 'datatables.net';
-import {PERMISSION_ROUTES} from 'src/app/constants/routes.constants';
-import {ActivatedRoute} from '@angular/router';
+import { NgForm } from '@angular/forms';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { Subscription } from 'rxjs';
+import { SweetAlertOptions } from 'sweetalert2';
+import { Config } from 'datatables.net';
+import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
+import { ActivatedRoute } from '@angular/router';
 import {
   IUpdateShrimpFarmModel,
   IReadShrimpFarmModel,
-  ICreateShrimpFarmModel, TransportationMethodEnum
-} from "../../../interfaces/shrimp-farm.interface";
-import {ShrimpFarmService} from "../../../services/shrimp-farm.service";
+  ICreateShrimpFarmModel,
+  TransportationMethodEnum,
+} from '../../../interfaces/shrimp-farm.interface';
+import { ShrimpFarmService } from '../../../services/shrimp-farm.service';
 
 @Component({
   selector: 'app-shrimp-farm-information',
   templateUrl: './shrimp-farm-information.component.html',
 })
 export class ShrimpFarmInformationComponent
-  implements OnInit, AfterViewInit, OnChanges, OnDestroy {
+  implements OnInit, AfterViewInit, OnChanges, OnDestroy
+{
   PERMISSION_ROUTES = PERMISSION_ROUTES;
 
   isLoading = false;
@@ -74,7 +76,8 @@ export class ShrimpFarmInformationComponent
       {
         title: 'Metodo de Transporte',
         data: 'transportationMethod',
-        render: (data, type, row) => this.getTranslatedTransportationMethod(data).toUpperCase(),
+        render: (data, type, row) =>
+          this.getTranslatedTransportationMethod(data).toUpperCase(),
       },
     ],
     language: {
@@ -86,8 +89,7 @@ export class ShrimpFarmInformationComponent
     private shrimpFarmService: ShrimpFarmService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     // If personId is not provided as an input, get it from route resolver
@@ -103,8 +105,7 @@ export class ShrimpFarmInformationComponent
     }
   }
 
-  ngAfterViewInit(): void {
-  }
+  ngAfterViewInit(): void {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['personId'] && changes['personId'].currentValue) {
@@ -144,7 +145,9 @@ export class ShrimpFarmInformationComponent
   delete(id: string): void {
     const deleteSub = this.shrimpFarmService.deleteShrimpFarm(id).subscribe({
       next: () => {
-        this.shrimpFarmData = this.shrimpFarmData.filter((item) => item.id !== id);
+        this.shrimpFarmData = this.shrimpFarmData.filter(
+          (item) => item.id !== id
+        );
         this.reloadEvent.emit(true);
       },
       error: () => {
@@ -160,8 +163,12 @@ export class ShrimpFarmInformationComponent
 
   // 🔹 Edit Shrimp Farm Info
   edit(shrimpFarmId: string): void {
-    const foundItem = this.shrimpFarmData.find((item) => item.id === shrimpFarmId);
-    this.shrimpFarmInfo = foundItem ? {...foundItem} : ({} as IReadShrimpFarmModel);
+    const foundItem = this.shrimpFarmData.find(
+      (item) => item.id === shrimpFarmId
+    );
+    this.shrimpFarmInfo = foundItem
+      ? { ...foundItem }
+      : ({} as IReadShrimpFarmModel);
   }
 
   // 🔹 Create a new Shrimp Farm Info
@@ -202,7 +209,7 @@ export class ShrimpFarmInformationComponent
     };
 
     const updateFn = () => {
-      const updatePayload: IUpdateShrimpFarmModel = {...this.shrimpFarmInfo};
+      const updatePayload: IUpdateShrimpFarmModel = { ...this.shrimpFarmInfo };
       console.log(updatePayload);
       this.shrimpFarmService
         .updateShrimpFarm(this.shrimpFarmInfo.id, updatePayload)
@@ -211,7 +218,7 @@ export class ShrimpFarmInformationComponent
             const index = this.shrimpFarmData.findIndex(
               (item) => item.id === updatedInfo.id
             );
-            if (index > -1) this.shrimpFarmData[index] = {...updatedInfo};
+            if (index > -1) this.shrimpFarmData[index] = { ...updatedInfo };
 
             this.showAlert(successAlert);
 
@@ -233,7 +240,7 @@ export class ShrimpFarmInformationComponent
     };
 
     const createFn = () => {
-      const createPayload: ICreateShrimpFarmModel = {...this.shrimpFarmInfo};
+      const createPayload: ICreateShrimpFarmModel = { ...this.shrimpFarmInfo };
       this.shrimpFarmService.createShrimpFarm(createPayload).subscribe({
         next: () => {
           this.showAlert(successAlert);
@@ -257,8 +264,8 @@ export class ShrimpFarmInformationComponent
 
   getTranslatedTransportationMethod(method: TransportationMethodEnum): string {
     const translations: { [key in TransportationMethodEnum]: string } = {
-      [TransportationMethodEnum.CAR]: "Carro",
-      [TransportationMethodEnum.CARBOAT]: "Carro y Bote",
+      [TransportationMethodEnum.CAR]: 'Carro',
+      [TransportationMethodEnum.CARBOAT]: 'Carro y Bote',
     };
     return translations[method] || method;
   }

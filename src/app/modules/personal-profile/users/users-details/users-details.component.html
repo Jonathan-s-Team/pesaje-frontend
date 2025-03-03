@@ -229,16 +229,12 @@
                   <label class="col-lg-4 col-form-label required fw-bold fs-6">Roles</label>
                   <div class="col-lg-8">
                     <div *ngFor="let role of availableRoles" class="form-check">
-                      <input
-                        type="checkbox"
-                        class="form-check-input"
-                        [value]="role.id"
-                        (change)="onRoleChange($event)"
-                        [checked]="selectedRoles.includes(role.id)"
-                        id="{{ role.id }}">
+                      <input type="checkbox" class="form-check-input" [value]="role.id" (change)="onRoleChange($event)"
+                        [checked]="selectedRoles.includes(role.id)" id="{{ role.id }}">
                       <label class="form-check-label" for="role-{{ role.id }}">{{ role.name }}</label>
                     </div>
-                    <div *ngIf="userForm.submitted && selectedRoles.length === 0" class="fv-plugins-message-container invalid-feedback">
+                    <div *ngIf="userForm.submitted && selectedRoles.length === 0"
+                      class="fv-plugins-message-container invalid-feedback">
                       <div>Debe seleccionar al menos un rol.</div>
                     </div>
                   </div>
@@ -262,7 +258,8 @@
       <!-- end::Details -->
 
       <!-- begin::Payment Info -->
-      <div class="tab-pane fade" [ngClass]="{'show active': activeTab === 'Payment Info'}">
+      <div class="tab-pane fade" [ngClass]="{'show active': activeTab === 'Payment Info'}"
+        *ngIf="activeTab === 'Payment Info'">
         <app-payment-information [personId]="personId" />
       </div>
       <!-- end::Payment Info -->

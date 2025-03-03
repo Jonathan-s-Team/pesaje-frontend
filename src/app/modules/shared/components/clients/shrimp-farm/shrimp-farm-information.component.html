@@ -6,7 +6,7 @@
       <div class="d-flex align-items-center position-relative my-1">
         <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
         <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
-               placeholder="Buscar Camaronera">
+          placeholder="Buscar Camaronera">
       </div>
       <!--end::Search-->
     </div>
@@ -17,8 +17,8 @@
       <!--begin::Toolbar-->
       <div class="d-flex justify-content-end">
         <!--begin::Add shrimp farm info-->
-        <button *appCanEdit="PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE" type="button" class="btn btn-primary"
-                data-action="create" (click)="create()">
+        <button *appCanEdit="PERMISSION_ROUTES.CLIENTS" type="button" class="btn btn-primary" data-action="create"
+          (click)="create()">
           Agregar Camaronera
         </button>
         <!--end::Add shrimp farm info-->
@@ -29,8 +29,8 @@
   </div>
 
   <div class="card-body pt-0">
-    <app-crud [datatableConfig]="datatableConfig" permissionRoute="{{PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE}}"
-              (editEvent)="edit($event.toString())" (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal">
+    <app-crud [datatableConfig]="datatableConfig" permissionRoute="{{PERMISSION_ROUTES.CLIENTS}}"
+      (editEvent)="edit($event.toString())" (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal">
     </app-crud>
   </div>
 </div>
@@ -51,15 +51,10 @@
           <!-- Identificador -->
           <div class="fv-row mb-7">
             <label class="required fw-semibold fs-6 mb-2">Identificador</label>
-            <input type="text"
-                   class="form-control form-control-solid"
-                   name="identifier"
-                   [(ngModel)]="shrimpFarmInfo.identifier"
-                   #identifier="ngModel"
-                   required
-                   minlength="3" />
+            <input type="text" class="form-control form-control-solid" name="identifier"
+              [(ngModel)]="shrimpFarmInfo.identifier" #identifier="ngModel" required minlength="3" />
             <div *ngIf="myForm.submitted && identifier.invalid"
-                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div *ngIf="identifier.errors?.['required']">El identificador es obligatorio.</div>
               <div *ngIf="identifier.errors?.['minlength']">Debe tener al menos 3 caracteres.</div>
             </div>
@@ -68,15 +63,10 @@
           <!-- Hectáreas -->
           <div class="fv-row mb-7">
             <label class="required fw-semibold fs-6 mb-2">Hectáreas</label>
-            <input type="number"
-                   class="form-control form-control-solid"
-                   name="numberHectares"
-                   [(ngModel)]="shrimpFarmInfo.numberHectares"
-                   #numberHectares="ngModel"
-                   required
-                   min="1" />
+            <input type="number" class="form-control form-control-solid" name="numberHectares"
+              [(ngModel)]="shrimpFarmInfo.numberHectares" #numberHectares="ngModel" required min="1" />
             <div *ngIf="myForm.submitted && numberHectares.invalid"
-                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div *ngIf="numberHectares.errors?.['required']">Las hectáreas son obligatorias.</div>
               <div *ngIf="numberHectares.errors?.['min']">Debe ser al menos 1.</div>
             </div>
@@ -85,15 +75,10 @@
           <!-- Lugar -->
           <div class="fv-row mb-7">
             <label class="required fw-semibold fs-6 mb-2">Lugar</label>
-            <input type="text"
-                   class="form-control form-control-solid"
-                   name="place"
-                   [(ngModel)]="shrimpFarmInfo.place"
-                   #place="ngModel"
-                   required
-                   minlength="3" />
+            <input type="text" class="form-control form-control-solid" name="place" [(ngModel)]="shrimpFarmInfo.place"
+              #place="ngModel" required minlength="3" />
             <div *ngIf="myForm.submitted && place.invalid"
-                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div *ngIf="place.errors?.['required']">El lugar es obligatorio.</div>
               <div *ngIf="place.errors?.['minlength']">Debe tener al menos 3 caracteres.</div>
             </div>
@@ -102,17 +87,14 @@
           <!-- Metodo de Transporte -->
           <div class="fv-row mb-7">
             <label class="required fw-semibold fs-6 mb-2">Método de Transporte</label>
-            <select class="form-control form-control-solid"
-                    name="transportationMethod"
-                    [(ngModel)]="shrimpFarmInfo.transportationMethod"
-                    #transportationMethod="ngModel"
-                    required>
+            <select class="form-control form-control-solid" name="transportationMethod"
+              [(ngModel)]="shrimpFarmInfo.transportationMethod" #transportationMethod="ngModel" required>
               <option *ngFor="let method of transportationMethods" [value]="method">
                 {{ getTranslatedTransportationMethod(method) }}
               </option>
             </select>
             <div *ngIf="myForm.submitted && transportationMethod.invalid"
-                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div *ngIf="transportationMethod.errors?.['required']">El método de transporte es obligatorio.</div>
             </div>
           </div>
@@ -120,16 +102,10 @@
           <!-- Distancia a la Puerta -->
           <div class="fv-row mb-7">
             <label class="required fw-semibold fs-6 mb-2">Distancia a la Puerta</label>
-            <input type="number"
-                   class="form-control form-control-solid"
-                   name="distanceToGate"
-                   [(ngModel)]="shrimpFarmInfo.distanceToGate"
-                   #distanceToGate="ngModel"
-                   required
-                   min="0"
-                   step="0.1" />
+            <input type="number" class="form-control form-control-solid" name="distanceToGate"
+              [(ngModel)]="shrimpFarmInfo.distanceToGate" #distanceToGate="ngModel" required min="0" step="0.1" />
             <div *ngIf="myForm.submitted && distanceToGate.invalid"
-                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div *ngIf="distanceToGate.errors?.['required']">La distancia a la puerta es obligatoria.</div>
               <div *ngIf="distanceToGate.errors?.['min']">Debe ser un valor positivo.</div>
             </div>
@@ -138,15 +114,10 @@
           <!-- Tiempo desde Pedernales -->
           <div class="fv-row mb-7">
             <label class="required fw-semibold fs-6 mb-2">Tiempo desde Pedernales</label>
-            <input type="number"
-                   class="form-control form-control-solid"
-                   name="timeFromPedernales"
-                   [(ngModel)]="shrimpFarmInfo.timeFromPedernales"
-                   #timeFromPedernales="ngModel"
-                   required
-                   min="0" />
+            <input type="number" class="form-control form-control-solid" name="timeFromPedernales"
+              [(ngModel)]="shrimpFarmInfo.timeFromPedernales" #timeFromPedernales="ngModel" required min="0" />
             <div *ngIf="myForm.submitted && timeFromPedernales.invalid"
-                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div *ngIf="timeFromPedernales.errors?.['required']">El tiempo desde Pedernales es obligatorio.</div>
               <div *ngIf="timeFromPedernales.errors?.['min']">Debe ser un valor positivo.</div>
             </div>
