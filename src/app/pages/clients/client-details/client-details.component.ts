@@ -38,9 +38,6 @@ export class ClientDetailsComponent
   filteredBuyers: IReadUsersModel[] = [];
   selectedUserIds: string[] = [];
 
-  /** Propiedad para el filtro del buscador*/
-  buyerFilter: string = '';
-
   /** Stores all active subscriptions */
   private unsubscribe: Subscription[] = [];
 
@@ -88,7 +85,9 @@ export class ClientDetailsComponent
             .split('T')[0];
         }
 
-        this.changeDetectorRef.detectChanges();
+        this.selectedUserIds = (client.buyersItBelongs || []).map(buyer =>
+          typeof buyer === 'string' ? buyer : buyer.id
+        );        this.changeDetectorRef.detectChanges();
       },
       error: (err) => {
         console.error('Error fetching clients details:', err);
@@ -108,7 +107,7 @@ export class ClientDetailsComponent
     }
 
     const payload: ICreateUpdateClientModel = {
-      buyersItBelongs: this.clientData.buyersItBelongs.map(buyer => buyer.id),
+      buyersItBelongs: this.selectedUserIds,
       person: this.clientData.person,
     };
 
@@ -127,16 +126,23 @@ export class ClientDetailsComponent
     this.unsubscribe.push(updateSub);
   }
 
-  filterBuyers(): void {
-    if (!this.buyerFilter) {
-      this.filteredBuyers = this.buyers;
-      return;
-    }
-    const filterValue = this.buyerFilter.toLowerCase();
-    this.filteredBuyers = this.buyers.filter(buyer =>
-      buyer.person.names.toLowerCase().includes(filterValue)
-    );
+  compareBuyerIds(value1: any, value2: any): boolean {
+    return value1 === value2;
   }
+
+  getSelectedBuyerNames(): string {
+    if (!this.selectedUserIds || !this.selectedUserIds.length || !this.buyers) {
+      return '';
+    }
+    const names = this.selectedUserIds
+      .map(id => {
+        const buyer = this.buyers.find(b => b.id === id);
+        return buyer ? buyer.person.names : '';
+      })
+      .filter(name => name !== '');
+    return names.join(', ');
+  }
+
 
   private showSuccessAlert() {
     const options: SweetAlertOptions = {
