@@ -6,7 +6,9 @@ import { environment } from 'src/environments/environment';
 import {
   ICreatePeriodModel,
   IReadPeriodModel,
+  IUpdatePeriodModel,
 } from '../interfaces/period.interface';
+import { IUpdateSizePriceModel } from '../interfaces/size-price.interface';
 
 const API_PERIOD_URL = `${environment.apiUrl}/period`;
 
@@ -50,21 +52,18 @@ export class PeriodService {
       );
   }
 
-  // updatePaymentInfo(
-  //   id: string,
-  //   updateData: Partial<IPaymentInfoModel>
-  // ): Observable<IPaymentInfoModel> {
-  //   this.isLoadingSubject.next(true);
-  //   return this.http
-  //     .put<{ updatedPaymentInfo: IPaymentInfoModel }>(
-  //       `${API_PAYMENT_INFO_URL}/${id}`,
-  //       updateData
-  //     )
-  //     .pipe(
-  //       map((response) => response.updatedPaymentInfo), // ✅ Extract object from response
-  //       finalize(() => this.isLoadingSubject.next(false))
-  //     );
-  // }
+  updatePaymentInfo(
+    id: string,
+    updateData: IUpdatePeriodModel
+  ): Observable<IReadPeriodModel> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .put<{ data: IReadPeriodModel }>(`${API_PERIOD_URL}/${id}`, updateData)
+      .pipe(
+        map((response) => response.data), // ✅ Extract object from response
+        finalize(() => this.isLoadingSubject.next(false))
+      );
+  }
 
   // deletePaymentInfo(id: string): Observable<{ message: string }> {
   //   this.isLoadingSubject.next(true);

@@ -49,4 +49,12 @@ export class FormUtilsService {
       form.controls[key].markAsUntouched(); // Mark as untouched
     });
   }
+
+  enableAllControls(form: FormGroup) {
+    Object.values(form.controls).forEach((control) => control.enable());
+  }
+
+  disableAllControls(form: FormGroup) {
+    Object.values(form.controls).forEach((control) => control.disable());
+  }
 }

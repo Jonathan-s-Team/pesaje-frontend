@@ -37,18 +37,20 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let size of uniqueSizes">
+          <tr *ngFor="let size of headlessSizes">
             <td class="text-gray-900 fw-bolder text-start fs-6">
               {{ size.size }}
             </td>
             <td class="text-end">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="text" class="form-control form-control-sm text-end" [formControlName]="'cola-a-'+size.id"
-                  (blur)="formatPrice('cola-a-'+size.id)" (keypress)="validateNumber($event)" placeholder="0.00" />
+                <input type="text" class="form-control form-control-sm text-end"
+                  [formControlName]="'cola-a-'+size.idColaA" (blur)="formatPrice('cola-a-'+size.idColaA)"
+                  (keypress)="validateNumber($event)" placeholder="0.00" />
               </div>
               <!-- Show validation error -->
-              <div *ngIf="form.controls['cola-a-'+size.id]?.invalid && form.controls['cola-a-'+size.id]?.touched"
+              <div
+                *ngIf="form.controls['cola-a-'+size.idColaA]?.invalid && form.controls['cola-a-'+size.idColaA]?.touched"
                 class="text-danger small mt-1">
                 Ingrese un número válido
               </div>
@@ -56,11 +58,13 @@
             <td class="text-end">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="text" class="form-control form-control-sm text-end" [formControlName]="'cola-a--'+size.id"
-                  (blur)="formatPrice('cola-a--'+size.id)" (keypress)="validateNumber($event)" placeholder="0.00" />
+                <input type="text" class="form-control form-control-sm text-end"
+                  [formControlName]="'cola-a--'+size.idColaA_" (blur)="formatPrice('cola-a--'+size.idColaA_)"
+                  (keypress)="validateNumber($event)" placeholder="0.00" />
               </div>
               <!-- Show validation error -->
-              <div *ngIf="form.controls['cola-a--'+size.id]?.invalid && form.controls['cola-a--'+size.id]?.touched"
+              <div
+                *ngIf="form.controls['cola-a--'+size.idColaA_]?.invalid && form.controls['cola-a--'+size.idColaA_]?.touched"
                 class="text-danger small mt-1">
                 Ingrese un número válido
               </div>
@@ -68,11 +72,13 @@
             <td class="text-end">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="text" class="form-control form-control-sm text-end" [formControlName]="'cola-b-'+size.id"
-                  (blur)="formatPrice('cola-b-'+size.id)" (keypress)="validateNumber($event)" placeholder="0.00" />
+                <input type="text" class="form-control form-control-sm text-end"
+                  [formControlName]="'cola-b-'+size.idColaB" (blur)="formatPrice('cola-b-'+size.idColaB)"
+                  (keypress)="validateNumber($event)" placeholder="0.00" />
               </div>
               <!-- Show validation error -->
-              <div *ngIf="form.controls['cola-b-'+size.id]?.invalid && form.controls['cola-b-'+size.id]?.touched"
+              <div
+                *ngIf="form.controls['cola-b-'+size.idColaB]?.invalid && form.controls['cola-b-'+size.idColaB]?.touched"
                 class="text-danger small mt-1">
                 Ingrese un número válido
               </div>

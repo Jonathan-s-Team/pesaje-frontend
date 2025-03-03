@@ -14,7 +14,33 @@ export class SidebarDynamicMenuComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  /**
+   * ✅ Checks if the option's route is active
+   */
   isOptionActive(option: IPermissionModel): boolean {
-    return !!option.route && this.router.url === '/' + option.route;
+    if (!option) return false;
+
+    // console.log(
+    //   'Checking active status for:',
+    //   option.name,
+    //   'with route:',
+    //   option.route
+    // );
+    // console.log('Current URL:', this.router.url);
+
+    // 🔹 Direct match for main options
+    if (option.route && this.router.url.includes(option.route)) {
+      // console.log('✅ Matched main route:', option.route);
+      return true;
+    }
+
+    // 🔹 Check suboptions recursively
+    if (option.suboptions?.length > 0) {
+      return option.suboptions.some((sub: IPermissionModel) =>
+        this.isOptionActive(sub)
+      );
+    }
+
+    return false;
   }
 }
