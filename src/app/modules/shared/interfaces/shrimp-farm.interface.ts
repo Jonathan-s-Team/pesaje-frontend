@@ -1,11 +1,20 @@
-export interface ICreateUpdateShrimpFarmModel {
+export interface ICreateShrimpFarmModel {
   identifier: string;
   numberHectares: number;
   place: string;
   transportationMethod: string;
   distanceToGate: number;
   timeFromPedernales: number;
-  client?: string;
+  client: string;
+}
+
+export interface IUpdateShrimpFarmModel {
+  identifier: string;
+  numberHectares: number;
+  place: string;
+  transportationMethod: string;
+  distanceToGate: number;
+  timeFromPedernales: number;
 }
 
 export interface IReadShrimpFarmModel {

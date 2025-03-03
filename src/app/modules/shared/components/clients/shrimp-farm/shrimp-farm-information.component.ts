@@ -17,7 +17,11 @@ import {SweetAlertOptions} from 'sweetalert2';
 import {Config} from 'datatables.net';
 import {PERMISSION_ROUTES} from 'src/app/constants/routes.constants';
 import {ActivatedRoute} from '@angular/router';
-import {ICreateUpdateShrimpFarmModel, IReadShrimpFarmModel} from "../../../interfaces/shrimp-farm.interface";
+import {
+  IUpdateShrimpFarmModel,
+  IReadShrimpFarmModel,
+  ICreateShrimpFarmModel
+} from "../../../interfaces/shrimp-farm.interface";
 import {ShrimpFarmService} from "../../../services/shrimp-farm.service";
 
 @Component({
@@ -32,9 +36,7 @@ export class ShrimpFarmInformationComponent
   private unsubscribe: Subscription[] = [];
 
   shrimpFarmData: IReadShrimpFarmModel[] = [];
-  shrimpFarmInfo:
-    | ICreateUpdateShrimpFarmModel
-    | Partial<IReadShrimpFarmModel> = {} as ICreateUpdateShrimpFarmModel;
+  shrimpFarmInfo: IReadShrimpFarmModel = {} as IReadShrimpFarmModel;
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
   @Input() clientId?: string;
@@ -166,19 +168,23 @@ export class ShrimpFarmInformationComponent
   }
 
   // 🔹 Handle Form Submission
-  onSubmit(event: Event, myForm: NgForm, modal: any): void {
+  onSubmit(event: Event, myForm: NgForm): void {
     if (myForm && myForm.invalid) {
       return;
     }
 
     if (!this.clientId) return;
 
-    const isUpdate = !!(this.shrimpFarmInfo as any).id;
+    this.shrimpFarmInfo.client = this.clientId;
+
+    this.isLoading = true;
+
+    //const isUpdate = !!(this.shrimpFarmInfo as any).id;
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: '¡Éxito!',
-      text: isUpdate
+      text: this.shrimpFarmInfo.id
         ? 'Información de camaronera actualizada correctamente.'
         : 'Información de camaronera creada correctamente.',
     };
@@ -193,62 +199,60 @@ export class ShrimpFarmInformationComponent
       this.isLoading = false;
     };
 
-    if (isUpdate) {
-      const {
-        identifier,
-        numberHectares,
-        place,
-        transportationMethod,
-        distanceToGate,
-        timeFromPedernales,
-      } = this.shrimpFarmInfo as IReadShrimpFarmModel;
-
-      const payload: ICreateUpdateShrimpFarmModel = {
-        identifier,
-        numberHectares,
-        place,
-        transportationMethod,
-        distanceToGate,
-        timeFromPedernales,
-      };
-
-      this.isLoading = true;
+    const updateFn = () => {
+      const updatePayload: IUpdateShrimpFarmModel = {...this.shrimpFarmInfo};
+      console.log(updatePayload);
       this.shrimpFarmService
-        .updateShrimpFarm((this.shrimpFarmInfo as any).id, payload)
+        .updateShrimpFarm(this.shrimpFarmInfo.id, updatePayload)
         .subscribe({
           next: (updatedInfo) => {
-            modal.dismiss('update success');
+            const index = this.shrimpFarmData.findIndex(
+              (item) => item.id === updatedInfo.id
+            );
+            if (index > -1) this.shrimpFarmData[index] = {...updatedInfo};
+
             this.showAlert(successAlert);
-            this.loadShrimpFarmInfos();
+
+            this.datatableConfig = {
+              ...this.datatableConfig,
+              data: [...this.shrimpFarmData],
+            };
+
+            this.cdr.detectChanges();
+            this.reloadEvent.emit(true);
           },
-          error: () => {
+          error: (error) => {
             errorAlert.text = 'No se pudo actualizar la camaronera.';
             this.showAlert(errorAlert);
             this.isLoading = false;
           },
           complete: completeFn,
         });
+    };
+
+    const createFn = () => {
+      const createPayload: ICreateShrimpFarmModel = {...this.shrimpFarmInfo};
+      this.shrimpFarmService.createShrimpFarm(createPayload).subscribe({
+        next: () => {
+          this.showAlert(successAlert);
+          this.loadShrimpFarmInfos();
+        },
+        error: (error) => {
+          errorAlert.text = 'No se pudo crear la camaronera.';
+          this.showAlert(errorAlert);
+          this.isLoading = false;
+        },
+        complete: completeFn,
+      });
+    };
+
+    if (this.shrimpFarmInfo.id) {
+      updateFn();
     } else {
-      (this.shrimpFarmInfo as ICreateUpdateShrimpFarmModel).client = this.clientId;
-      this.isLoading = true;
-      this.shrimpFarmService
-        .createShrimpFarm(this.shrimpFarmInfo as ICreateUpdateShrimpFarmModel)
-        .subscribe({
-          next: () => {
-            // Cerrar el modal y recargar la lista
-            modal.dismiss('create success');
-            this.showAlert(successAlert);
-            this.loadShrimpFarmInfos();
-          },
-          error: () => {
-            errorAlert.text = 'No se pudo crear la camaronera.';
-            this.showAlert(errorAlert);
-            this.isLoading = false;
-          },
-          complete: completeFn,
-        });
+      createFn();
     }
   }
+
 
   // 🔹 Show SweetAlert Message
   showAlert(swalOptions: SweetAlertOptions): void {

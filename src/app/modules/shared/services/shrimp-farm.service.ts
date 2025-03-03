@@ -2,7 +2,11 @@ import {environment} from "../../../../environments/environment";
 import {Injectable} from "@angular/core";
 import {BehaviorSubject, map, Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
-import {ICreateUpdateShrimpFarmModel, IReadShrimpFarmModel} from "../interfaces/shrimp-farm.interface";
+import {
+  IUpdateShrimpFarmModel,
+  IReadShrimpFarmModel,
+  ICreateShrimpFarmModel
+} from "../interfaces/shrimp-farm.interface";
 import {finalize} from "rxjs/operators";
 
 const API_SHRIMP_FARM_URL = `${environment.apiUrl}/shrimp-farm`;
@@ -15,7 +19,7 @@ export class ShrimpFarmService {
   constructor(private http: HttpClient) {}
 
   createShrimpFarm(
-    farmData: Partial<ICreateUpdateShrimpFarmModel>
+    farmData: ICreateShrimpFarmModel
   ): Observable<{ message: string }> {
     this.isLoadingSubject.next(true);
     return this.http
@@ -25,7 +29,7 @@ export class ShrimpFarmService {
 
   updateShrimpFarm(
     shrimpFarmId: string,
-    updateData: Partial<ICreateUpdateShrimpFarmModel>
+    updateData: IUpdateShrimpFarmModel
   ): Observable<IReadShrimpFarmModel> {
     this.isLoadingSubject.next(true);
     return this.http
