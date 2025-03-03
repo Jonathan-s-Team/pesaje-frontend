@@ -31,6 +31,7 @@ export class ClientDetailsComponent
 
   clientData: IReadClientModel = {} as IReadClientModel;
   personId: string = '';
+  clientId: string = '';
   formattedBirthDate: string = '';
 
   /** Propiedades para el multi-select de usuarios */
@@ -78,6 +79,7 @@ export class ClientDetailsComponent
       next: (client) => {
         this.clientData = client;
         this.personId = client.person?.id ?? '';
+        this.clientId = this.clientData.id ?? '';
 
         if (this.clientData.person?.birthDate) {
           this.formattedBirthDate = new Date(this.clientData.person.birthDate)
