@@ -90,8 +90,8 @@ export class PageInfoService {
 
   public calculateBreadcrumbs() {
     const asideBc = this.calculateBreadcrumbsInMenu('kt_app_sidebar');
-    const headerBc = this.calculateBreadcrumbsInMenu('kt_app_header_wrapper');
-    const bc = asideBc && asideBc.length > 0 ? asideBc : headerBc;
+    // const headerBc = this.calculateBreadcrumbsInMenu('kt_app_header_wrapper');
+    const bc = asideBc && asideBc.length > 0 ? asideBc : null;
 
     if (!bc) {
       this.setBreadcrumbs([]);
@@ -100,116 +100,121 @@ export class PageInfoService {
     this.setBreadcrumbs(bc);
   }
 
-  // public calculateBreadcrumbsInMenu(
-  //   menuId: string
-  // ): Array<PageLink> | undefined {
-  //   const result: Array<PageLink> = [];
-  //   const menu = document.getElementById(menuId);
-  //   if (!menu) {
-  //     return;
-  //   }
-
-  //   const allActiveParents = Array.from<HTMLDivElement>(
-  //     menu.querySelectorAll('div.menu-item')
-  //   ).filter((link) => link.classList.contains('here'));
-
-  //   if (!allActiveParents || allActiveParents.length === 0) {
-  //     return;
-  //   }
-
-  //   allActiveParents.forEach((parent) => {
-  //     const titleSpan = parent.querySelector(
-  //       'span.menu-title'
-  //     ) as HTMLSpanElement | null;
-  //     if (!titleSpan) {
-  //       return;
-  //     }
-
-  //     const title = titleSpan.innerText;
-  //     const path = titleSpan.getAttribute('data-link');
-  //     if (!path) {
-  //       return;
-  //     }
-
-  //     result.push({
-  //       title,
-  //       path,
-  //       isSeparator: false,
-  //       isActive: false,
-  //     });
-  //     // add separator
-  //     result.push({
-  //       title: '',
-  //       path: '',
-  //       isSeparator: true,
-  //       isActive: false,
-  //     });
-  //   });
-
-  //   return result;
-  // }
-
   public calculateBreadcrumbsInMenu(
     menuId: string
   ): Array<PageLink> | undefined {
     const result: Array<PageLink> = [];
     const menu = document.getElementById(menuId);
+    if (!menu) {
+      return;
+    }
 
-    if (!menu) return;
+    const allActiveParents = Array.from<HTMLDivElement>(
+      menu.querySelectorAll('div.menu-item')
+    ).filter((link) => link.classList.contains('here'));
 
-    // 🔹 Find the currently active link
-    const activeLink = menu.querySelector(
-      '.menu-link.active'
-    ) as HTMLAnchorElement | null;
-    if (!activeLink) return;
+    if (!allActiveParents || allActiveParents.length === 0) {
+      return;
+    }
 
-    let currentItem: HTMLElement | null = activeLink.closest('.menu-item');
-
-    const addedPaths = new Set<string>(); // 🔹 Prevents duplicates
-
-    // 🔹 Traverse upwards in the menu hierarchy
-    while (currentItem) {
-      const titleSpan = currentItem.querySelector(
-        '.menu-title'
+    allActiveParents.forEach((parent) => {
+      const titleSpan = parent.querySelector(
+        'span.menu-title'
       ) as HTMLSpanElement | null;
-      if (!titleSpan) break;
+      if (!titleSpan) {
+        return;
+      }
 
-      const title = titleSpan.innerText.trim();
-      const path = titleSpan.getAttribute('data-link'); // 🔹 Get path if available
+      const title = titleSpan.innerText;
+      const path = titleSpan.getAttribute('data-link');
+      if (path) {
+        return;
+      }
 
-      // 🔹 Avoid duplicates by checking Set
-      if (addedPaths.has(path || '')) break;
-      addedPaths.add(path || '');
-
-      result.unshift({
+      result.push({
         title,
-        path: path && path !== '/' ? path : null, // ✅ Prevents navigation if path is missing
+        path,
         isSeparator: false,
         isActive: false,
       });
-
-      // 🔹 Move to the parent menu item
-      currentItem = currentItem.closest('.menu-item.menu-accordion');
-    }
-
-    // 🔹 Add separators
-    if (result.length > 1) {
-      const breadcrumbWithSeparators: PageLink[] = [];
-      result.forEach((item, index) => {
-        breadcrumbWithSeparators.push(item);
-        if (index < result.length - 1) {
-          breadcrumbWithSeparators.push({
-            title: '',
-            path: null, // ✅ Ensures no navigation on separators
-            isSeparator: true,
-            isActive: false,
-          });
-        }
+      // add separator
+      result.push({
+        title: '',
+        path: '',
+        isSeparator: true,
+        isActive: false,
       });
-
-      return breadcrumbWithSeparators;
-    }
+    });
 
     return result;
   }
+
+  //   public calculateBreadcrumbsInMenu(
+  //     menuId: string
+  //   ): Array<PageLink> | undefined {
+  //     const result: Array<PageLink> = [];
+  //     const menu = document.getElementById(menuId);
+  // console.log(menu)
+  //     if (!menu) return;
+
+  //     // 🔹 Find the currently active link
+  //     const activeLink = menu.querySelector(
+  //       '.menu-link.active'
+  //     ) as HTMLAnchorElement | null;
+  //     console.log(activeLink)
+
+  //     if (!activeLink) return;
+
+  //     let currentItem: HTMLElement | null = activeLink.closest('.menu-item');
+  //     console.log(currentItem)
+  //     const addedPaths = new Set<string>(); // 🔹 Prevents duplicates
+
+  //     // 🔹 Traverse upwards in the menu hierarchy
+  //     while (currentItem) {
+  //       const titleSpan = currentItem.querySelector(
+  //         '.menu-title'
+  //       ) as HTMLSpanElement | null;
+  //       console.log(titleSpan)
+  //       if (!titleSpan) break;
+
+  //       const title = titleSpan.innerText.trim();
+  //       const path = titleSpan.getAttribute('data-link'); // 🔹 Get path if available
+
+  //       // 🔹 Avoid duplicates by checking Set
+  //       if (addedPaths.has(path || '')) break;
+  //       addedPaths.add(path || '');
+
+  //       result.unshift({
+  //         title,
+  //         path: path && path !== '/' ? path : null, // ✅ Prevents navigation if path is missing
+  //         isSeparator: false,
+  //         isActive: false,
+  //       });
+
+  //       // 🔹 Move to the parent menu item
+  //       currentItem = currentItem.closest('.menu-item.menu-accordion');
+  //     }
+  //     console.log(addedPaths, result)
+
+  //     // 🔹 Add separators
+  //     if (result.length > 1) {
+  //       const breadcrumbWithSeparators: PageLink[] = [];
+  //       result.forEach((item, index) => {
+  //         breadcrumbWithSeparators.push(item);
+  //         if (index < result.length - 1) {
+  //           breadcrumbWithSeparators.push({
+  //             title: '',
+  //             path: null, // ✅ Ensures no navigation on separators
+  //             isSeparator: true,
+  //             isActive: false,
+  //           });
+  //         }
+  //       });
+  //       console.log(breadcrumbWithSeparators)
+
+  //       return breadcrumbWithSeparators;
+  //     }
+
+  //   return result;
+  // }
 }
