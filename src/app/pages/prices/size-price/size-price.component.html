@@ -44,11 +44,27 @@
             </button>
           </div>
 
-          <!-- Add Period Button (Fixed Size) -->
-          <button *appCanCreate="PERMISSION_ROUTES.PRICES" class="btn btn-success btn-sm" (click)="toggleAddPeriod()"
-            style="min-width: 150px;">
-            Agregar Periodo
-          </button>
+          <!-- Buttons Section -->
+          <div *ngIf="!isEditing" class="d-flex gap-2">
+            <!-- Add Period Button (Nuevo) -->
+            <button *appCanCreate="PERMISSION_ROUTES.PRICES" class="btn btn-success btn-sm" (click)="toggleAddPeriod()">
+              Nuevo
+            </button>
+
+            <!-- Edit Period Button -->
+            <div *ngIf="showEditButton">
+              <button *appCanEdit="PERMISSION_ROUTES.PRICES" class="btn btn-warning btn-sm" (click)="editPeriod()">
+                Editar
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="isEditing" class="d-flex gap-2">
+            <button class="btn btn-primary btn-sm me-3" (click)="savePeriod()">
+              Guardar
+            </button>
+            <button class="btn btn-danger btn-sm" (click)="cancelEditing()">Cancelar</button>
+          </div>
         </div>
       </div>
     </div>

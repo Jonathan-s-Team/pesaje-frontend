@@ -151,9 +151,17 @@ export class HeadlessTableComponent implements OnInit, OnChanges, OnDestroy {
 
     // ✅ Preserve existing form and only update missing controls
     this.sizePrices.forEach(({ size, price }) => {
-      this.ensureFormControlExists(`cola-a-${size.id}`, price);
-      this.ensureFormControlExists(`cola-a--${size.id}`, price);
-      this.ensureFormControlExists(`cola-b-${size.id}`, price);
+      switch (size.type) {
+        case SizeTypeEnum['TAIL-A']:
+          this.ensureFormControlExists(`cola-a-${size.id}`, price);
+          break;
+        case SizeTypeEnum['TAIL-A-']:
+          this.ensureFormControlExists(`cola-a--${size.id}`, price);
+          break;
+        case SizeTypeEnum['TAIL-B']:
+          this.ensureFormControlExists(`cola-b-${size.id}`, price);
+          break;
+      }
     });
 
     // ✅ Mark controls as touched and force validation recheck

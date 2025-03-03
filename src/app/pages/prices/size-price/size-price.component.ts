@@ -16,13 +16,18 @@ import { HeadlessTableComponent } from 'src/app/modules/shared/components/prices
 import {
   ICreatePeriodModel,
   IReadPeriodModel,
+  IUpdatePeriodModel,
 } from 'src/app/modules/shared/interfaces/period.interface';
 import { PeriodService } from 'src/app/modules/shared/services/period.service';
-import { SizeTypeEnum } from 'src/app/modules/shared/interfaces/size.interface';
+import {
+  IReadSizeModel,
+  SizeTypeEnum,
+} from 'src/app/modules/shared/interfaces/size.interface';
 import { distinctUntilChanged } from 'rxjs/operators';
 import {
   ICreateSizePriceModel,
   IReadSizePriceModel,
+  IUpdateSizePriceModel,
 } from 'src/app/modules/shared/interfaces/size-price.interface';
 
 @Component({
@@ -64,6 +69,8 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   selectedYear = '';
 
   isAdding = false;
+  isEditing = false;
+  showEditButton = false;
   showErrors = false;
 
   wholeSizePrices: IReadSizePriceModel[] = [];
@@ -129,6 +136,9 @@ export class SizePriceComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.showEditButton = true;
+    this.isEditing = false;
+
     // Call API to fetch period details by ID
     this.periodService.getPeriodById(this.selectedPeriod).subscribe({
       next: (periodDetails) => {
@@ -168,8 +178,26 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     this.selectedYear = '';
     this.selectedPeriod = '';
     this.showErrors = false;
+    this.showEditButton = false;
 
     this.resetTableForms();
+
+    this.cdr.detectChanges();
+  }
+
+  toggleEditPeriod() {
+    this.isEditing = false;
+
+    this.showErrors = false;
+    this.showEditButton = true;
+
+    if (this.wholeTableComponent) {
+      this.wholeTableComponent.disableForm();
+    }
+
+    if (this.headlessTableComponent) {
+      this.headlessTableComponent.disableForm();
+    }
 
     this.cdr.detectChanges();
   }
@@ -188,10 +216,41 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     }
   }
 
+  editPeriod() {
+    this.isEditing = true;
+
+    if (this.wholeTableComponent) {
+      this.wholeTableComponent.enableForm();
+    }
+
+    if (this.headlessTableComponent) {
+      this.headlessTableComponent.enableForm();
+    }
+
+    this.cdr.detectChanges();
+  }
+
+  cancelEditing() {
+    this.isEditing = false;
+
+    if (this.wholeTableComponent) {
+      this.wholeTableComponent.disableForm();
+    }
+
+    if (this.headlessTableComponent) {
+      this.headlessTableComponent.disableForm();
+    }
+
+    this.search();
+  }
+
   savePeriod() {
-    // ✅ Show validation errors for missing dropdown values
-    this.showErrors =
-      !this.selectedCompany || !this.selectedMonth || !this.selectedYear;
+    if (this.isEditing) {
+      this.showErrors = !this.selectedCompany || !this.selectedPeriod;
+    } else {
+      this.showErrors =
+        !this.selectedCompany || !this.selectedMonth || !this.selectedYear;
+    }
 
     // ✅ Trigger form validation checks
     const hasErrors =
@@ -209,74 +268,91 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     // ✅ Stop execution if any validation errors exist
     if (this.showErrors || hasErrors) return;
 
-    // ✅ Create period payload
-    const periodPayload: ICreatePeriodModel = {
-      name: `${this.selectedMonth}-${this.selectedYear}`,
-      company: this.selectedCompany,
+    const periodPayload: IUpdatePeriodModel = {
       sizePrices: [
         ...this.extractSizePrices(this.wholeTableComponent),
         ...this.extractSizePrices(this.headlessTableComponent),
       ],
     };
 
-    // ✅ Call API
-    const createPeriodSub = this.periodService
-      .createPeriod(periodPayload)
-      .subscribe({
-        next: () => {
-          this.showAlert({
-            icon: 'success',
-            title: '¡Éxito!',
-            text: 'Periodo creado exitosamente!',
-          });
-          this.toggleAddPeriod();
-        },
-        error: () => {
-          this.showAlert({
-            icon: 'error',
-            title: '¡Error!',
-            text: 'No se pudo crear el periodo.',
-          });
-        },
-      });
+    if (this.selectedPeriod) {
+      // ✅ Update existing period
+      const updatePeriodSub = this.periodService
+        .updatePaymentInfo(this.selectedPeriod, periodPayload)
+        .subscribe({
+          next: () => {
+            this.showAlert({
+              icon: 'success',
+              title: '¡Éxito!',
+              text: 'Periodo actualizado exitosamente!',
+            });
+            this.toggleEditPeriod();
+          },
+          error: () => {
+            this.showAlert({
+              icon: 'error',
+              title: '¡Error!',
+              text: 'No se pudo actualizar el periodo.',
+            });
+          },
+        });
 
-    this.unsubscribe.push(createPeriodSub);
+      this.unsubscribe.push(updatePeriodSub);
+    } else {
+      // ✅ Create new period
+      const createPeriodSub = this.periodService
+        .createPeriod({
+          name: `${this.selectedMonth}-${this.selectedYear}`,
+          company: this.selectedCompany,
+          ...periodPayload,
+        })
+        .subscribe({
+          next: () => {
+            this.showAlert({
+              icon: 'success',
+              title: '¡Éxito!',
+              text: 'Periodo creado exitosamente!',
+            });
+            this.toggleAddPeriod();
+          },
+          error: () => {
+            this.showAlert({
+              icon: 'error',
+              title: '¡Error!',
+              text: 'No se pudo crear el periodo.',
+            });
+          },
+        });
+
+      this.unsubscribe.push(createPeriodSub);
+    }
   }
 
   extractSizePrices(
     component: WholeTableComponent | HeadlessTableComponent
-  ): ICreateSizePriceModel[] {
+  ): IUpdateSizePriceModel[] {
     if (!component?.sizes || !component.form) return [];
 
-    return component.sizes.reduce<ICreateSizePriceModel[]>((acc, size) => {
-      let controlKey: string;
+    return component.sizes.map((size) => {
+      const controlKey = this.getSizeControlKey(size);
+      return {
+        sizeId: size.id,
+        price: +component.form.value[controlKey] || 0, // Ensure conversion to number
+      };
+    });
+  }
 
-      switch (size.type) {
-        case SizeTypeEnum['TAIL-A']:
-          controlKey = `cola-a-${size.id}`;
-          break;
-        case SizeTypeEnum['TAIL-A-']:
-          controlKey = `cola-a--${size.id}`;
-          break;
-        case SizeTypeEnum['TAIL-B']:
-          controlKey = `cola-b-${size.id}`;
-          break;
-        default:
-          controlKey = size.id; // Default case for WholeTableComponent
-      }
-
-      const price = component.form.controls[controlKey]?.value ?? 0;
-
-      // Ensure only valid prices are pushed
-      if (!isNaN(price)) {
-        acc.push({
-          sizeId: size.id,
-          price: +price, // Convert safely
-        });
-      }
-
-      return acc;
-    }, []);
+  private getSizeControlKey(size: IReadSizeModel): string {
+    switch (size.type) {
+      case SizeTypeEnum['TAIL-A']:
+        return `cola-a-${size.id}`;
+      case SizeTypeEnum['TAIL-A-']:
+        return `cola-a--${size.id}`;
+      case SizeTypeEnum['TAIL-B']:
+        return `cola-b-${size.id}`;
+      default:
+        return size.id;
+    }
   }
 
   showAlert(swalOptions: SweetAlertOptions) {

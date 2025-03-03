@@ -11,7 +11,6 @@ export interface ICreateSizePriceModel {
 }
 
 export interface IUpdateSizePriceModel {
-  id: string;
   sizeId: string;
   price: number;
 }
