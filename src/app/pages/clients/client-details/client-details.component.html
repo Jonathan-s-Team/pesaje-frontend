@@ -15,21 +15,28 @@
         flex-nowrap
       " role="tablist">
 
+      <!-- 🔹 Back Button Tab -->
+      <li class="nav-item">
+        <a class="nav-link cursor-pointer" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i> <!-- FontAwesome icon -->
+        </a>
+      </li>
+
       <li class="nav-item">
         <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Details' }"
-           (click)="setActiveTab('Details')" role="tab">
+          (click)="setActiveTab('Details')" role="tab">
           Detalles
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Shrimp Farms' }"
-           (click)="setActiveTab('Shrimp Farms')" role="tab">
+          (click)="setActiveTab('Shrimp Farms')" role="tab">
           Camaroneras
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Payment Info' }"
-           (click)="setActiveTab('Payment Info')" role="tab">
+          (click)="setActiveTab('Payment Info')" role="tab">
           Informaciòn de pago
         </a>
       </li>
@@ -56,8 +63,8 @@
                       <!-- Nombres -->
                       <div class="col-lg-6 fv-row">
                         <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                               placeholder="Nombres" name="names" [(ngModel)]="clientData.person.names" #names="ngModel"
-                               required minlength="3">
+                          placeholder="Nombres" name="names" [(ngModel)]="clientData.person.names" #names="ngModel"
+                          required minlength="3">
                         <div
                           *ngIf="(clientForm.submitted || names.dirty || names.touched) && names.errors?.['required']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -72,8 +79,8 @@
                       <!-- Apellidos -->
                       <div class="col-lg-6 fv-row">
                         <input type="text" class="form-control form-control-lg form-control-solid"
-                               placeholder="Apellidos" name="lastNames" [(ngModel)]="clientData.person.lastNames"
-                               #lastNames="ngModel" required minlength="3">
+                          placeholder="Apellidos" name="lastNames" [(ngModel)]="clientData.person.lastNames"
+                          #lastNames="ngModel" required minlength="3">
                         <div
                           *ngIf="(clientForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['required']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -94,9 +101,8 @@
                   <label class="col-lg-4 col-form-label required fw-bold fs-6">Identificación</label>
                   <div class="col-lg-8 fv-row">
                     <input type="text" class="form-control form-control-lg form-control-solid"
-                           placeholder="Identificación" name="identification"
-                           [(ngModel)]="clientData.person.identification"
-                           #identification="ngModel" required>
+                      placeholder="Identificación" name="identification" [(ngModel)]="clientData.person.identification"
+                      #identification="ngModel" required>
                     <div
                       *ngIf="(clientForm.submitted || identification.dirty || identification.touched) && identification.errors?.['required']"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -110,8 +116,8 @@
                   <label class="col-lg-4 col-form-label required fw-bold fs-6">Fecha de Nacimiento</label>
                   <div class="col-lg-8 fv-row">
                     <input type="date" class="form-control form-control-lg form-control-solid" name="birthDate"
-                           [(ngModel)]="formattedBirthDate" (ngModelChange)="clientData.person.birthDate = $event"
-                           #birthDate="ngModel" required>
+                      [(ngModel)]="formattedBirthDate" (ngModelChange)="clientData.person.birthDate = $event"
+                      #birthDate="ngModel" required>
                     <div
                       *ngIf="(clientForm.submitted || birthDate.dirty || birthDate.touched) && birthDate.errors?.['required']"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -125,8 +131,7 @@
                   <label class="col-lg-4 col-form-label required fw-bold fs-6">Dirección</label>
                   <div class="col-lg-8 fv-row">
                     <input type="text" class="form-control form-control-lg form-control-solid" placeholder="Dirección"
-                           name="address" [(ngModel)]="clientData.person.address" #address="ngModel" required
-                           minlength="3">
+                      name="address" [(ngModel)]="clientData.person.address" #address="ngModel" required minlength="3">
                     <div
                       *ngIf="(clientForm.submitted || address.dirty || address.touched) && address.errors?.['required']"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -148,13 +153,13 @@
                       <!-- Teléfono fijo (opcional) -->
                       <div class="col-lg-4 fv-row">
                         <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
-                               placeholder="Teléfono fijo" name="phone" [(ngModel)]="clientData.person.phone">
+                          placeholder="Teléfono fijo" name="phone" [(ngModel)]="clientData.person.phone">
                       </div>
                       <!-- Celular 1 (requerido) -->
                       <div class="col-lg-4 fv-row">
                         <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
-                               placeholder="Celular 1" name="mobilePhone" [(ngModel)]="clientData.person.mobilePhone"
-                               #mobilePhone="ngModel" required pattern="^\+?[0-9\s\-\(\)]{7,15}$">
+                          placeholder="Celular 1" name="mobilePhone" [(ngModel)]="clientData.person.mobilePhone"
+                          #mobilePhone="ngModel" required pattern="^\+?[0-9\s\-\(\)]{7,15}$">
                         <div
                           *ngIf="(clientForm.submitted || mobilePhone.dirty || mobilePhone.touched) && mobilePhone.errors?.['required']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -169,7 +174,7 @@
                       <!-- Celular 2 (opcional) -->
                       <div class="col-lg-4 fv-row">
                         <input type="tel" class="form-control form-control-lg form-control-solid"
-                               placeholder="Celular 2" name="mobilePhone2" [(ngModel)]="clientData.person.mobilePhone2">
+                          placeholder="Celular 2" name="mobilePhone2" [(ngModel)]="clientData.person.mobilePhone2">
                       </div>
                     </div>
                   </div>
@@ -180,14 +185,14 @@
                   <label class="col-lg-4 col-form-label required fw-bold fs-6">Correo Electrónico</label>
                   <div class="col-lg-8 fv-row">
                     <input type="email" class="form-control form-control-lg form-control-solid"
-                           placeholder="Correo electrónico" name="email" [(ngModel)]="clientData.person.email"
-                           #email="ngModel" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
+                      placeholder="Correo electrónico" name="email" [(ngModel)]="clientData.person.email"
+                      #email="ngModel" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
                     <div *ngIf="(clientForm.submitted || email.dirty || email.touched) && email.errors?.['required']"
-                         class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                       <div>El correo electrónico es obligatorio.</div>
                     </div>
                     <div *ngIf="(clientForm.submitted || email.dirty || email.touched) && email.errors?.['pattern']"
-                         class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                       <div>Debe ingresar un correo válido.</div>
                     </div>
                   </div>
@@ -201,10 +206,9 @@
                       <!-- Nombre del contacto -->
                       <div class="col-lg-6 fv-row">
                         <input type="text" class="form-control form-control-lg form-control-solid mb-3"
-                               placeholder="Nombre contacto" name="emergencyContactName"
-                               [(ngModel)]="clientData.person.emergencyContactName" #emergencyContactName="ngModel"
-                               required
-                               minlength="3">
+                          placeholder="Nombre contacto" name="emergencyContactName"
+                          [(ngModel)]="clientData.person.emergencyContactName" #emergencyContactName="ngModel" required
+                          minlength="3">
                         <div
                           *ngIf="(clientForm.submitted || emergencyContactName.dirty || emergencyContactName.touched) && emergencyContactName.errors?.['required']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -220,9 +224,9 @@
                       <!-- Teléfono del contacto -->
                       <div class="col-lg-6 fv-row">
                         <input type="tel" class="form-control form-control-lg form-control-solid"
-                               placeholder="Teléfono contacto" name="emergencyContactPhone"
-                               [(ngModel)]="clientData.person.emergencyContactPhone" #emergencyContactPhone="ngModel"
-                               required pattern="^\+?[0-9\s\-\(\)]{7,15}$">
+                          placeholder="Teléfono contacto" name="emergencyContactPhone"
+                          [(ngModel)]="clientData.person.emergencyContactPhone" #emergencyContactPhone="ngModel"
+                          required pattern="^\+?[0-9\s\-\(\)]{7,15}$">
                         <div
                           *ngIf="(clientForm.submitted || emergencyContactPhone.dirty || emergencyContactPhone.touched) && emergencyContactPhone.errors?.['required']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -239,31 +243,28 @@
                 </div>
 
                 <!-- Multi-select de Compradores -->
-                <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Compradores</label>
-                  <div class="col-lg-8">
-                    <mat-form-field appearance="fill" class="w-100">
-                      <mat-label>Seleccionar Compradores</mat-label>
-                      <mat-select
-                        multiple
-                        required
-                        [(ngModel)]="selectedUserIds"
-                        name="selectedUserIds"
-                        #selectedBuyers="ngModel"
-                        [compareWith]="compareBuyerIds">
-                        <mat-select-trigger>
-                          {{ getSelectedBuyerNames() || 'Selecciona compradores' }}
-                        </mat-select-trigger>
-                        <mat-option *ngFor="let buyer of buyers" [value]="buyer.id">
-                          {{ buyer.person.names }}
-                        </mat-option>
-                      </mat-select>
-                      <div
-                        *ngIf="(clientForm.submitted || selectedBuyers.dirty || selectedBuyers.touched) && selectedBuyers.errors?.['required']"
-                        class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                        <div>Debe seleccionar al menos un comprador.</div>
+                <div class="mb-3">
+                  <label for="compradores" class="required fw-semibold fs-6 mb-2">Compradores Asociados</label>
+
+                  <!-- Wrapper to make it look like an input -->
+                  <div class="form-control p-0 border rounded"
+                    [ngClass]="{'is-invalid': (clientForm.submitted || compradores.touched) && compradores.errors?.['required']}">
+                    <mat-selection-list id="compradores" name="compradores" class="w-100 d-block" #compradores="ngModel"
+                      [(ngModel)]="selectedBuyers" required>
+                      <div style="max-height: 200px; overflow-y: auto;">
+                        @for (buyer of buyers; track buyer) {
+                        <mat-list-option [value]="buyer">
+                          {{ buyer.person.names }} {{ buyer.person.lastNames }}
+                        </mat-list-option>
+                        }
                       </div>
-                    </mat-form-field>
+                    </mat-selection-list>
+                  </div>
+
+                  <!-- Required Validation Message -->
+                  <div *ngIf="(clientForm.submitted || compradores.touched) && compradores.errors?.['required']"
+                    class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                    <div>Debe seleccionar al menos un comprador.</div>
                   </div>
                 </div>
 
@@ -287,13 +288,14 @@
       <!-- end::Details -->
 
       <!-- begin::Shrimp farms Info -->
-      <div class="tab-pane" [ngClass]="{ active: activeTab === 'Shrimp Farms' }">
-        <app-shrimp-farm-information [clientId]="clientId"/>
+      <div class="tab-pane" [ngClass]="{ active: activeTab === 'Shrimp Farms' }" *ngIf="activeTab === 'Shrimp Farms'">
+        <app-shrimp-farm-information [clientId]="clientId"></app-shrimp-farm-information>
       </div>
       <!-- end::Shrimp farms Info -->
+
       <!-- begin::Payment Info -->
-      <div class="tab-pane" [ngClass]="{ active: activeTab === 'Payment Info' }">
-        <app-payment-information [personId]="personId"/>
+      <div class="tab-pane" [ngClass]="{ active: activeTab === 'Payment Info' }" *ngIf="activeTab === 'Payment Info'">
+        <app-payment-information [permissionRoute]="PERMISSION_ROUTE" [personId]="personId"></app-payment-information>
       </div>
       <!-- end::Payment Info -->
 

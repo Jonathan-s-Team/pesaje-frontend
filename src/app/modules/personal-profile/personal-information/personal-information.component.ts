@@ -8,7 +8,7 @@ import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
   templateUrl: './personal-information.component.html',
 })
 export class PersonalInformationComponent implements OnInit {
-  PERMISSION_ROUTES = PERMISSION_ROUTES;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE;
 
   isEditing = false;
   user: UserModel | undefined;

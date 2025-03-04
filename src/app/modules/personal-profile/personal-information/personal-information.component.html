@@ -3,8 +3,8 @@
     <div class="card-title m-0">
       <h3 class="fw-bolder m-0">Detalles de Perfil</h3>
     </div>
-    <button *appCanEdit="PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE" (click)="toggleEditMode()"
-      class="btn align-self-center cursor-pointer" [ngClass]="isEditing ? 'btn-danger' : 'btn-primary' ">
+    <button *appCanEdit="PERMISSION_ROUTE" (click)="toggleEditMode()" class="btn align-self-center cursor-pointer"
+      [ngClass]="isEditing ? 'btn-danger' : 'btn-primary' ">
       {{ isEditing ? 'Cancelar' : 'Editar Perfil' }}
     </button>
   </div>
@@ -30,7 +30,9 @@
       <div class="row mb-7">
         <label class="col-lg-4 fw-bold text-muted">Fecha de Nacimiento</label>
         <div class="col-lg-8">
-          <span class="fw-bolder fs-6 text-gray-900">{{ user!.person.birthDate | date:'dd/MM/yyyy' || 'N/D' }}</span>
+          <span class="fw-bolder fs-6 text-gray-900"> {{ user?.person?.birthDate ? (user!.person.birthDate |
+            date:'dd/MM/yyyy') : 'N/D' }}
+          </span>
         </div>
       </div>
 

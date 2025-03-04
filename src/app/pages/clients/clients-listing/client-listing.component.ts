@@ -7,33 +7,39 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import {NgForm} from '@angular/forms';
-import {SwalComponent} from '@sweetalert2/ngx-sweetalert2';
-import {Subscription} from 'rxjs';
-import {SweetAlertOptions} from 'sweetalert2';
-import {Config} from 'datatables.net';
-import {AuthService} from 'src/app/modules/auth';
-import {PERMISSION_ROUTES} from 'src/app/constants/routes.constants';
+import { NgForm } from '@angular/forms';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { Subscription } from 'rxjs';
+import { SweetAlertOptions } from 'sweetalert2';
+import { Config } from 'datatables.net';
+import { AuthService } from 'src/app/modules/auth';
+import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 import {
   ICreateUpdateClientModel,
   IReadClientModel,
 } from 'src/app/modules/shared/interfaces/client.interface';
-import {IRoleModel} from 'src/app/modules/auth/interfaces/role.interface';
-import {ActivatedRoute, Router} from '@angular/router';
-import {IPaymentInfoModel} from 'src/app/modules/shared/interfaces/payment-info.interface';
-import {IPersonModel} from 'src/app/modules/shared/interfaces/person.interface';
-import {ClientService} from "../../../modules/shared/services/client.service";
+import { IRoleModel } from 'src/app/modules/auth/interfaces/role.interface';
+import { ActivatedRoute, Router } from '@angular/router';
+import { IPaymentInfoModel } from 'src/app/modules/shared/interfaces/payment-info.interface';
+import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
+import { ClientService } from '../../../modules/shared/services/client.service';
+import { UserService } from 'src/app/modules/personal-profile/services/user.service';
+import { IReadUsersModel } from 'src/app/modules/personal-profile/interfaces/user.interface';
 
 @Component({
   selector: 'app-client-listing',
   templateUrl: './client-listing.component.html',
 })
 export class ClientListingComponent
-  implements OnInit, AfterViewInit, OnDestroy {
-  PERMISSION_ROUTES = PERMISSION_ROUTES;
+  implements OnInit, AfterViewInit, OnDestroy
+{
+  PERMISSION_ROUTE = PERMISSION_ROUTES.CLIENTS;
 
   isLoading = false;
   isOnlyBuyer = false;
+
+  buyers: IReadUsersModel[];
+  selectedBuyers: IReadUsersModel[] = [];
 
   roles: IRoleModel[];
 
@@ -42,9 +48,9 @@ export class ClientListingComponent
   // Reload emitter inside datatable
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  clientModel: ICreateUpdateClientModel = {
+  createClientModel: ICreateUpdateClientModel = {
     person: {} as IPersonModel,
-    buyersItBelongs: []
+    buyersItBelongs: [],
   };
 
   clients: IReadClientModel[] = [];
@@ -79,11 +85,11 @@ export class ClientListingComponent
 
           const nameAndEmail = `
               <div class="d-flex flex-column" data-action="view" data-id="${
-            full.id
-          }">
+                full.id
+              }">
                 <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${
-            data || 'Sin nombre'
-          } ${full.person?.lastNames || ''}</a>
+                  data || 'Sin nombre'
+                } ${full.person?.lastNames || ''}</a>
                 <span>${full.person?.email || 'Sin correo'}</span>
               </div>
           `;
@@ -124,13 +130,12 @@ export class ClientListingComponent
   constructor(
     private clientService: ClientService,
     private authService: AuthService,
+    private userService: UserService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {
-  }
+  ) {}
 
-  ngAfterViewInit(): void {
-  }
+  ngAfterViewInit(): void {}
 
   ngOnInit(): void {
     this.roles = this.authService.currentUserValue?.roles!;
@@ -140,6 +145,19 @@ export class ClientListingComponent
       this.roles.every((role) => role.name === 'Comprador');
 
     this.loadUsers();
+    this.loadBuyers();
+  }
+
+  loadBuyers() {
+    const userSub = this.userService.getAllUsers(true, 'Comprador').subscribe({
+      next: (users: IReadUsersModel[]) => {
+        this.buyers = users;
+      },
+      error: (error) => {
+        console.error('Error fetching users:', error);
+      },
+    });
+    this.unsubscribe.push(userSub);
   }
 
   loadUsers(): void {
@@ -190,33 +208,15 @@ export class ClientListingComponent
     this.unsubscribe.push(deleteSub);
   }
 
-  originalBrokerModel: IReadClientModel | null = null;
-  originalPaymentInfoModel: IPaymentInfoModel | null = null;
-
-  hasBrokerChanges(): boolean {
-    return (
-      JSON.stringify(this.clientModel) !==
-      JSON.stringify(this.originalBrokerModel)
-    );
-  }
-
   edit(id: string) {
     const currentUrl = this.router.url;
     this.router.navigate([`${currentUrl}/${id}`]);
   }
 
   create() {
-    this.clientModel = {
+    this.createClientModel = {
       person: {} as IPersonModel,
     } as ICreateUpdateClientModel;
-  }
-
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
   }
 
   onSubmit(event: Event, myForm: NgForm) {
@@ -225,7 +225,16 @@ export class ClientListingComponent
     }
 
     this.isLoading = true;
-    this.clientModel.buyersItBelongs = [this.authService.currentUserValue!.id];
+
+    if (this.isOnlyBuyer) {
+      this.createClientModel.buyersItBelongs = [
+        this.authService.currentUserValue!.id,
+      ];
+    } else {
+      this.createClientModel.buyersItBelongs = this.selectedBuyers.map(
+        (buyer) => buyer.id
+      );
+    }
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
@@ -244,8 +253,7 @@ export class ClientListingComponent
     };
 
     const createFn = () => {
-      debugger
-      this.clientService.createClient(this.clientModel).subscribe({
+      this.clientService.createClient(this.createClientModel).subscribe({
         next: () => {
           this.showAlert(successAlert);
           this.loadUsers();

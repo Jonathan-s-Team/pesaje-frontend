@@ -1,4 +1,4 @@
-import {IPersonModel} from "./person.interface";
+import { IPersonModel } from './person.interface';
 
 export interface ICreateUpdateClientModel {
   person: IPersonModel;
@@ -7,10 +7,12 @@ export interface ICreateUpdateClientModel {
 
 export interface IReadClientModel {
   person: IPersonModel;
-  buyersItBelongs: {
-    id: string;
-    fullName: string;
-  }[];
+  buyersItBelongs:
+    | {
+        id: string;
+        fullName: string;
+      }[]
+    | string[];
   createdBy: string;
   deletedBy: string;
   id: string;

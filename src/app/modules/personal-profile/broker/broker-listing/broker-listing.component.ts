@@ -32,7 +32,7 @@ import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface
 export class BrokerListingComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
-  PERMISSION_ROUTES = PERMISSION_ROUTES;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.PERSONAL_PROFILE.BROKERS;
 
   isLoading = false;
   isOnlyComprador = false;
@@ -227,14 +227,6 @@ export class BrokerListingComponent
     this.brokerModel = {
       person: {} as IPersonModel, // Ensure person object is initialized
     } as ICreateBrokerModel;
-  }
-
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
   }
 
   onSubmit(event: Event, myForm: NgForm) {

@@ -17,8 +17,8 @@
       <!--begin::Toolbar-->
       <div class="d-flex justify-content-end">
         <!--begin::Add payment info-->
-        <button *appCanEdit="PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE" type="button" class="btn btn-primary"
-          data-action="create" (click)="create()">
+        <button *appCanEdit="permissionRoute" type="button" class="btn btn-primary" data-action="create"
+          (click)="create()">
           Agregar Información de Pago
         </button>
         <!--end::Add payment info-->
@@ -29,7 +29,7 @@
   </div>
 
   <div class="card-body pt-0">
-    <app-crud [datatableConfig]="datatableConfig" permissionRoute="{{PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE}}"
+    <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="permissionRoute"
       (editEvent)="edit($event.toString())" (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal">
     </app-crud>
   </div>

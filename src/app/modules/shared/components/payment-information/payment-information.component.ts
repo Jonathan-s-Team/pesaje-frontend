@@ -27,8 +27,6 @@ import { ActivatedRoute } from '@angular/router';
 export class PaymentInformationComponent
   implements OnInit, AfterViewInit, OnChanges, OnDestroy
 {
-  PERMISSION_ROUTES = PERMISSION_ROUTES;
-
   isLoading = false;
   private unsubscribe: Subscription[] = [];
 
@@ -36,6 +34,7 @@ export class PaymentInformationComponent
   paymentInfo: IPaymentInfoModel = {} as IPaymentInfoModel;
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
+  @Input() permissionRoute: string;
   @Input() personId?: string;
   @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
   swalOptions: SweetAlertOptions = {};

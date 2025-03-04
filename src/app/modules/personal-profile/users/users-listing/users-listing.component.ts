@@ -28,7 +28,7 @@ import { RoleService } from '../../../shared/services/role.service';
   templateUrl: './users-listing.component.html',
 })
 export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
-  PERMISSION_ROUTES = PERMISSION_ROUTES;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.PERSONAL_PROFILE.USERS;
 
   isLoading = false;
 
@@ -225,14 +225,6 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
   create() {
     this.userModel = { person: {} as IPersonModel, roles: [] };
     this.selectedRoles = [];
-  }
-
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
   }
 
   onSubmit(event: Event, myForm: NgForm) {

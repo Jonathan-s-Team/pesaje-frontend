@@ -35,7 +35,7 @@ import {
   templateUrl: './size-price.component.html',
 })
 export class SizePriceComponent implements OnInit, OnDestroy {
-  PERMISSION_ROUTES = PERMISSION_ROUTES;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.PRICES;
 
   @ViewChild(WholeTableComponent) wholeTableComponent!: WholeTableComponent;
   @ViewChild(HeadlessTableComponent)
