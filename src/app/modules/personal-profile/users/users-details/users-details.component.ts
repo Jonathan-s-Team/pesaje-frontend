@@ -17,6 +17,7 @@ import {
 import { UserService } from '../../services/user.service';
 import { IRoleModel } from 'src/app/modules/auth/interfaces/role.interface';
 import { RoleService } from 'src/app/modules/shared/services/role.service';
+import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
 
 type Tabs = 'Details' | 'Payment Info';
 
@@ -25,6 +26,8 @@ type Tabs = 'Details' | 'Payment Info';
   templateUrl: './users-details.component.html',
 })
 export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
+  PERMISSION_ROUTE = PERMISSION_ROUTES.PERSONAL_PROFILE.USERS;
+
   @ViewChild('userForm') userForm!: NgForm;
 
   isLoading$: Observable<boolean>;

@@ -17,6 +17,7 @@ import {
 import { ClientService } from '../../../modules/shared/services/client.service';
 import { UserService } from '../../../modules/personal-profile/services/user.service';
 import { IReadUsersModel } from '../../../modules/personal-profile/interfaces/user.interface';
+import { PERMISSION_ROUTES } from '../../../constants/routes.constants';
 
 type Tabs = 'Details' | 'Shrimp Farms' | 'Payment Info';
 
@@ -27,6 +28,8 @@ type Tabs = 'Details' | 'Shrimp Farms' | 'Payment Info';
 export class ClientDetailsComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
+  PERMISSION_ROUTE = PERMISSION_ROUTES.CLIENTS;
+
   @ViewChild('clientForm') clientForm!: NgForm;
 
   isLoading$: Observable<boolean>;

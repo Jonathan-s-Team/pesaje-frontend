@@ -28,7 +28,7 @@ import { RoleService } from '../../../shared/services/role.service';
   templateUrl: './users-listing.component.html',
 })
 export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
-  PERMISSION_ROUTES = PERMISSION_ROUTES;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.PERSONAL_PROFILE.USERS;
 
   isLoading = false;
 

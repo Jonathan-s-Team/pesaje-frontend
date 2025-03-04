@@ -32,7 +32,7 @@ import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface
 export class BrokerListingComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
-  PERMISSION_ROUTES = PERMISSION_ROUTES;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.PERSONAL_PROFILE.BROKERS;
 
   isLoading = false;
   isOnlyComprador = false;
@@ -228,7 +228,6 @@ export class BrokerListingComponent
       person: {} as IPersonModel, // Ensure person object is initialized
     } as ICreateBrokerModel;
   }
-
 
   onSubmit(event: Event, myForm: NgForm) {
     if (myForm && myForm.invalid) {

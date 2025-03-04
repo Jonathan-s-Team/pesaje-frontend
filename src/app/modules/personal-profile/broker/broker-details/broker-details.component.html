@@ -248,7 +248,7 @@
 
       <!-- begin::Payment Info -->
       <div class="tab-pane" [ngClass]="{ active: activeTab === 'Payment Info' }" *ngIf="activeTab === 'Payment Info'">
-        <app-payment-information [personId]="personId" />
+        <app-payment-information [permissionRoute]="PERMISSION_ROUTE" [personId]="personId" />
       </div>
       <!-- end::Payment Info -->
 

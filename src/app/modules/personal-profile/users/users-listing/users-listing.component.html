@@ -17,7 +17,7 @@
       <!--begin::Toolbar-->
       <div class="d-flex justify-content-end">
         <!--begin::Add bróker-->
-        <button *appCanCreate="PERMISSION_ROUTES.PERSONAL_PROFILE.USERS" type="button" class="btn btn-primary"
+        <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary"
           data-action="create" (click)="create()">
           Agregar Usuario
         </button>
@@ -29,7 +29,7 @@
   </div>
 
   <div class="card-body pt-0">
-    <app-crud [datatableConfig]="datatableConfig" permissionRoute="{{PERMISSION_ROUTES.PERSONAL_PROFILE.USERS}}"
+    <app-crud [datatableConfig]="datatableConfig" permissionRoute="{{PERMISSION_ROUTE}}"
       (deleteEvent)="delete($event.toString())" (editEvent)="edit($event.toString())" (createEvent)="create()"
       [reload]="reloadEvent" [modal]="formModal"></app-crud>
   </div>

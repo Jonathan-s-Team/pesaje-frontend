@@ -33,7 +33,7 @@ import { IReadUsersModel } from 'src/app/modules/personal-profile/interfaces/use
 export class ClientListingComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
-  PERMISSION_ROUTES = PERMISSION_ROUTES;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.CLIENTS;
 
   isLoading = false;
   isOnlyBuyer = false;

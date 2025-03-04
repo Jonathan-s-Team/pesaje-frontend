@@ -17,7 +17,7 @@
       <!--begin::Toolbar-->
       <div class="d-flex justify-content-end">
         <!--begin::Add shrimp farm info-->
-        <button *appCanEdit="PERMISSION_ROUTES.CLIENTS" type="button" class="btn btn-primary" data-action="create"
+        <button *appCanEdit="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create"
           (click)="create()">
           Agregar Camaronera
         </button>
@@ -29,7 +29,7 @@
   </div>
 
   <div class="card-body pt-0">
-    <app-crud [datatableConfig]="datatableConfig" permissionRoute="{{PERMISSION_ROUTES.CLIENTS}}"
+    <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="PERMISSION_ROUTE"
       (editEvent)="edit($event.toString())" (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal">
     </app-crud>
   </div>

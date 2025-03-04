@@ -15,6 +15,7 @@ import {
 import { NgForm } from '@angular/forms';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { Observable, Subscription } from 'rxjs';
+import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
 
 type Tabs = 'Details' | 'Payment Info';
 
@@ -26,6 +27,8 @@ type Tabs = 'Details' | 'Payment Info';
 export class BrokerDetailsComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
+  PERMISSION_ROUTE = PERMISSION_ROUTES.PERSONAL_PROFILE.BROKERS;
+
   @ViewChild('brokerForm') brokerForm!: NgForm;
 
   isLoading$: Observable<boolean>;

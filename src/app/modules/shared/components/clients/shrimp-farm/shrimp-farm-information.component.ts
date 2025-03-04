@@ -32,7 +32,7 @@ import { ShrimpFarmService } from '../../../services/shrimp-farm.service';
 export class ShrimpFarmInformationComponent
   implements OnInit, AfterViewInit, OnChanges, OnDestroy
 {
-  PERMISSION_ROUTES = PERMISSION_ROUTES;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.CLIENTS;
 
   isLoading = false;
   private unsubscribe: Subscription[] = [];
