@@ -23,6 +23,8 @@ import { IRoleModel } from 'src/app/modules/auth/interfaces/role.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IPaymentInfoModel } from 'src/app/modules/shared/interfaces/payment-info.interface';
 import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
+import { IReadUsersModel } from '../../interfaces/user.interface';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-broker-listing',
@@ -35,7 +37,10 @@ export class BrokerListingComponent
   PERMISSION_ROUTE = PERMISSION_ROUTES.PERSONAL_PROFILE.BROKERS;
 
   isLoading = false;
-  isOnlyComprador = false;
+  isOnlyBuyer = false;
+
+  buyers: IReadUsersModel[];
+  selectedBuyer: IReadUsersModel[];
 
   roles: IRoleModel[];
 
@@ -44,7 +49,7 @@ export class BrokerListingComponent
   // Reload emitter inside datatable
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  brokerModel: ICreateBrokerModel = {
+  createBrokerModel: ICreateBrokerModel = {
     person: {} as IPersonModel,
   } as ICreateBrokerModel;
 
@@ -132,6 +137,7 @@ export class BrokerListingComponent
   constructor(
     private brokerService: BrokerService,
     private authService: AuthService,
+    private userService: UserService,
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
@@ -142,12 +148,12 @@ export class BrokerListingComponent
   ngOnInit(): void {
     this.roles = this.authService.currentUserValue?.roles!;
 
-    this.isOnlyComprador =
+    this.isOnlyBuyer =
       this.roles.length > 0 &&
       this.roles.every((role) => role.name === 'Comprador');
 
     // Agregar la columna "Comprador" solo si el usuario no es solo Comprador
-    if (!this.isOnlyComprador) {
+    if (!this.isOnlyBuyer) {
       this.datatableConfig.columns!.push({
         title: 'Comprador',
         data: 'buyerItBelongs.fullName',
@@ -158,13 +164,26 @@ export class BrokerListingComponent
     }
 
     this.loadBrokers();
+    this.loadBuyers();
+  }
+
+  loadBuyers() {
+    const userSub = this.userService.getAllUsers(true, 'Comprador').subscribe({
+      next: (users: IReadUsersModel[]) => {
+        this.buyers = users;
+      },
+      error: (error) => {
+        console.error('Error fetching users:', error);
+      },
+    });
+    this.unsubscribe.push(userSub);
   }
 
   loadBrokers(): void {
     const userId = this.authService.currentUserValue?.id;
     if (!userId) return;
 
-    const brokerObservable = !this.isOnlyComprador
+    const brokerObservable = !this.isOnlyBuyer
       ? this.brokerService.getAllBrokers(true)
       : this.brokerService.getBrokersByUser(userId!);
 
@@ -208,23 +227,13 @@ export class BrokerListingComponent
     this.unsubscribe.push(deleteSub);
   }
 
-  originalBrokerModel: IReadBrokerModel | null = null;
-  originalPaymentInfoModel: IPaymentInfoModel | null = null;
-
-  hasBrokerChanges(): boolean {
-    return (
-      JSON.stringify(this.brokerModel) !==
-      JSON.stringify(this.originalBrokerModel)
-    );
-  }
-
   edit(id: string) {
     const currentUrl = this.router.url;
     this.router.navigate([`${currentUrl}/${id}`]);
   }
 
   create() {
-    this.brokerModel = {
+    this.createBrokerModel = {
       person: {} as IPersonModel, // Ensure person object is initialized
     } as ICreateBrokerModel;
   }
@@ -236,7 +245,12 @@ export class BrokerListingComponent
 
     this.isLoading = true;
 
-    this.brokerModel.buyerItBelongs = this.authService.currentUserValue!.id;
+    if (this.isOnlyBuyer) {
+      this.createBrokerModel.buyerItBelongs =
+        this.authService.currentUserValue!.id;
+    } else {
+      this.createBrokerModel.buyerItBelongs = this.selectedBuyer[0].id;
+    }
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
@@ -255,7 +269,7 @@ export class BrokerListingComponent
     };
 
     const createFn = () => {
-      this.brokerService.createBroker(this.brokerModel).subscribe({
+      this.brokerService.createBroker(this.createBrokerModel).subscribe({
         next: () => {
           this.showAlert(successAlert);
           this.loadBrokers();

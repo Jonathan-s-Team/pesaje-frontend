@@ -14,6 +14,7 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { SharedModule } from '../../shared/shared.module';
+import { MaterialModule } from 'src/app/material.module';
 
 @NgModule({
   declarations: [BrokerListingComponent, BrokerDetailsComponent],
@@ -38,6 +39,7 @@ import { SharedModule } from '../../shared/shared.module';
     NgbDropdownModule,
     NgbCollapseModule,
     NgbTooltipModule,
+    MaterialModule,
     SweetAlert2Module.forChild(),
   ],
 })
