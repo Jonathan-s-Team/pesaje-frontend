@@ -60,7 +60,7 @@
           </div>
 
           <div *ngIf="isEditing" class="d-flex gap-2">
-            <button class="btn btn-primary btn-sm me-3" (click)="savePeriod()">
+            <button class="btn btn-primary btn-sm me-3" (click)="confirmSave()">
               Guardar
             </button>
             <button class="btn btn-danger btn-sm" (click)="cancelEditing()">Cancelar</button>
@@ -114,7 +114,7 @@
 
             <!-- Save Button -->
             <div class="d-flex align-items-center">
-              <button class="btn btn-primary btn-sm me-3" (click)="savePeriod()">
+              <button class="btn btn-primary btn-sm me-3" (click)="confirmSave()">
                 Guardar
               </button>
             </div>
@@ -148,4 +148,9 @@
 <!-- end::Row -->
 
 <swal #noticeSwal [swalOptions]="swalOptions">
+</swal>
+
+<swal #confirmSwal title="¿Estás seguro?" text="Se guardarán los cambios. ¿Deseas continuar?" icon="warning"
+  [showCancelButton]="true" [focusCancel]="true"
+  [customClass]="{confirmButton: 'btn btn-primary', cancelButton: 'btn btn-active-light'}">
 </swal>

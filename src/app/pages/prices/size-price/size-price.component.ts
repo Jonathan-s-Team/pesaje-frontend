@@ -41,8 +41,12 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   @ViewChild(HeadlessTableComponent)
   headlessTableComponent!: HeadlessTableComponent;
 
+  @ViewChild('confirmSwal')
+  public readonly confirmSwal!: SwalComponent;
+
   @ViewChild('noticeSwal')
   noticeSwal!: SwalComponent;
+
   swalOptions: SweetAlertOptions = {};
 
   months = [
@@ -353,6 +357,14 @@ export class SizePriceComponent implements OnInit, OnDestroy {
       default:
         return size.id;
     }
+  }
+
+  confirmSave() {
+    this.confirmSwal.fire().then((clicked) => {
+      if (clicked.isConfirmed) {
+        this.savePeriod();
+      }
+    });
   }
 
   showAlert(swalOptions: SweetAlertOptions) {
