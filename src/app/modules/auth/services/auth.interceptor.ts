@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import {
   HttpInterceptor,
   HttpRequest,
@@ -27,7 +27,8 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private tokenStorageService: TokenStorageService,
     private authHttpService: AuthHTTPService,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone
   ) {}
 
   intercept(
@@ -123,6 +124,12 @@ export class AuthInterceptor implements HttpInterceptor {
 
   private logoutAndRedirect() {
     this.tokenStorageService.removeToken();
-    this.router.navigate(['/auth/login']);
+
+    // ✅ Ensure navigation occurs outside of Angular's HTTP execution context
+    this.ngZone.run(() => {
+      this.router.navigate(['/auth/login']).then(() => {
+        window.location.reload(); // ✅ Optional: Ensure a full reload to clear state
+      });
+    });
   }
 }

@@ -25,7 +25,6 @@ import {
 } from 'src/app/modules/shared/interfaces/size.interface';
 import { distinctUntilChanged } from 'rxjs/operators';
 import {
-  ICreateSizePriceModel,
   IReadSizePriceModel,
   IUpdateSizePriceModel,
 } from 'src/app/modules/shared/interfaces/size-price.interface';
@@ -71,6 +70,9 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   selectedCompany = '';
   selectedMonth = '';
   selectedYear = '';
+
+  receivedDate: Date | null = null;
+  receivedTime: string = '';
 
   isAdding = false;
   isEditing = false;
@@ -158,6 +160,8 @@ export class SizePriceComponent implements OnInit, OnDestroy {
           ) || []),
         ];
 
+        this.setReceivedDateTime(periodDetails.receivedDateTime);
+
         if (this.wholeTableComponent) {
           this.wholeTableComponent.disableForm();
         }
@@ -181,6 +185,8 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     this.selectedMonth = '';
     this.selectedYear = '';
     this.selectedPeriod = '';
+    this.receivedDate = null;
+    this.receivedTime = '';
     this.showErrors = false;
     this.showEditButton = false;
 
@@ -249,30 +255,8 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   }
 
   savePeriod() {
-    if (this.isEditing) {
-      this.showErrors = !this.selectedCompany || !this.selectedPeriod;
-    } else {
-      this.showErrors =
-        !this.selectedCompany || !this.selectedMonth || !this.selectedYear;
-    }
-
-    // ✅ Trigger form validation checks
-    const hasErrors =
-      this.wholeTableComponent?.form.invalid ||
-      this.headlessTableComponent?.form.invalid;
-
-    if (this.wholeTableComponent?.form.invalid) {
-      this.wholeTableComponent.triggerValidation();
-    }
-
-    if (this.headlessTableComponent?.form.invalid) {
-      this.headlessTableComponent.triggerValidation();
-    }
-
-    // ✅ Stop execution if any validation errors exist
-    if (this.showErrors || hasErrors) return;
-
     const periodPayload: IUpdatePeriodModel = {
+      receivedDateTime: this.getReceivedDateTime(),
       sizePrices: [
         ...this.extractSizePrices(this.wholeTableComponent),
         ...this.extractSizePrices(this.headlessTableComponent),
@@ -307,6 +291,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
       const createPeriodSub = this.periodService
         .createPeriod({
           name: `${this.selectedMonth}-${this.selectedYear}`,
+          receivedDateTime: this.getReceivedDateTime(),
           company: this.selectedCompany,
           ...periodPayload,
         })
@@ -330,6 +315,45 @@ export class SizePriceComponent implements OnInit, OnDestroy {
 
       this.unsubscribe.push(createPeriodSub);
     }
+  }
+
+  confirmSave() {
+    if (this.isEditing) {
+      this.showErrors =
+        !this.selectedCompany ||
+        !this.selectedPeriod ||
+        !this.receivedDate ||
+        !this.receivedTime;
+    } else {
+      this.showErrors =
+        !this.selectedCompany ||
+        !this.selectedMonth ||
+        !this.selectedYear ||
+        !this.receivedDate ||
+        !this.receivedTime;
+    }
+
+    // ✅ Trigger form validation checks
+    const hasErrors =
+      this.wholeTableComponent?.form.invalid ||
+      this.headlessTableComponent?.form.invalid;
+
+    if (this.wholeTableComponent?.form.invalid) {
+      this.wholeTableComponent.triggerValidation();
+    }
+
+    if (this.headlessTableComponent?.form.invalid) {
+      this.headlessTableComponent.triggerValidation();
+    }
+
+    // ✅ Stop execution if any validation errors exist
+    if (this.showErrors || hasErrors) return;
+
+    this.confirmSwal.fire().then((clicked) => {
+      if (clicked.isConfirmed) {
+        this.savePeriod();
+      }
+    });
   }
 
   extractSizePrices(
@@ -359,12 +383,42 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     }
   }
 
-  confirmSave() {
-    this.confirmSwal.fire().then((clicked) => {
-      if (clicked.isConfirmed) {
-        this.savePeriod();
-      }
-    });
+  /**
+   * 👉 Method to set date & time from an ISO datetime string
+   */
+  private setReceivedDateTime(isoString: string): void {
+    this.receivedDate = null;
+    this.receivedTime = '';
+
+    if (!isoString) return;
+
+    const dateObj = new Date(isoString); // Convert ISO string to Date object
+
+    // Extract date (YYYY-MM-DD)
+    this.receivedDate = new Date(
+      dateObj.getFullYear(),
+      dateObj.getMonth(),
+      dateObj.getDate()
+    );
+
+    // Extract time (HH:mm)
+    const hours = dateObj.getHours().toString().padStart(2, '0'); // Ensure 2 digits
+    const minutes = dateObj.getMinutes().toString().padStart(2, '0');
+    this.receivedTime = `${hours}:${minutes}`;
+  }
+
+  /**
+   * 👉 Returns a formatted ISO 8601 string combining the selected date and time
+   */
+  private getReceivedDateTime(): string {
+    if (!this.receivedDate || !this.receivedTime) return '';
+
+    const date = new Date(this.receivedDate);
+    const [hours, minutes] = this.receivedTime.split(':').map(Number);
+
+    date.setHours(hours, minutes, 0, 0); // Set time on the date object
+
+    return date.toISOString(); // Convert to ISO format
   }
 
   showAlert(swalOptions: SweetAlertOptions) {

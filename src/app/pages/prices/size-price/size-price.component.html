@@ -134,6 +134,49 @@
 <div class="row g-5 g-xl-8 mt-1">
 
   <!-- begin::Col -->
+  <div class="col-xl-12">
+    <div class="card card-xl-stretch mb-xl-8 p-3">
+
+      <!-- Date & Time Pickers in One Row -->
+      <div class="row g-3 align-items-center">
+
+        <!-- Date Picker -->
+        <div class="col-md-6">
+          <mat-form-field class="w-100">
+            <mat-label>Fecha de recibido</mat-label>
+            <input matInput [matDatepicker]="picker" [(ngModel)]="receivedDate" name="receivedDate"
+              placeholder="dd/MM/yyyy" [disabled]="!isEditing && !isAdding" required>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <!-- Time Picker -->
+        <div class="col-md-6">
+          <mat-form-field class="w-100">
+            <mat-label>Hora de recibido</mat-label>
+            <input matInput type="time" [(ngModel)]="receivedTime" name="receivedTime" [attr.placeholder]="'HH:mm'"
+              [disabled]="!isEditing && !isAdding" required>
+          </mat-form-field>
+        </div>
+
+      </div>
+
+
+      <!-- Validation Message (Spans Full Width) -->
+      <small *ngIf="showErrors && !receivedDate" class="text-danger small mt-1">
+        La fecha y hora de recibido es requerida
+      </small>
+
+    </div>
+  </div>
+  <!-- end::Col -->
+</div>
+<!-- end::Row -->
+
+<!-- begin::Row -->
+<div class="row g-5 g-xl-8 mt-1">
+  <!-- begin::Col -->
   <div class="col-xl-6">
     <app-whole-table class="card card-xl-stretch mb-xl-8" [sizePrices]="wholeSizePrices"></app-whole-table>
   </div>

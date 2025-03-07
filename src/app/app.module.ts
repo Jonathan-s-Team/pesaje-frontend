@@ -15,6 +15,8 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 // #fake-start#
 import { FakeAPIService } from './_fake/fake-api.service';
 import { AuthInterceptor } from './modules/auth/services/auth.interceptor';
+import { MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { CUSTOM_DATE_FORMATS } from './config/mat-date-formats';
 // #fake-end#
 
 function appInitializer(authService: AuthService) {
@@ -55,6 +57,8 @@ function appInitializer(authService: AuthService) {
       deps: [AuthService],
     },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: MAT_DATE_LOCALE, useValue: 'es-EC' }, // Set locale to Spanish (DD/MM/YYYY)
+    { provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS },
   ],
   bootstrap: [AppComponent],
 })
