@@ -6,6 +6,7 @@ import {
 
 export interface ICreatePeriodModel {
   name: string;
+  receivedDateTime: string;
   company: string;
   sizePrices: ICreateSizePriceModel[];
 }
@@ -13,10 +14,12 @@ export interface ICreatePeriodModel {
 export interface IReadPeriodModel {
   id: string;
   name: string;
-  company?: string;
+  receivedDateTime: string;
+  company: string;
   sizePrices?: IReadSizePriceModel[];
 }
 
 export interface IUpdatePeriodModel {
+  receivedDateTime?: string;
   sizePrices: IUpdateSizePriceModel[];
 }
