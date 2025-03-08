@@ -3,44 +3,64 @@ import { Routes } from '@angular/router';
 const Routing: Routes = [
   {
     path: 'dashboard',
-    loadChildren: () => import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
+    loadChildren: () =>
+      import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
   },
   {
     path: 'builder',
-    loadChildren: () => import('./builder/builder.module').then((m) => m.BuilderModule),
+    loadChildren: () =>
+      import('./builder/builder.module').then((m) => m.BuilderModule),
   },
   {
     path: 'personal-profile',
-    loadChildren: () => import('../modules/personal-profile/personal-profile.module').then((m) => m.PersonalProfileModule),
+    loadChildren: () =>
+      import('../modules/personal-profile/personal-profile.module').then(
+        (m) => m.PersonalProfileModule
+      ),
     // data: { layout: 'light-sidebar' },
   },
   {
+    path: 'purchases',
+    loadChildren: () =>
+      import('../modules/purchases/purchases.module').then(
+        (m) => m.PurchasesModule
+      ),
+  },
+  {
     path: 'prices',
-    loadChildren: () => import('./prices/prices.module').then((m) => m.PricesModule),
+    loadChildren: () =>
+      import('./prices/prices.module').then((m) => m.PricesModule),
   },
   {
     path: 'crafted/pages/profile',
-    loadChildren: () => import('../modules/profile/profile.module').then((m) => m.ProfileModule),
+    loadChildren: () =>
+      import('../modules/profile/profile.module').then((m) => m.ProfileModule),
     // data: { layout: 'light-sidebar' },
   },
   {
     path: 'crafted/account',
-    loadChildren: () => import('../modules/account/account.module').then((m) => m.AccountModule),
+    loadChildren: () =>
+      import('../modules/account/account.module').then((m) => m.AccountModule),
     // data: { layout: 'dark-header' },
   },
   {
     path: 'crafted/pages/wizards',
-    loadChildren: () => import('../modules/wizards/wizards.module').then((m) => m.WizardsModule),
+    loadChildren: () =>
+      import('../modules/wizards/wizards.module').then((m) => m.WizardsModule),
     // data: { layout: 'light-header' },
   },
   {
     path: 'crafted/widgets',
-    loadChildren: () => import('../modules/widgets-examples/widgets-examples.module').then((m) => m.WidgetsExamplesModule),
+    loadChildren: () =>
+      import('../modules/widgets-examples/widgets-examples.module').then(
+        (m) => m.WidgetsExamplesModule
+      ),
     // data: { layout: 'light-header' },
   },
   {
     path: 'apps/chat',
-    loadChildren: () => import('../modules/apps/chat/chat.module').then((m) => m.ChatModule),
+    loadChildren: () =>
+      import('../modules/apps/chat/chat.module').then((m) => m.ChatModule),
     // data: { layout: 'light-sidebar' },
   },
   {
@@ -53,11 +73,13 @@ const Routing: Routes = [
   },
   {
     path: 'apps/permissions',
-    loadChildren: () => import('./permission/permission.module').then((m) => m.PermissionModule),
+    loadChildren: () =>
+      import('./permission/permission.module').then((m) => m.PermissionModule),
   },
   {
     path: 'clients',
-    loadChildren: () => import('./clients/client.module').then((m) => m.ClientModule),
+    loadChildren: () =>
+      import('./clients/client.module').then((m) => m.ClientModule),
   },
   {
     path: '',
