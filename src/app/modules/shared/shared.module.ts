@@ -6,7 +6,7 @@ import { CanDeleteDirective } from '../../directives/can-delete.directive';
 import { CanReadDirective } from 'src/app/directives/can-read.directive';
 import { CrudModule } from '../crud/crud.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PaymentInformationComponent } from './components/payment-information/payment-information.component';
+import { PaymentInformationComponent } from './components/profile/payment-information/payment-information.component';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { SharedModule as SharedModuleMetronic } from 'src/app/_metronic/shared/shared.module';
 import { WholeTableComponent } from './components/prices/whole-table/whole-table.component';
