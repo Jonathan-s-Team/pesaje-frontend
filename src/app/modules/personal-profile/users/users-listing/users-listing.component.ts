@@ -19,7 +19,7 @@ import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface
 import { UserService } from '../../services/user.service';
 import {
   ICreateUserModel,
-  IReadUsersModel,
+  IReadUserModel,
 } from '../../interfaces/user.interface';
 import { RoleService } from '../../../shared/services/role.service';
 
@@ -47,7 +47,7 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
     roles: [],
   } as ICreateUserModel;
 
-  users: IReadUsersModel[] = [];
+  users: IReadUserModel[] = [];
 
   // Single model
   // aBroker: Observable<IReadBrokerModel>;

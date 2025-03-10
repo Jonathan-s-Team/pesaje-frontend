@@ -14,6 +14,7 @@ import {
 import { SharedModule } from '../shared/shared.module';
 import { PurchasesRoutingModule } from './purchases-routing.module';
 import { NewPurchaseComponent } from './new-purchase/new-purchase.component';
+import { MaterialModule } from 'src/app/material.module';
 
 @NgModule({
   declarations: [NewPurchaseComponent],
@@ -26,6 +27,7 @@ import { NewPurchaseComponent } from './new-purchase/new-purchase.component';
     FormsModule,
     CrudModule,
     SweetAlert2Module.forChild(),
+    MaterialModule,
     NgbNavModule,
     NgbDropdownModule,
     NgbCollapseModule,

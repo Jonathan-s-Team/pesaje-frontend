@@ -16,8 +16,10 @@ export interface IReadBrokerModel {
   deletedAt: string;
   id: string;
   person: IPersonModel;
-  buyerItBelongs: {
-    id: string;
-    fullName: string;
-  };
+  buyerItBelongs: BuyerModel | string;
+}
+
+export interface BuyerModel {
+  id: string;
+  fullName: string;
 }

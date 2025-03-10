@@ -16,7 +16,7 @@ import {
 } from '../../../modules/shared/interfaces/client.interface';
 import { ClientService } from '../../../modules/shared/services/client.service';
 import { UserService } from '../../../modules/personal-profile/services/user.service';
-import { IReadUsersModel } from '../../../modules/personal-profile/interfaces/user.interface';
+import { IReadUserModel } from '../../../modules/personal-profile/interfaces/user.interface';
 import { PERMISSION_ROUTES } from '../../../constants/routes.constants';
 
 type Tabs = 'Details' | 'Shrimp Farms' | 'Payment Info';
@@ -41,8 +41,8 @@ export class ClientDetailsComponent
   formattedBirthDate: string = '';
 
   /** Propiedades para el multi-select de compradores */
-  buyers: IReadUsersModel[] = [];
-  selectedBuyers: IReadUsersModel[] = [];
+  buyers: IReadUserModel[] = [];
+  selectedBuyers: IReadUserModel[] = [];
 
   /** Stores all active subscriptions */
   private unsubscribe: Subscription[] = [];
@@ -107,7 +107,7 @@ export class ClientDetailsComponent
     }
 
     const userSub = this.userService.getAllUsers(true, 'Comprador').subscribe({
-      next: (users: IReadUsersModel[]) => {
+      next: (users: IReadUserModel[]) => {
         this.buyers = users;
         this.processSelectedBuyers(); // Process selected buyers separately
         this.changeDetectorRef.detectChanges();

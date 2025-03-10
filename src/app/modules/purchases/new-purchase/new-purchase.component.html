@@ -5,254 +5,305 @@
   </div>
 </div>
 
-<div *ngIf="!(isLoading$ | async)" class="card card-custom">
-  <!-- begin::Header -->
-  <div class="card-header card-header-stretch overflow-auto">
-    <ul class="
-        nav nav-stretch nav-line-tabs
-        fw-bold
-        border-transparent
-        flex-nowrap
-      " role="tablist">
+<!-- Purchase Form -->
+<div *ngIf="!(isLoading$ | async)">
+  <form #purchaseForm="ngForm" (ngSubmit)="submitForm(purchaseForm)" novalidate>
 
-      <li class="nav-item">
-        <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Details' }"
-          (click)="setActiveTab('Details')" role="tab">
-          Detalles
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Payment Info' }"
-          (click)="setActiveTab('Payment Info')" role="tab">
-          Informaciòn de pago
-        </a>
-      </li>
-    </ul>
-  </div>
-  <!-- end::Header -->
+    <!-- First Section: General Purchase Info -->
+    <div class="card mb-4">
+      <div class="card-header py-2 d-flex align-items-center"> <!-- ✅ Reduced padding -->
+        <h6 class="fw-bold m-0">Información General</h6> <!-- ✅ Smaller text & no margin -->
+      </div>
+      <div class="card-body">
 
-  <!-- begin::Body -->
-  <div class="card-body">
-    <div class="tab-content pt-3">
+        <!-- begin::Row -->
+        <div class="row g-5 g-xl-8">
 
-      <!-- begin::Details -->
-      <div class="tab-pane" [ngClass]="{ active: activeTab === 'Details' }">
-        <div class="card mb-5 mb-xl-10">
-          <div id="kt_account_broker_details" class="collapse show">
-            <form novalidate class="form" #brokerForm="ngForm">
-              <div class="card-body border-top p-9">
+          <!-- Purchase Date (First Row, Full Width) -->
+          <div class="col-md-12">
+            <mat-form-field class="w-100">
+              <mat-label>Fecha de la compra</mat-label>
+              <input matInput [matDatepicker]="picker" name="purchaseDate" placeholder="dd/MM/yyyy" ngModel required
+                #purchaseDate="ngModel">
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+            <div *ngIf="purchaseForm.submitted && purchaseDate.invalid" class="text-danger small">
+              La fecha es obligatoria.
+            </div>
+          </div>
 
-                <!-- Nombre Completo -->
-                <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Nombre Completo</label>
-                  <div class="col-lg-8">
-                    <div class="row">
-                      <!-- Nombres -->
-                      <div class="col-lg-6 fv-row">
-                        <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                          placeholder="Nombres" name="names" [(ngModel)]="brokerData.person.names" #names="ngModel"
-                          required minlength="3">
-                        <div
-                          *ngIf="(brokerForm.submitted || names.dirty || names.touched) && names.errors?.['required']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>El nombre es obligatorio.</div>
-                        </div>
-                        <div
-                          *ngIf="(brokerForm.submitted || names.dirty || names.touched) && names.errors?.['minlength']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>Debe tener al menos 3 caracteres.</div>
-                        </div>
-                      </div>
-                      <!-- Apellidos -->
-                      <div class="col-lg-6 fv-row">
-                        <input type="text" class="form-control form-control-lg form-control-solid"
-                          placeholder="Apellidos" name="lastNames" [(ngModel)]="brokerData.person.lastNames"
-                          #lastNames="ngModel" required minlength="3">
-                        <div
-                          *ngIf="(brokerForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['required']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>Los apellidos son obligatorios.</div>
-                        </div>
-                        <div
-                          *ngIf="(brokerForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['minlength']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>Debe tener al menos 3 caracteres.</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          <!-- Has Invoice Selector & Invoice Number (Second Row) -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Factura recibida?</mat-label>
+              <mat-select name="hasInvoice" ngModel required #hasInvoice="ngModel">
+                <mat-option [value]="true">Sí</mat-option>
+                <mat-option [value]="false">No</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="purchaseForm.submitted && hasInvoice.invalid" class="text-danger small">
+              Debe seleccionar una opción.
+            </div>
+          </div>
 
-                <!-- Identificación -->
-                <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Identificación</label>
-                  <div class="col-lg-8 fv-row">
-                    <input type="text" class="form-control form-control-lg form-control-solid"
-                      placeholder="Identificación" name="identification" [(ngModel)]="brokerData.person.identification"
-                      #identification="ngModel" required>
-                    <div
-                      *ngIf="(brokerForm.submitted || identification.dirty || identification.touched) && identification.errors?.['required']"
-                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                      <div>La identificación es obligatoria.</div>
-                    </div>
-                  </div>
-                </div>
+          <div class="col-md-6" *ngIf="purchaseForm.controls.hasInvoice?.value">
+            <mat-form-field class="w-100">
+              <mat-label>Número de Factura</mat-label>
+              <input matInput name="invoiceNumber" ngModel #invoiceNumber="ngModel" required>
+            </mat-form-field>
+            <div *ngIf="purchaseForm.submitted && invoiceNumber.invalid" class="text-danger small">
+              El número de factura es obligatorio.
+            </div>
+          </div>
 
-                <!-- Fecha de Nacimiento -->
-                <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Fecha de Nacimiento</label>
-                  <div class="col-lg-8 fv-row">
-                    <input type="date" class="form-control form-control-lg form-control-solid" name="birthDate"
-                      [(ngModel)]="formattedBirthDate" (ngModelChange)="brokerData.person.birthDate = $event"
-                      #birthDate="ngModel" required>
-                    <div
-                      *ngIf="(brokerForm.submitted || birthDate.dirty || birthDate.touched) && birthDate.errors?.['required']"
-                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                      <div>La fecha de nacimiento es obligatoria.</div>
-                    </div>
-                  </div>
-                </div>
+        </div>
+        <!-- end::Row -->
+      </div>
+    </div>
 
-                <!-- Dirección -->
-                <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Dirección</label>
-                  <div class="col-lg-8 fv-row">
-                    <input type="text" class="form-control form-control-lg form-control-solid" placeholder="Dirección"
-                      name="address" [(ngModel)]="brokerData.person.address" #address="ngModel" required minlength="3">
-                    <div
-                      *ngIf="(brokerForm.submitted || address.dirty || address.touched) && address.errors?.['required']"
-                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                      <div>La dirección es obligatoria.</div>
-                    </div>
-                    <div
-                      *ngIf="(brokerForm.submitted || address.dirty || address.touched) && address.errors?.['minlength']"
-                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                      <div>Debe tener al menos 3 caracteres.</div>
-                    </div>
-                  </div>
-                </div>
+    <!-- Second Section: Responsible -->
+    <div class="card mb-4">
+      <div class="card-header py-2 d-flex align-items-center"> <!-- ✅ Reduced padding -->
+        <h6 class="fw-bold m-0">Responsables</h6> <!-- ✅ Smaller text & no margin -->
+      </div>
+      <div class="card-body">
 
-                <!-- Teléfonos -->
-                <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Teléfonos</label>
-                  <div class="col-lg-8">
-                    <div class="row">
-                      <!-- Teléfono fijo (opcional) -->
-                      <div class="col-lg-4 fv-row">
-                        <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
-                          placeholder="Teléfono fijo" name="phone" [(ngModel)]="brokerData.person.phone">
-                      </div>
-                      <!-- Celular 1 (requerido) -->
-                      <div class="col-lg-4 fv-row">
-                        <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
-                          placeholder="Celular 1" name="mobilePhone" [(ngModel)]="brokerData.person.mobilePhone"
-                          #mobilePhone="ngModel" required pattern="^\+?[0-9\s\-\(\)]{7,15}$">
-                        <div
-                          *ngIf="(brokerForm.submitted || mobilePhone.dirty || mobilePhone.touched) && mobilePhone.errors?.['required']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>El teléfono móvil es obligatorio.</div>
-                        </div>
-                        <div
-                          *ngIf="(brokerForm.submitted || mobilePhone.dirty || mobilePhone.touched) && mobilePhone.errors?.['pattern']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>Ingrese un número de teléfono válido.</div>
-                        </div>
-                      </div>
-                      <!-- Celular 2 (opcional) -->
-                      <div class="col-lg-4 fv-row">
-                        <input type="tel" class="form-control form-control-lg form-control-solid"
-                          placeholder="Celular 2" name="mobilePhone2" [(ngModel)]="brokerData.person.mobilePhone2">
-                      </div>
-                    </div>
-                  </div>
-                </div>
+        <div class="row g-5 g-xl-8">
 
-                <!-- Correo Electrónico -->
-                <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Correo Electrónico</label>
-                  <div class="col-lg-8 fv-row">
-                    <input type="email" class="form-control form-control-lg form-control-solid"
-                      placeholder="Correo electrónico" name="email" [(ngModel)]="brokerData.person.email"
-                      #email="ngModel" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
-                    <div *ngIf="(brokerForm.submitted || email.dirty || email.touched) && email.errors?.['required']"
-                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                      <div>El correo electrónico es obligatorio.</div>
-                    </div>
-                    <div *ngIf="(brokerForm.submitted || email.dirty || email.touched) && email.errors?.['pattern']"
-                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                      <div>Debe ingresar un correo válido.</div>
-                    </div>
-                  </div>
-                </div>
+          <!-- Buyer -->
+          <div *ngIf="!isOnlyBuyer" class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Comprador</mat-label>
+              <mat-select name="buyer" ngModel required #buyer="ngModel" (ngModelChange)="onBuyerChange($event)">
+                <mat-option *ngFor="let buyer of buyersList" [value]="buyer.id">
+                  {{ buyer.person.names }} {{ buyer.person.lastNames }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="purchaseForm.submitted && buyer.invalid" class="text-danger small">
+              Debe seleccionar un comprador.
+            </div>
+          </div>
 
-                <!-- Contacto de Emergencia -->
-                <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Contacto de Emergencia</label>
-                  <div class="col-lg-8">
-                    <div class="row">
-                      <!-- Nombre del contacto -->
-                      <div class="col-lg-6 fv-row">
-                        <input type="text" class="form-control form-control-lg form-control-solid mb-3"
-                          placeholder="Nombre contacto" name="emergencyContactName"
-                          [(ngModel)]="brokerData.person.emergencyContactName" #emergencyContactName="ngModel" required
-                          minlength="3">
-                        <div
-                          *ngIf="(brokerForm.submitted || emergencyContactName.dirty || emergencyContactName.touched) && emergencyContactName.errors?.['required']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>El nombre del contacto de emergencia es obligatorio.</div>
-                        </div>
-                        <div
-                          *ngIf="(brokerForm.submitted || emergencyContactName.dirty || emergencyContactName.touched) && emergencyContactName.errors?.['minlength']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>Debe tener al menos 3 caracteres.</div>
-                        </div>
-                      </div>
-                      <!-- Teléfono del contacto -->
-                      <div class="col-lg-6 fv-row">
-                        <input type="tel" class="form-control form-control-lg form-control-solid"
-                          placeholder="Teléfono contacto" name="emergencyContactPhone"
-                          [(ngModel)]="brokerData.person.emergencyContactPhone" #emergencyContactPhone="ngModel"
-                          required pattern="^\+?[0-9\s\-\(\)]{7,15}$">
-                        <div
-                          *ngIf="(brokerForm.submitted || emergencyContactPhone.dirty || emergencyContactPhone.touched) && emergencyContactPhone.errors?.['required']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>El teléfono del contacto es obligatorio.</div>
-                        </div>
-                        <div
-                          *ngIf="(brokerForm.submitted || emergencyContactPhone.dirty || emergencyContactPhone.touched) && emergencyContactPhone.errors?.['pattern']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>Ingrese un número de teléfono válido.</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          <!-- Company -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Empresa</mat-label>
+              <mat-select name="company" ngModel required #company="ngModel">
+                <mat-option *ngFor="let company of companiesList" [value]="company.id">
+                  {{ company.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="purchaseForm.submitted && company.invalid" class="text-danger small">
+              Debe seleccionar una empresa.
+            </div>
+          </div>
 
-              </div>
+          <!-- Broker -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Bróker</mat-label>
+              <mat-select name="broker" ngModel required #broker="ngModel">
+                <mat-option *ngFor="let broker of brokersList" [value]="broker.id">
+                  {{ broker.person.names }} {{ broker.person.lastNames }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="purchaseForm.submitted && broker.invalid" class="text-danger small">
+              Debe seleccionar un bróker.
+            </div>
+          </div>
 
-              <!-- Botón para guardar -->
-              <div class="card-footer d-flex justify-content-end py-6 px-9">
-                <button type="button" class="btn btn-primary" [disabled]="isLoading$|async" (click)="saveBroker()">
-                  <span *ngIf="!(isLoading$|async)">Guardar Cambios</span>
-                  <span *ngIf="isLoading$|async" class="indicator-progress">
-                    Por favor, espere...
-                    <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                  </span>
-                </button>
-              </div>
-            </form>
+          <!-- Client Dropdown & "Nuevo Cliente" Button -->
+          <div class="col-md-6 d-flex align-items-center">
+            <mat-form-field class="flex-grow-1">
+              <mat-label>Cliente</mat-label>
+              <mat-select name="client" ngModel required #client="ngModel" (ngModelChange)="onClientChange($event)">
+                <mat-option *ngFor="let client of clientsList" [value]="client.id">
+                  {{ client.person.names }} {{ client.person.lastNames }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <!-- "Nuevo Cliente" Icon Button (Next to Dropdown) -->
+            <button *appCanCreate="PERMISSION_ROUTE" class="btn btn-outline-primary btn-sm ms-2"
+              (click)="addNewClient()" matTooltip="Nuevo Cliente">
+              <i class="fas fa-user-plus"></i>
+            </button>
+          </div>
+
+          <!-- Piscina -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Piscina</mat-label>
+              <mat-select name="shrimpFarm" ngModel required #shrimpFarm="ngModel"
+                (ngModelChange)="onShrimpFarmChange($event)">
+                <mat-option *ngFor="let shrimpFarm of shrimpFarmsList" [value]="shrimpFarm">
+                  {{ shrimpFarm.identifier }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="purchaseForm.submitted && shrimpFarm.invalid" class="text-danger small">
+              Debe seleccionar una piscina.
+            </div>
+          </div>
+
+          <!-- Farm Place (Disabled Input) -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Ubicación de la Piscina</mat-label>
+              <input matInput name="farmPlace" ngModel [(ngModel)]="farmPlace" disabled>
+            </mat-form-field>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Third Section: Details -->
+    <div class="card mb-4">
+      <div class="card-header py-2 d-flex align-items-center"> <!-- ✅ Reduced padding -->
+        <h6 class="fw-bold m-0">Detalles</h6> <!-- ✅ Smaller text & no margin -->
+      </div>
+      <div class="card-body">
+
+        <div class="row g-5 g-xl-8">
+
+          <!-- Gramo promedio de camaron (g) -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Gramo promedio (g)</mat-label>
+              <input matInput type="number" name="averageGrams" ngModel required #averageGrams="ngModel"
+                (keydown)="preventNegative($event)" (input)="validateNumber($event); onInputChange()">
+            </mat-form-field>
+            <div *ngIf="purchaseForm.submitted && averageGrams.invalid" class="text-danger small">
+              Debe ingresar el gramo promedio.
+            </div>
+          </div>
+
+          <!-- Shrimp Size in company -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Talla de camarón en compañía</mat-label>
+              <input matInput name="shrimpFarmSize" ngModel [(ngModel)]="shrimpFarmSize" disabled>
+            </mat-form-field>
+          </div>
+
+          <!-- Precio camaron ($) -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Precio ($)</mat-label>
+              <input matInput type="number" name="price" ngModel required #price="ngModel"
+                (keydown)="preventNegative($event)" (input)="validateNumber($event); onInputChange()">
+            </mat-form-field>
+            <div *ngIf="purchaseForm.submitted && price.invalid" class="text-danger small">
+              Debe ingresar el precio del camarón.
+            </div>
+          </div>
+
+          <!-- Libras compradas (lb) -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Libras compradas (lb)</mat-label>
+              <input matInput type="number" name="pounds" ngModel required #pounds="ngModel"
+                (keydown)="preventNegative($event)" (input)="validateNumber($event); onInputChange()">
+            </mat-form-field>
+            <div *ngIf="purchaseForm.submitted && pounds.invalid" class="text-danger small">
+              Debe ingresar las libras compradas.
+            </div>
+          </div>
+
+          <!-- Gramo promedio de camaron 2 (g) -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Gramo promedio 2 (g)</mat-label>
+              <input matInput type="number" name="averageGrams2" ngModel #averageGrams2="ngModel"
+                (keydown)="preventNegative($event)" (input)="validateNumber($event); onInputChange()">
+            </mat-form-field>
+          </div>
+
+          <!-- Shrimp Size 2 in company -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Talla de camarón 2 en compañía</mat-label>
+              <input matInput name="shrimpFarmSize2" ngModel [(ngModel)]="shrimpFarmSize2" disabled>
+            </mat-form-field>
+          </div>
+
+          <!-- Precio camaron 2 ($) -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Precio 2 ($)</mat-label>
+              <input matInput type="number" name="price2" ngModel #price2="ngModel" (keydown)="preventNegative($event)"
+                (input)="validateNumber($event); onInputChange()">
+            </mat-form-field>
+          </div>
+
+          <!-- Libras compradas 2 (lb) -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Libras compradas 2 (lb)</mat-label>
+              <input matInput type="number" name="pounds2" ngModel #pounds2="ngModel"
+                (keydown)="preventNegative($event)" (input)="validateNumber($event); onInputChange()">
+            </mat-form-field>
+          </div>
+
+          <!-- Total (lb) Compradas (Disabled) -->
+          <div class="col-md-4">
+            <mat-form-field class="w-100">
+              <mat-label>Total (lb) compradas</mat-label>
+              <input matInput type="number" name="totalPounds" ngModel #totalPounds="ngModel" disabled>
+
+            </mat-form-field>
+          </div>
+
+          <!-- Subtotal a pagar ($) (Disabled) -->
+          <div class="col-md-4">
+            <mat-form-field class="w-100">
+              <mat-label>Subtotal a pagar ($)</mat-label>
+              <input matInput type="number" name="subtotal" ngModel #subtotal="ngModel" disabled>
+            </mat-form-field>
+          </div>
+
+          <!-- Subtotal a pagar 2 ($) (Disabled) -->
+          <div class="col-md-4">
+            <mat-form-field class="w-100">
+              <mat-label>Subtotal a pagar 2 ($)</mat-label>
+              <input matInput type="number" name="subtotal2" ngModel #subtotal2="ngModel" disabled>
+            </mat-form-field>
+          </div>
+
+          <!-- Total a pagar ($) (Disabled) -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Total a pagar ($)</mat-label>
+              <input matInput type="number" name="grandTotal" ngModel #grandTotal="ngModel" disabled>
+            </mat-form-field>
+          </div>
+
+          <!-- Total acordado por el comprador ($) (Enabled) -->
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>Total acordado por el comprador ($)</mat-label>
+              <input matInput type="number" name="totalAgreedToPay" ngModel required #totalAgreedToPay="ngModel"
+                (keydown)="preventNegative($event)" (input)="validateNumber($event)">
+            </mat-form-field>
           </div>
         </div>
       </div>
-      <!-- end::Details -->
-
-      <!-- begin::Payment Info -->
-      <div class="tab-pane" [ngClass]="{ active: activeTab === 'Payment Info' }" *ngIf="activeTab === 'Payment Info'">
-        <app-payment-information [permissionRoute]="PERMISSION_ROUTE" [personId]="personId" />
-      </div>
-      <!-- end::Payment Info -->
-
     </div>
-  </div>
-  <!-- end::Body -->
+
+
+    <!-- Buttons Section -->
+    <div class="d-flex justify-content-center align-items-center mt-4"> <!-- 🔹 Increased spacing -->
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn btn-primary" [disabled]="isLoading$ | async">
+        Guardar
+      </button>
+    </div>
+
+  </form>
 </div>

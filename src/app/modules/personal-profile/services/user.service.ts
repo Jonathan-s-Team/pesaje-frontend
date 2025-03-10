@@ -4,7 +4,7 @@ import {BehaviorSubject, finalize, map, Observable, tap} from 'rxjs';
 import {environment} from 'src/environments/environment';
 import {UserModel} from '../../auth/models/user.model';
 import {AuthService} from '../../auth';
-import {ICreateUserModel, IReadUsersModel, IUpdateUserModel} from '../interfaces/user.interface';
+import {ICreateUserModel, IReadUserModel, IUpdateUserModel} from '../interfaces/user.interface';
 
 const API_USERS_URL = `${environment.apiUrl}/user`;
 
@@ -75,14 +75,14 @@ export class UserService {
       );
   }
 
-  getAllUsers(includeDeleted: boolean, role?: string): Observable<IReadUsersModel[]> {
+  getAllUsers(includeDeleted: boolean, role?: string): Observable<IReadUserModel[]> {
     this.isLoadingSubject.next(true);
     let params = new HttpParams().set('includeDeleted', includeDeleted.toString());
     if (role) {
       params = params.set('role', role);
     }
     return this.http
-      .get<{ ok: boolean; users: IReadUsersModel[] }>(`${API_USERS_URL}/`, { params })
+      .get<{ ok: boolean; users: IReadUserModel[] }>(`${API_USERS_URL}/`, { params })
       .pipe(
         map((response) => response.users || []),
         finalize(() => this.isLoadingSubject.next(false))

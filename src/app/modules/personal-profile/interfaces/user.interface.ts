@@ -16,7 +16,7 @@ export interface ICreateUserModel {
   person?: IPersonModel;
 }
 
-export interface IReadUsersModel {
+export interface IReadUserModel {
   deletedAt?: Date;
   id: string;
   person: IPersonModel;
