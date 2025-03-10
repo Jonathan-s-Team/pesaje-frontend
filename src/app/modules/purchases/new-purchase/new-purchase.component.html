@@ -187,7 +187,7 @@
           <div class="col-md-6">
             <mat-form-field class="w-100">
               <mat-label>Talla de camarón en compañía</mat-label>
-              <input matInput name="shrimpFarmSize" ngModel [(ngModel)]="shrimpFarmSize" disabled>
+              <input matInput name="shrimpFarmSize" ngModel #shrimpFarmSize="ngModel" disabled>
             </mat-form-field>
           </div>
 
@@ -228,7 +228,7 @@
           <div class="col-md-6">
             <mat-form-field class="w-100">
               <mat-label>Talla de camarón 2 en compañía</mat-label>
-              <input matInput name="shrimpFarmSize2" ngModel [(ngModel)]="shrimpFarmSize2" disabled>
+              <input matInput name="shrimpFarmSize2" ngModel #shrimpFarmSize2="ngModel" disabled>
             </mat-form-field>
           </div>
 

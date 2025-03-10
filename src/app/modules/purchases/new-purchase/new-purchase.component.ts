@@ -275,31 +275,9 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     inputElement.value = value;
   }
 
-  calculateTotalPounds(): number {
-    const pounds = this.purchaseForm?.controls['pounds']?.value || 0;
-    const pounds2 = this.purchaseForm?.controls['pounds2']?.value || 0;
-    return pounds + pounds2;
-  }
-
-  calculateSubtotal(): number {
-    const pounds = this.purchaseForm?.controls['pounds']?.value || 0;
-    const price = this.purchaseForm?.controls['price']?.value || 0;
-    return pounds * price;
-  }
-
-  calculateSubtotal2(): number {
-    const pounds2 = this.purchaseForm?.controls['pounds2']?.value || 0;
-    const price2 = this.purchaseForm?.controls['price2']?.value || 0;
-    return pounds2 * price2;
-  }
-
-  calculateGrandTotal(): number {
-    const subtotal = this.calculateSubtotal();
-    const subtotal2 = this.calculateSubtotal2();
-    return subtotal + subtotal2;
-  }
-
   onInputChange(): void {
+    // ya tengo pounds
+
     const pounds = this.purchaseForm.controls.pounds?.value || 0;
     const pounds2 = this.purchaseForm.controls.pounds2?.value || 0;
     const price = this.purchaseForm.controls.price?.value || 0;
@@ -310,12 +288,16 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     const subtotal = pounds * price;
     const subtotal2 = pounds2 * price2;
     const grandTotal = subtotal + subtotal2;
+    const sizeInCompany = pounds > 0 ? 1000/pounds : 0;
+    const sizeInCompany2 = pounds2 > 0 ? 1000/pounds2 : 0;
 
     // Set calculated values in the form
     this.purchaseForm.controls.totalPounds?.setValue(totalPounds);
     this.purchaseForm.controls.subtotal?.setValue(subtotal);
     this.purchaseForm.controls.subtotal2?.setValue(subtotal2);
     this.purchaseForm.controls.grandTotal?.setValue(grandTotal);
+    this.purchaseForm.controls.shrimpFarmSize?.setValue(sizeInCompany);
+    this.purchaseForm.controls.shrimpFarmSize2?.setValue(sizeInCompany2);
   }
 
   private showSuccessAlert() {
