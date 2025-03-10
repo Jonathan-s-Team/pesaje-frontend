@@ -9,6 +9,7 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { BrokerService } from '../../services/broker.service';
 import {
+  BuyerModel,
   IReadBrokerModel,
   IUpdateBrokerModel,
 } from '../../interfaces/broker.interface';
@@ -96,7 +97,7 @@ export class BrokerDetailsComponent
     const payload: IUpdateBrokerModel = {
       id: this.brokerData.id,
       deletedAt: this.brokerData.deletedAt,
-      buyerItBelongs: this.brokerData.buyerItBelongs.id,
+      buyerItBelongs: (this.brokerData.buyerItBelongs as BuyerModel).id,
       person: this.brokerData.person,
     };
 

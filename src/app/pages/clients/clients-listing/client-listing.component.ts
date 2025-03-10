@@ -24,7 +24,7 @@ import { IPaymentInfoModel } from 'src/app/modules/shared/interfaces/payment-inf
 import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
 import { ClientService } from '../../../modules/shared/services/client.service';
 import { UserService } from 'src/app/modules/personal-profile/services/user.service';
-import { IReadUsersModel } from 'src/app/modules/personal-profile/interfaces/user.interface';
+import { IReadUserModel } from 'src/app/modules/personal-profile/interfaces/user.interface';
 
 @Component({
   selector: 'app-client-listing',
@@ -38,8 +38,8 @@ export class ClientListingComponent
   isLoading = false;
   isOnlyBuyer = false;
 
-  buyers: IReadUsersModel[];
-  selectedBuyers: IReadUsersModel[] = [];
+  buyers: IReadUserModel[];
+  selectedBuyers: IReadUserModel[] = [];
 
   roles: IRoleModel[];
 
@@ -150,7 +150,7 @@ export class ClientListingComponent
 
   loadBuyers() {
     const userSub = this.userService.getAllUsers(true, 'Comprador').subscribe({
-      next: (users: IReadUsersModel[]) => {
+      next: (users: IReadUserModel[]) => {
         this.buyers = users;
       },
       error: (error) => {

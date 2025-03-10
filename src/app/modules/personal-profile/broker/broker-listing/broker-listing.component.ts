@@ -23,7 +23,7 @@ import { IRoleModel } from 'src/app/modules/auth/interfaces/role.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IPaymentInfoModel } from 'src/app/modules/shared/interfaces/payment-info.interface';
 import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
-import { IReadUsersModel } from '../../interfaces/user.interface';
+import { IReadUserModel } from '../../interfaces/user.interface';
 import { UserService } from '../../services/user.service';
 
 @Component({
@@ -39,8 +39,8 @@ export class BrokerListingComponent
   isLoading = false;
   isOnlyBuyer = false;
 
-  buyers: IReadUsersModel[];
-  selectedBuyer: IReadUsersModel[];
+  buyers: IReadUserModel[];
+  selectedBuyer: IReadUserModel[];
 
   roles: IRoleModel[];
 
@@ -169,7 +169,7 @@ export class BrokerListingComponent
 
   loadBuyers() {
     const userSub = this.userService.getAllUsers(true, 'Comprador').subscribe({
-      next: (users: IReadUsersModel[]) => {
+      next: (users: IReadUserModel[]) => {
         this.buyers = users;
       },
       error: (error) => {

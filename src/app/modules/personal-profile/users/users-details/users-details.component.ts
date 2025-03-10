@@ -11,7 +11,7 @@ import { NgForm } from '@angular/forms';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { Observable, Subscription } from 'rxjs';
 import {
-  IReadUsersModel,
+  IReadUserModel,
   IUpdateUserModel,
 } from '../../interfaces/user.interface';
 import { UserService } from '../../services/user.service';
@@ -33,7 +33,7 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading$: Observable<boolean>;
   activeTab: Tabs = 'Details';
 
-  userData: IReadUsersModel = {} as IReadUsersModel;
+  userData: IReadUserModel = {} as IReadUserModel;
   personId: string;
   formattedBirthDate: string = '';
 

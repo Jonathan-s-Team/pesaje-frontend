@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { MyProfileComponent } from './my-profile.component';
 import { PersonalInformationComponent } from './personal-information/personal-information.component';
-import { PaymentInformationComponent } from '../shared/components/payment-information/payment-information.component';
+import { PaymentInformationComponent } from '../shared/components/profile/payment-information/payment-information.component';
 import { PersonIdResolver } from './resolvers/person-id.resolver';
 
 const routes: Routes = [

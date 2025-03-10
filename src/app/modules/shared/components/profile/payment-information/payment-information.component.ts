@@ -16,8 +16,8 @@ import { Subscription } from 'rxjs';
 import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
-import { IPaymentInfoModel } from '../../interfaces/payment-info.interface';
-import { PaymentInfoService } from '../../services/payment-info.service';
+import { IPaymentInfoModel } from '../../../interfaces/payment-info.interface';
+import { PaymentInfoService } from '../../../services/payment-info.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
