@@ -7,52 +7,67 @@
 
 <!-- Purchase Form -->
 <div *ngIf="!(isLoading$ | async)">
-  <form #purchaseForm="ngForm" (ngSubmit)="submitForm(purchaseForm)" novalidate>
+  <form #purchaseForm="ngForm" (ngSubmit)="confirmSave($event,purchaseForm)" novalidate>
 
     <!-- First Section: General Purchase Info -->
-    <div class="card mb-4">
-      <div class="card-header py-2 d-flex align-items-center"> <!-- ✅ Reduced padding -->
-        <h6 class="fw-bold m-0">Información General</h6> <!-- ✅ Smaller text & no margin -->
+    <div class="card card-xl-stretch mb-xl-8">
+
+      <!-- begin::Header -->
+      <div class="card-header border-0 pt-5">
+        <h4 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1">Información General</span>
+        </h4>
       </div>
-      <div class="card-body">
+      <!-- end::Header -->
+
+      <!-- begin::Body -->
+      <div class="card-body py-3">
 
         <!-- begin::Row -->
         <div class="row g-5 g-xl-8">
 
-          <!-- Purchase Date (First Row, Full Width) -->
-          <div class="col-md-12">
-            <mat-form-field class="w-100">
-              <mat-label>Fecha de la compra</mat-label>
-              <input matInput [matDatepicker]="picker" name="purchaseDate" placeholder="dd/MM/yyyy" ngModel required
-                #purchaseDate="ngModel">
-              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
-            </mat-form-field>
-            <div *ngIf="purchaseForm.submitted && purchaseDate.invalid" class="text-danger small">
-              La fecha es obligatoria.
+          <!-- Purchase Date -->
+          <div class="col-md-6">
+            <label for="purchaseDate" class="required fw-semibold fs-6 mb-2">Fecha de la compra</label>
+            <input type="date" class="form-control form-control-sm" id="purchaseDate" name="purchaseDate"
+              [(ngModel)]="createPurchaseModel.purchaseDate" required #purchaseDate="ngModel">
+            <div
+              *ngIf="(purchaseForm.submitted || purchaseDate.dirty || purchaseDate.touched) && purchaseDate.errors?.['required']"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>La fecha de compra es obligatoria.</div>
             </div>
+            <!-- Si necesitas validar el formato ISO8601, deberás implementar un validador personalizado -->
+          </div>
+
+          <!-- Control number -->
+          <div class="col-md-6">
+            <label for="controlNumber" class="fw-semibold fs-6 mb-2">Número de control</label>
+            <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
+              disabled />
           </div>
 
           <!-- Has Invoice Selector & Invoice Number (Second Row) -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Factura recibida?</mat-label>
-              <mat-select name="hasInvoice" ngModel required #hasInvoice="ngModel">
-                <mat-option [value]="true">Sí</mat-option>
-                <mat-option [value]="false">No</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <div *ngIf="purchaseForm.submitted && hasInvoice.invalid" class="text-danger small">
-              Debe seleccionar una opción.
+            <label for="hasInvoice" class="required fw-semibold fs-6 mb-2">¿Factura recibida?</label>
+            <select id="hasInvoice" name="hasInvoice" class="form-select form-select-sm"
+              [(ngModel)]="createPurchaseModel.hasInvoice" #hasInvoice="ngModel" required>
+              <option [ngValue]="null" disabled selected>Seleccione una opción</option>
+              <option [ngValue]="true">Si</option>
+              <option [ngValue]="false">No</option>
+            </select>
+            <div *ngIf="purchaseForm.submitted && hasInvoice.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>Debe seleccionar una opción.</div>
             </div>
           </div>
 
-          <div class="col-md-6" *ngIf="purchaseForm.controls.hasInvoice?.value">
-            <mat-form-field class="w-100">
-              <mat-label>Número de Factura</mat-label>
-              <input matInput name="invoiceNumber" ngModel #invoiceNumber="ngModel" required>
-            </mat-form-field>
-            <div *ngIf="purchaseForm.submitted && invoiceNumber.invalid" class="text-danger small">
+          <!-- Invoice Number -->
+          <div class="col-md-6" *ngIf="createPurchaseModel.hasInvoice === true">
+            <label for="invoiceNumber" class="required fw-semibold fs-6 mb-2">Número de factura</label>
+            <input type="text" id="invoiceNumber" name="invoiceNumber" [(ngModel)]="createPurchaseModel.invoice"
+              #invoiceNumber="ngModel" class="form-control form-control-sm" required />
+            <div *ngIf="purchaseForm.submitted && invoiceNumber.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               El número de factura es obligatorio.
             </div>
           </div>
@@ -60,243 +75,290 @@
         </div>
         <!-- end::Row -->
       </div>
+      <!-- end::Body -->
     </div>
+    <!-- end::First Section: General Purchase Info -->
 
     <!-- Second Section: Responsible -->
-    <div class="card mb-4">
-      <div class="card-header py-2 d-flex align-items-center"> <!-- ✅ Reduced padding -->
-        <h6 class="fw-bold m-0">Responsables</h6> <!-- ✅ Smaller text & no margin -->
+    <div class="card card-xl-stretch mb-xl-8 mt-2">
+
+      <!-- begin::Header -->
+      <div class="card-header border-0 pt-5">
+        <h4 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1">Responsables</span>
+        </h4>
       </div>
-      <div class="card-body">
+      <!-- end::Header -->
+
+      <!-- begin::Body -->
+      <div class="card-body py-3">
 
         <div class="row g-5 g-xl-8">
-
           <!-- Buyer -->
           <div *ngIf="!isOnlyBuyer" class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Comprador</mat-label>
-              <mat-select name="buyer" ngModel required #buyer="ngModel" (ngModelChange)="onBuyerChange($event)">
-                <mat-option *ngFor="let buyer of buyersList" [value]="buyer.id">
-                  {{ buyer.person.names }} {{ buyer.person.lastNames }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-            <div *ngIf="purchaseForm.submitted && buyer.invalid" class="text-danger small">
-              Debe seleccionar un comprador.
+            <label for="buyer" class="required fw-semibold fs-6 mb-2">Comprador</label>
+            <select id="buyer" name="buyer" class="form-select form-select-sm" [(ngModel)]="createPurchaseModel.buyer"
+              #buyer="ngModel" required (change)="onBuyerChange($event)">
+              <option [ngValue]="null" disabled selected>Seleccione una opción</option>
+              <option *ngFor="let buyer of buyersList" [value]="buyer.id">
+                {{ buyer.person.names }} {{ buyer.person.lastNames }}
+              </option>
+            </select>
+            <div *ngIf="purchaseForm.submitted && buyer.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>Debe seleccionar un comprador.</div>
             </div>
           </div>
 
           <!-- Company -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Empresa</mat-label>
-              <mat-select name="company" ngModel required #company="ngModel">
-                <mat-option *ngFor="let company of companiesList" [value]="company.id">
-                  {{ company.name }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-            <div *ngIf="purchaseForm.submitted && company.invalid" class="text-danger small">
-              Debe seleccionar una empresa.
+            <label for="company" class="required fw-semibold fs-6 mb-2">Compañía</label>
+            <select id="company" name="company" class="form-select form-select-sm"
+              [(ngModel)]="createPurchaseModel.company" #company="ngModel" required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option *ngFor="let company of companiesList" [value]="company.id">
+                {{ company.name }}
+              </option>
+            </select>
+            <div *ngIf="purchaseForm.submitted && company.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>Debe seleccionar una compañía.</div>
             </div>
           </div>
+        </div>
 
+        <div class="row g-5 g-xl-8 mt-1">
           <!-- Broker -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Bróker</mat-label>
-              <mat-select name="broker" ngModel required #broker="ngModel">
-                <mat-option *ngFor="let broker of brokersList" [value]="broker.id">
-                  {{ broker.person.names }} {{ broker.person.lastNames }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-            <div *ngIf="purchaseForm.submitted && broker.invalid" class="text-danger small">
-              Debe seleccionar un bróker.
+            <label for="broker" class="required fw-semibold fs-6 mb-2">Bróker</label>
+            <select id="broker" name="broker" class="form-select form-select-sm"
+              [(ngModel)]="createPurchaseModel.broker" #broker="ngModel" required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option *ngFor="let broker of brokersList" [value]="broker.id">
+                {{ broker.person.names }} {{ broker.person.lastNames }}
+              </option>
+            </select>
+            <div *ngIf="purchaseForm.submitted && broker.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>Debe seleccionar un bróker.</div>
             </div>
           </div>
 
           <!-- Client Dropdown & "Nuevo Cliente" Button -->
           <div class="col-md-6 d-flex align-items-center">
-            <mat-form-field class="flex-grow-1">
-              <mat-label>Cliente</mat-label>
-              <mat-select name="client" ngModel required #client="ngModel" (ngModelChange)="onClientChange($event)">
-                <mat-option *ngFor="let client of clientsList" [value]="client.id">
-                  {{ client.person.names }} {{ client.person.lastNames }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
+            <div class="flex-grow-1">
+              <label for="client" class="required fw-semibold fs-6 mb-2">Cliente</label>
+              <div class="d-flex align-items-center">
+                <!-- Dropdown takes most of the width -->
+                <select id="client" name="client" class="form-select form-select-sm flex-grow-1"
+                  [(ngModel)]="createPurchaseModel.client" #client="ngModel" required (change)="onClientChange($event)">
+                  <option value="" disabled selected>Seleccione una opción</option>
+                  <option *ngFor="let client of clientsList" [value]="client.id">
+                    {{ client.person.names }} {{ client.person.lastNames }}
+                  </option>
+                </select>
 
-            <!-- "Nuevo Cliente" Icon Button (Next to Dropdown) -->
-            <button *appCanCreate="PERMISSION_ROUTE" class="btn btn-outline-primary btn-sm ms-2"
-              (click)="addNewClient()" matTooltip="Nuevo Cliente">
-              <i class="fas fa-user-plus"></i>
-            </button>
+                <!-- Button at input level, right-aligned -->
+                <button *appCanCreate="PERMISSION_ROUTE"
+                  class="btn btn-outline-primary btn-sm ms-2 d-flex align-items-center" (click)="addNewClient()"
+                  matTooltip="Nuevo Cliente">
+                  <i class="fas fa-user-plus"></i>
+                </button>
+              </div>
+
+              <div *ngIf="purchaseForm.submitted && client.invalid"
+                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div>Debe seleccionar un cliente.</div>
+              </div>
+            </div>
           </div>
+
 
           <!-- Piscina -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Piscina</mat-label>
-              <mat-select name="shrimpFarm" ngModel required #shrimpFarm="ngModel"
-                (ngModelChange)="onShrimpFarmChange($event)">
-                <mat-option *ngFor="let shrimpFarm of shrimpFarmsList" [value]="shrimpFarm">
-                  {{ shrimpFarm.identifier }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-            <div *ngIf="purchaseForm.submitted && shrimpFarm.invalid" class="text-danger small">
-              Debe seleccionar una piscina.
+            <label for="shrimpFarm" class="required fw-semibold fs-6 mb-2">Piscina</label>
+            <select id="shrimpFarm" name="shrimpFarm" class="form-select form-select-sm"
+              [(ngModel)]="createPurchaseModel.shrimpFarm" #shrimpFarm="ngModel" (change)="onShrimpFarmChange($event)"
+              required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option *ngFor="let shrimpFarm of shrimpFarmsList" [value]="shrimpFarm.id">
+                {{ shrimpFarm.identifier }}
+              </option>
+            </select>
+            <div *ngIf="purchaseForm.submitted && shrimpFarm.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>Debe seleccionar una piscina.</div>
             </div>
           </div>
 
           <!-- Farm Place (Disabled Input) -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Ubicación de la Piscina</mat-label>
-              <input matInput name="farmPlace" ngModel [(ngModel)]="farmPlace" disabled>
-            </mat-form-field>
+            <label for="farmPlace" class="fw-semibold fs-6 mb-2">Ubicación de la Piscina</label>
+            <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm"
+              [(ngModel)]="farmPlace" disabled />
           </div>
-
         </div>
       </div>
+      <!-- end::Body -->
+
     </div>
+    <!-- end::Second Section: Responsible -->
 
     <!-- Third Section: Details -->
-    <div class="card mb-4">
-      <div class="card-header py-2 d-flex align-items-center"> <!-- ✅ Reduced padding -->
-        <h6 class="fw-bold m-0">Detalles</h6> <!-- ✅ Smaller text & no margin -->
+    <div class="card card-xl-stretch mb-xl-8 mt-2">
+
+      <!-- begin::Header -->
+      <div class="card-header border-0 pt-5">
+        <h4 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1">Detalles</span>
+        </h4>
       </div>
-      <div class="card-body">
+      <!-- end::Header -->
+
+      <div class="card-body py-3">
 
         <div class="row g-5 g-xl-8">
 
           <!-- Gramo promedio de camaron (g) -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Gramo promedio (g)</mat-label>
-              <input matInput type="number" name="averageGrams" ngModel required #averageGrams="ngModel"
-                (keypress)="validateNumber($event)" (input)="onInputChange()" (blur)="formatDecimal('averageGrams')">
-            </mat-form-field>
-            <div *ngIf="purchaseForm.submitted && averageGrams.invalid" class="text-danger small">
+            <label for="averageGrams" class="required fw-semibold fs-6 mb-2">Gramo promedio (g)</label>
+            <input type="text" id="averageGrams" name="averageGrams" [(ngModel)]="createPurchaseModel.averageGrams"
+              #averageGrams="ngModel" class="form-control form-control-sm" required (keypress)="validateNumber($event)"
+              (input)="onInputChange()" (blur)="formatDecimal('averageGrams')" />
+            <div *ngIf="purchaseForm.submitted && averageGrams.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               Debe ingresar el gramo promedio.
             </div>
           </div>
 
           <!-- Shrimp Size in company -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Talla de camarón en compañía</mat-label>
-              <input matInput name="shrimpFarmSize" ngModel #shrimpFarmSize="ngModel" disabled>
-            </mat-form-field>
+            <label for="shrimpFarmSize" class="fw-semibold fs-6 mb-2">Talla de camarón en compañía</label>
+            <input type="text" id="shrimpFarmSize" name="shrimpFarmSize" class="form-control form-control-sm"
+              [(ngModel)]="shrimpFarmSize" disabled />
           </div>
 
           <!-- Precio camaron ($) -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Precio ($)</mat-label>
-              <input matInput type="number" name="price" ngModel required #price="ngModel"
-                (keypress)="validateNumber($event)" (input)="onInputChange()" (blur)="formatDecimal('price')">
-            </mat-form-field>
-            <div *ngIf="purchaseForm.submitted && price.invalid" class="text-danger small">
+            <label for="price" class="required fw-semibold fs-6 mb-2">Precio</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="text" id="price" name="price" [(ngModel)]="createPurchaseModel.price" #price="ngModel"
+                class="form-control form-control-sm text-end" required (keypress)="validateNumber($event)"
+                (input)="onInputChange()" (blur)="formatDecimal('price')" />
+            </div>
+            <div *ngIf="purchaseForm.submitted && price.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               Debe ingresar el precio del camarón.
             </div>
           </div>
 
           <!-- Libras compradas (lb) -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Libras compradas (lb)</mat-label>
-              <input matInput type="number" name="pounds" ngModel required #pounds="ngModel"
-                (keypress)="validateNumber($event)" (input)="onInputChange()" (blur)="formatDecimal('pounds')">
-            </mat-form-field>
-            <div *ngIf="purchaseForm.submitted && pounds.invalid" class="text-danger small">
+            <label for="pounds" class="required fw-semibold fs-6 mb-2">Libras compradas (lb)</label>
+            <input type="text" id="pounds" name="pounds" [(ngModel)]="createPurchaseModel.pounds" #pounds="ngModel"
+              class="form-control form-control-sm" required (keypress)="validateNumber($event)"
+              (input)="onInputChange()" (blur)="formatDecimal('pounds')" />
+            <div *ngIf="purchaseForm.submitted && pounds.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               Debe ingresar las libras compradas.
             </div>
           </div>
 
           <!-- Gramo promedio de camaron 2 (g) -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Gramo promedio 2 (g)</mat-label>
-              <input matInput type="number" name="averageGrams2" ngModel #averageGrams2="ngModel"
-                (keypress)="validateNumber($event)" (input)="onInputChange()" (blur)="formatDecimal('averageGrams2')">
-            </mat-form-field>
+            <label for="averageGrams2" class="fw-semibold fs-6 mb-2">Gramo promedio 2 (g)</label>
+            <input type="text" id="averageGrams2" name="averageGrams2" [(ngModel)]="createPurchaseModel.averageGrams2"
+              #averageGrams2="ngModel" class="form-control form-control-sm" (keypress)="validateNumber($event)"
+              (input)="onInputChange()" (blur)="formatDecimal('averageGrams')" />
           </div>
 
           <!-- Shrimp Size 2 in company -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Talla de camarón 2 en compañía</mat-label>
-              <input matInput name="shrimpFarmSize2" ngModel #shrimpFarmSize2="ngModel" disabled>
-            </mat-form-field>
+            <label for="shrimpFarmSize2" class="fw-semibold fs-6 mb-2">Talla de camarón 2 en compañía</label>
+            <input type="text" id="shrimpFarmSize2" name="shrimpFarmSize2" class="form-control form-control-sm"
+              [(ngModel)]="shrimpFarmSize2" disabled />
           </div>
 
-          <!-- Precio camaron 2 ($) -->
+          <!-- Precio camaron ($) -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Precio 2 ($)</mat-label>
-              <input matInput type="number" name="price2" ngModel #price2="ngModel" (keypress)="validateNumber($event)"
-                (input)="onInputChange()" (blur)="formatDecimal('price2')">
-            </mat-form-field>
+            <label for="price2" class="fw-semibold fs-6 mb-2">Precio 2</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="text" id="price2" name="price2" [(ngModel)]="createPurchaseModel.price2" #price2="ngModel"
+                class="form-control form-control-sm text-end" (keypress)="validateNumber($event)"
+                (input)="onInputChange()" (blur)="formatDecimal('price2')" />
+            </div>
           </div>
 
           <!-- Libras compradas 2 (lb) -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Libras compradas 2 (lb)</mat-label>
-              <input matInput type="number" name="pounds2" ngModel #pounds2="ngModel"
-                (keypress)="validateNumber($event)" (input)="onInputChange()" (blur)="formatDecimal('pounds2')">
-            </mat-form-field>
+            <label for="pounds2" class="fw-semibold fs-6 mb-2">Libras compradas 2 (lb)</label>
+            <input type="text" id="pounds2" name="pounds2" [(ngModel)]="createPurchaseModel.pounds2" #pounds2="ngModel"
+              class="form-control form-control-sm" (keypress)="validateNumber($event)" (input)="onInputChange()"
+              (blur)="formatDecimal('pounds2')" />
           </div>
 
           <!-- Total (lb) Compradas (Disabled) -->
           <div class="col-md-4">
-            <mat-form-field class="w-100">
-              <mat-label>Total (lb) compradas</mat-label>
-              <input matInput type="number" name="totalPounds" ngModel #totalPounds="ngModel" disabled>
-
-            </mat-form-field>
+            <label for="totalPounds" class="fw-semibold fs-6 mb-2">Total (lb) compradas</label>
+            <input type="text" id="totalPounds" name="totalPounds" class="form-control"
+              [(ngModel)]="createPurchaseModel.totalPounds" #totalPounds="ngModel" disabled
+              (keypress)="validateNumber($event)" (blur)="formatDecimal('totalPounds')" />
           </div>
 
           <!-- Subtotal a pagar ($) (Disabled) -->
           <div class="col-md-4">
-            <mat-form-field class="w-100">
-              <mat-label>Subtotal a pagar ($)</mat-label>
-              <input matInput type="number" name="subtotal" ngModel #subtotal="ngModel" disabled>
-            </mat-form-field>
+            <label for="subtotal" class="fw-semibold fs-6 mb-2">Subtotal a pagar</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="text" id="subtotal" name="subtotal" class="form-control text-end"
+                [(ngModel)]="createPurchaseModel.subtotal" #subtotal="ngModel" disabled
+                (keypress)="validateNumber($event)" (blur)="formatDecimal('subtotal')" />
+            </div>
           </div>
 
           <!-- Subtotal a pagar 2 ($) (Disabled) -->
           <div class="col-md-4">
-            <mat-form-field class="w-100">
-              <mat-label>Subtotal a pagar 2 ($)</mat-label>
-              <input matInput type="number" name="subtotal2" ngModel #subtotal2="ngModel" disabled>
-            </mat-form-field>
+            <label for="subtotal2" class="fw-semibold fs-6 mb-2">Subtotal a pagar 2</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="text" id="subtotal2" name="subtotal2" class="form-control text-end"
+                [(ngModel)]="createPurchaseModel.subtotal2" #subtotal2="ngModel" disabled
+                (keypress)="validateNumber($event)" (blur)="formatDecimal('subtotal2')" />
+            </div>
           </div>
 
           <!-- Total a pagar ($) (Disabled) -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Total a pagar ($)</mat-label>
-              <input matInput type="number" name="grandTotal" ngModel #grandTotal="ngModel" disabled>
-            </mat-form-field>
+            <label for="grandTotal" class="fw-semibold fs-6 mb-2">Total a pagar</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="text" id="grandTotal" name="grandTotal" class="form-control text-end"
+                [(ngModel)]="createPurchaseModel.grandTotal" #grandTotal="ngModel" disabled
+                (keypress)="validateNumber($event)" (blur)="formatDecimal('grandTotal')" />
+            </div>
           </div>
 
           <!-- Total acordado por el comprador ($) -->
           <div class="col-md-6">
-            <mat-form-field class="w-100">
-              <mat-label>Total acordado por el comprador ($)</mat-label>
-              <input matInput type="number" name="totalAgreedToPay" ngModel required #totalAgreedToPay="ngModel"
-                (keypress)="validateNumber($event)" (blur)="formatDecimal('totalAgreedToPay')">
-            </mat-form-field>
-            <div *ngIf="purchaseForm.submitted && totalAgreedToPay.invalid" class="text-danger small">
+            <label for="totalAgreedToPay" class="required fw-semibold fs-6 mb-2">Total acordado por el comprador</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="text" id="totalAgreedToPay" name="totalAgreedToPay"
+                [(ngModel)]="createPurchaseModel.totalAgreedToPay" #totalAgreedToPay="ngModel"
+                class="form-control form-control-sm text-end" required (keypress)="validateNumber($event)"
+                (blur)="formatDecimal('pounds')" />
+            </div>
+            <div *ngIf="purchaseForm.submitted && totalAgreedToPay.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               Debe ingresar el total acordado.
             </div>
           </div>
         </div>
       </div>
     </div>
+    <!-- end::Third Section: Details -->
 
 
     <!-- Buttons Section -->

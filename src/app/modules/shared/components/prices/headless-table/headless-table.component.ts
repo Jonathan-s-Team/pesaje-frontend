@@ -15,6 +15,7 @@ import {
 } from '../../../interfaces/size.interface';
 import { IReadSizePriceModel } from '../../../interfaces/size-price.interface';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
+import { InputUtilsService } from 'src/app/utils/input-utils.service';
 
 @Component({
   selector: 'app-headless-table',
@@ -41,7 +42,8 @@ export class HeadlessTableComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(
     private sizeService: SizeService,
-    private formUtils: FormUtilsService
+    private formUtils: FormUtilsService,
+    private inputUtils: InputUtilsService
   ) {
     this.form = new FormGroup({});
     this.isLoading$ = this.sizeService.isLoading$;
@@ -175,7 +177,7 @@ export class HeadlessTableComponent implements OnInit, OnChanges, OnDestroy {
   formatPrice(id: string) {
     const control = this.form.get(id);
     if (control) {
-      this.formUtils.formatDecimal(control); // ✅ Use utility function
+      this.formUtils.formatControlToDecimal(control); // ✅ Use utility function
     }
   }
 
@@ -183,7 +185,7 @@ export class HeadlessTableComponent implements OnInit, OnChanges, OnDestroy {
    * 👉 Validates numeric input (prevents invalid characters)
    */
   validateNumber(event: KeyboardEvent) {
-    this.formUtils.validateNumber(event); // ✅ Use utility function
+    this.inputUtils.validateNumber(event); // ✅ Use utility function
   }
 
   /**

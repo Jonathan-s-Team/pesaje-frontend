@@ -15,13 +15,13 @@
             <!-- Company Selector -->
             <div class="w-150px me-3 position-relative">
               <select class="form-select form-select-sm" [(ngModel)]="selectedCompany" (change)="onCompanyChange()">
-                <option value="" disabled selected>Seleccione una empresa</option>
+                <option value="" disabled selected>Seleccione una compañía</option>
                 <option *ngFor="let company of companies" [value]="company.id">
                   {{ company.name }}
                 </option>
               </select>
               <small *ngIf="showErrors && !selectedCompany" class="text-danger small mt-1 position-absolute">
-                Debe seleccionar una empresa
+                Debe seleccionar una compañía
               </small>
             </div>
 
@@ -189,11 +189,3 @@
   <!-- end::Col -->
 </div>
 <!-- end::Row -->
-
-<swal #noticeSwal [swalOptions]="swalOptions">
-</swal>
-
-<swal #confirmSwal title="¿Estás seguro?" text="Se guardarán los cambios. ¿Deseas continuar?" icon="warning"
-  [showCancelButton]="true" [focusCancel]="true"
-  [customClass]="{confirmButton: 'btn btn-primary', cancelButton: 'btn btn-active-light'}">
-</swal>

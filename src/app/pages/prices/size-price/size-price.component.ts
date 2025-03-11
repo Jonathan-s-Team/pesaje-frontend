@@ -28,6 +28,7 @@ import {
   IReadSizePriceModel,
   IUpdateSizePriceModel,
 } from 'src/app/modules/shared/interfaces/size-price.interface';
+import { AlertService } from 'src/app/utils/alert.service';
 
 @Component({
   selector: 'app-size-price',
@@ -39,12 +40,6 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   @ViewChild(WholeTableComponent) wholeTableComponent!: WholeTableComponent;
   @ViewChild(HeadlessTableComponent)
   headlessTableComponent!: HeadlessTableComponent;
-
-  @ViewChild('confirmSwal')
-  public readonly confirmSwal!: SwalComponent;
-
-  @ViewChild('noticeSwal')
-  noticeSwal!: SwalComponent;
 
   swalOptions: SweetAlertOptions = {};
 
@@ -87,6 +82,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   constructor(
     private companyService: CompanyService,
     private periodService: PeriodService,
+    private alertService: AlertService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -269,7 +265,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
         .updatePaymentInfo(this.selectedPeriod, periodPayload)
         .subscribe({
           next: () => {
-            this.showAlert({
+            this.alertService.showAlert({
               icon: 'success',
               title: '¡Éxito!',
               text: 'Periodo actualizado exitosamente!',
@@ -277,7 +273,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
             this.toggleEditPeriod();
           },
           error: () => {
-            this.showAlert({
+            this.alertService.showAlert({
               icon: 'error',
               title: '¡Error!',
               text: 'No se pudo actualizar el periodo.',
@@ -297,7 +293,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
         })
         .subscribe({
           next: () => {
-            this.showAlert({
+            this.alertService.showAlert({
               icon: 'success',
               title: '¡Éxito!',
               text: 'Periodo creado exitosamente!',
@@ -305,7 +301,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
             this.toggleAddPeriod();
           },
           error: () => {
-            this.showAlert({
+            this.alertService.showAlert({
               icon: 'error',
               title: '¡Error!',
               text: 'No se pudo crear el periodo.',
@@ -349,8 +345,8 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     // ✅ Stop execution if any validation errors exist
     if (this.showErrors || hasErrors) return;
 
-    this.confirmSwal.fire().then((clicked) => {
-      if (clicked.isConfirmed) {
+    this.alertService.confirm().then((result) => {
+      if (result.isConfirmed) {
         this.savePeriod();
       }
     });
@@ -419,21 +415,6 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     date.setHours(hours, minutes, 0, 0); // Set time on the date object
 
     return date.toISOString(); // Convert to ISO format
-  }
-
-  showAlert(swalOptions: SweetAlertOptions) {
-    let style = swalOptions.icon?.toString() || 'success';
-    if (swalOptions.icon === 'error') {
-      style = 'danger';
-    }
-    this.swalOptions = {
-      ...swalOptions,
-      buttonsStyling: false,
-      confirmButtonText: 'Ok, got it!',
-      customClass: { confirmButton: 'btn btn-' + style },
-    };
-    this.cdr.detectChanges();
-    this.noticeSwal.fire();
   }
 
   ngOnDestroy(): void {

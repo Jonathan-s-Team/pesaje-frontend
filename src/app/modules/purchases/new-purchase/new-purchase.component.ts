@@ -9,8 +9,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgForm } from '@angular/forms';
-import Swal, { SweetAlertOptions } from 'sweetalert2';
-import { distinctUntilChanged, finalize, Observable, Subscription } from 'rxjs';
+import { distinctUntilChanged, Observable, Subscription } from 'rxjs';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 import { PurchaseService } from '../services/purchase.service';
 import { IReadUserModel } from '../../personal-profile/interfaces/user.interface';
@@ -27,6 +26,9 @@ import { IReadShrimpFarmModel } from '../../shared/interfaces/shrimp-farm.interf
 import { ShrimpFarmService } from '../../shared/services/shrimp-farm.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
+import { ICreatePurchaseModel } from '../interfaces/purchase.interface';
+import { InputUtilsService } from 'src/app/utils/input-utils.service';
+import { AlertService } from 'src/app/utils/alert.service';
 
 type Tabs = 'Details' | 'Payment Info';
 
@@ -56,6 +58,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   shrimpFarmSize2: string = '';
   purchaseId: string | null = null;
 
+  createPurchaseModel: ICreatePurchaseModel = {} as ICreatePurchaseModel;
+
   /** Stores all active subscriptions */
   private unsubscribe: Subscription[] = [];
 
@@ -69,6 +73,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     private shrimpFarmService: ShrimpFarmService,
     private modalService: NgbModal,
     private formUtils: FormUtilsService,
+    private inputUtils: InputUtilsService,
+    private alertService: AlertService,
     private route: ActivatedRoute,
     private router: Router,
     private changeDetectorRef: ChangeDetectorRef
@@ -84,12 +90,11 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       this.roles.every((role) => role.name === 'Comprador');
 
     if (this.isOnlyBuyer) {
-      const buyerId = this.authService.currentUserValue?.id;
-      this.purchaseForm.controls.buyer.setValue(buyerId);
-      this.loadBrokers(buyerId as string); // Load brokers immediately
-      this.loadClients(buyerId as string); // Load clients immediately
+      this.createPurchaseModel.buyer = this.authService.currentUserValue?.id!;
+      this.loadBrokers(this.createPurchaseModel.buyer);
+      this.loadClients(this.createPurchaseModel.buyer);
     } else {
-      this.loadBuyers(); // Load buyers normally
+      this.loadBuyers();
     }
 
     this.loadCompanies();
@@ -165,88 +170,76 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     this.unsubscribe.push(shrimpFarmSub);
   }
 
-  onBuyerChange(buyerId: string): void {
+  onBuyerChange(event: Event): void {
+    const buyerId = (event.target as HTMLSelectElement).value;
     if (buyerId) {
       this.loadBrokers(buyerId); // Load brokers when buyer changes
       this.loadClients(buyerId); // Load clients when buyer changes
     }
   }
 
-  onClientChange(clientId: string): void {
+  onClientChange(event: Event): void {
+    const clientId = (event.target as HTMLSelectElement).value;
     if (clientId) {
       this.loadShrimpFarms(clientId);
     }
   }
 
-  onShrimpFarmChange(farm: IReadShrimpFarmModel): void {
+  onShrimpFarmChange(event: Event): void {
+    const farmId = (event.target as HTMLSelectElement).value;
+    const farm = this.shrimpFarmsList.filter((sf) => sf.id === farmId)[0];
     if (farm) {
-      this.farmPlace = farm.place; // ✅ Update input field
+      this.farmPlace = (farm as IReadShrimpFarmModel).place; // ✅ Update input field
     }
   }
 
-  submitForm(form: NgForm): void {
-    if (form.invalid) {
+  submitForm(): void {
+    console.log('Submitting purchase data:', this.createPurchaseModel);
+
+    // if (this.purchaseId) {
+    //   // ✅ Update Purchase if ID exists
+    //   this.purchaseService
+    //     .updatePurchase(this.purchaseId, purchaseData)
+    //     .subscribe({
+    //       next: (response) => {
+    //         console.log('Purchase updated successfully:', response);
+    //         this.showSuccessAlert();
+    //       },
+    //       error: (error) => {
+    //         console.error('Error updating purchase:', error);
+    //         this.showErrorAlert(error);
+    //       },
+    //     });
+    // } else {
+    //   // ✅ Create New Purchase if ID does NOT exist
+    //   this.purchaseService.createPurchase(purchaseData).subscribe({
+    //     next: (response) => {
+    //       console.log('Purchase created successfully:', response);
+    //       this.purchaseId = response.id; // ✅ Store the new ID for future updates
+    //       this.showSuccessAlert();
+    //       form.resetForm(); // Reset form after successful creation
+    //     },
+    //     error: (error) => {
+    //       console.error('Error creating purchase:', error);
+    //       this.showErrorAlert(error);
+    //     },
+    //   });
+    // }
+  }
+
+  confirmSave(event: Event, form: NgForm): void {
+    if (form && form.invalid) {
       return;
     }
 
     // Ensure calculated fields are updated before submission
     this.onInputChange();
 
-    const purchaseData = {
-      id: this.purchaseId || null, // Check if it's an update
-      purchaseDate: form.controls.purchaseDate?.value,
-      hasInvoice: form.controls.hasInvoice?.value,
-      invoice: form.controls.invoiceNumber?.value || null,
-      buyer: form.controls.buyer?.value,
-      company: form.controls.company?.value,
-      broker: form.controls.broker?.value,
-      client: form.controls.client?.value,
-      period: '', // Set period if necessary
-      shrimpFarm: form.controls.shrimpFarm?.value.id,
-      averageGrams: form.controls.averageGrams?.value,
-      price: form.controls.price?.value,
-      pounds: form.controls.pounds?.value,
-      averageGrams2: form.controls.averageGrams2?.value || 0,
-      price2: form.controls.price2?.value || 0,
-      pounds2: form.controls.pounds2?.value || 0,
-      totalPounds: form.controls.totalPounds?.value,
-      subtotal: form.controls.subtotal?.value,
-      subtotal2: form.controls.subtotal2?.value,
-      grandTotal: form.controls.grandTotal?.value,
-      totalAgreedToPay: form.controls.totalAgreedToPay?.value,
-    };
-
-    console.log('Submitting purchase data:', purchaseData);
-
-    if (this.purchaseId) {
-      // ✅ Update Purchase if ID exists
-      this.purchaseService
-        .updatePurchase(this.purchaseId, purchaseData)
-        .subscribe({
-          next: (response) => {
-            console.log('Purchase updated successfully:', response);
-            this.showSuccessAlert();
-          },
-          error: (error) => {
-            console.error('Error updating purchase:', error);
-            this.showErrorAlert(error);
-          },
-        });
-    } else {
-      // ✅ Create New Purchase if ID does NOT exist
-      this.purchaseService.createPurchase(purchaseData).subscribe({
-        next: (response) => {
-          console.log('Purchase created successfully:', response);
-          this.purchaseId = response.id; // ✅ Store the new ID for future updates
-          this.showSuccessAlert();
-          form.resetForm(); // Reset form after successful creation
-        },
-        error: (error) => {
-          console.error('Error creating purchase:', error);
-          this.showErrorAlert(error);
-        },
-      });
-    }
+    this.alertService.confirm().then((result) => {
+      if (result.isConfirmed) {
+        this.submitForm();
+      }
+    });
   }
 
   addNewClient() {
@@ -254,36 +247,27 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   onInputChange(): void {
-    const avgGrams = this.purchaseForm.controls.averageGrams?.value || 0;
-    const avgGrams2 = this.purchaseForm.controls.averageGrams2?.value || 0;
-    const pounds = this.purchaseForm.controls.pounds?.value || 0;
-    const pounds2 = this.purchaseForm.controls.pounds2?.value || 0;
-    const price = this.purchaseForm.controls.price?.value || 0;
-    const price2 = this.purchaseForm.controls.price2?.value || 0;
+    const avgGrams = this.createPurchaseModel.averageGrams || 0;
+    const avgGrams2 = this.createPurchaseModel.averageGrams2 || 0;
+    const pounds = this.createPurchaseModel.pounds || 0;
+    const pounds2 = this.createPurchaseModel.pounds2 || 0;
+    const price = this.createPurchaseModel.price || 0;
+    const price2 = this.createPurchaseModel.price2 || 0;
 
     // Calculate values
-    const totalPounds = pounds + pounds2;
-    const subtotal = pounds * price;
-    const subtotal2 = pounds2 * price2;
-    const grandTotal = subtotal + subtotal2;
-    const sizeInCompany = avgGrams > 0 ? 1000 / avgGrams : 0;
-    const sizeInCompany2 = avgGrams2 > 0 ? 1000 / avgGrams2 : 0;
+    this.createPurchaseModel.totalPounds = pounds + pounds2;
+    this.createPurchaseModel.subtotal = pounds * price;
+    this.createPurchaseModel.subtotal2 = pounds2 * price2;
+    this.createPurchaseModel.grandTotal =
+      this.createPurchaseModel.subtotal + this.createPurchaseModel.subtotal2;
 
-    // Set calculated values in the form
-    this.purchaseForm.controls.totalPounds?.setValue(totalPounds);
-    this.purchaseForm.controls.subtotal?.setValue(subtotal);
-    this.purchaseForm.controls.subtotal2?.setValue(subtotal2);
-    this.purchaseForm.controls.grandTotal?.setValue(grandTotal);
-    this.purchaseForm.controls.shrimpFarmSize?.setValue(sizeInCompany);
-    this.purchaseForm.controls.shrimpFarmSize2?.setValue(sizeInCompany2);
-
-    // Format disabled fields
-    this.formatDecimal('totalPounds');
-    this.formatDecimal('subtotal');
-    this.formatDecimal('subtotal2');
-    this.formatDecimal('grandTotal');
-    this.formatDecimal('shrimpFarmSize');
-    this.formatDecimal('shrimpFarmSize2');
+    // Calculate shrimp size in company
+    this.shrimpFarmSize = this.inputUtils.formatToDecimal(
+      avgGrams > 0 ? 1000 / avgGrams : 0
+    );
+    this.shrimpFarmSize2 = this.inputUtils.formatToDecimal(
+      avgGrams2 > 0 ? 1000 / avgGrams2 : 0
+    );
   }
 
   /**
@@ -292,7 +276,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   formatDecimal(controlName: string) {
     const control = this.purchaseForm.controls[controlName];
     if (control) {
-      this.formUtils.formatDecimal(control); // ✅ Use utility function
+      this.formUtils.formatControlToDecimal(control); // ✅ Use utility function
     }
   }
 
@@ -300,35 +284,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
    * 👉 Validates numeric input (prevents invalid characters)
    */
   validateNumber(event: KeyboardEvent) {
-    this.formUtils.validateNumber(event); // ✅ Use utility function
-  }
-
-  private showSuccessAlert() {
-    const options: SweetAlertOptions = {
-      title: '¡Éxito!',
-      text: 'Los cambios se guardaron correctamente',
-      icon: 'success',
-      confirmButtonText: 'Aceptar',
-      confirmButtonColor: '#3085d6',
-      timer: 5000,
-      timerProgressBar: true,
-    };
-    Swal.fire(options);
-  }
-
-  private showErrorAlert(error: any) {
-    const options: SweetAlertOptions = {
-      title: 'Error',
-      html: `<strong>${
-        error.message || 'Ocurrió un error inesperado.'
-      }</strong>`,
-      icon: 'error',
-      confirmButtonText: 'Entendido',
-      confirmButtonColor: '#d33',
-      showCloseButton: true,
-      focusConfirm: false,
-    };
-    Swal.fire(options);
+    this.inputUtils.validateNumber(event); // ✅ Use utility function
   }
 
   /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */
