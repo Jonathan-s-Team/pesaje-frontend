@@ -1,33 +1,31 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
+import { InputUtilsService } from './input-utils.service';
 
 @Injectable({
   providedIn: 'root', // ✅ Makes it available throughout the app
 })
 export class FormUtilsService {
+  constructor(private inputUtilsService: InputUtilsService) {}
+
   /**
    * 👉 Ensures value is properly formatted to 2 decimal places.
    */
-  formatDecimal(control: AbstractControl): void {
-    if (!control || !control.value) return;
+  formatControlToDecimal(control: AbstractControl): void {
+    if (
+      !control ||
+      control.value === null ||
+      control.value === undefined ||
+      control.value === ''
+    )
+      return;
 
-    const value = parseFloat(control.value);
-    if (!isNaN(value)) {
-      control.setValue(value.toFixed(2), { emitEvent: false });
-    }
-  }
+    // Convert and format the value to two decimal places
+    const formattedValue = this.inputUtilsService.formatToDecimal(
+      control.value
+    );
 
-  /**
-   * 👉 Validates numeric input (allows numbers & decimal points).
-   */
-  validateNumber(event: KeyboardEvent): void {
-    const pattern = /^[0-9.]$/;
-    const inputChar = event.key;
-
-    // Prevent input if not a number or dot
-    if (!pattern.test(inputChar)) {
-      event.preventDefault();
-    }
+    control.setValue(formattedValue, { emitEvent: false });
   }
 
   /**
