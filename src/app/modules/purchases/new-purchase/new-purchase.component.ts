@@ -26,6 +26,7 @@ import { IReadClientModel } from '../../shared/interfaces/client.interface';
 import { IReadShrimpFarmModel } from '../../shared/interfaces/shrimp-farm.interface';
 import { ShrimpFarmService } from '../../shared/services/shrimp-farm.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FormUtilsService } from 'src/app/utils/form-utils.service';
 
 type Tabs = 'Details' | 'Payment Info';
 
@@ -67,6 +68,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     private clientService: ClientService,
     private shrimpFarmService: ShrimpFarmService,
     private modalService: NgbModal,
+    private formUtils: FormUtilsService,
     private route: ActivatedRoute,
     private router: Router,
     private changeDetectorRef: ChangeDetectorRef
@@ -194,7 +196,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       id: this.purchaseId || null, // Check if it's an update
       purchaseDate: form.controls.purchaseDate?.value,
       hasInvoice: form.controls.hasInvoice?.value,
-      invoiceNumber: form.controls.invoiceNumber?.value || null,
+      invoice: form.controls.invoiceNumber?.value || null,
       buyer: form.controls.buyer?.value,
       company: form.controls.company?.value,
       broker: form.controls.broker?.value,
@@ -251,33 +253,9 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     this.router.navigate(['clients']);
   }
 
-  preventNegative(event: KeyboardEvent): void {
-    // Prevents negative numbers from being typed
-    if (event.key === '-' || event.key === 'e') {
-      event.preventDefault();
-    }
-  }
-
-  // 🔹 Ensure valid numeric input
-  validateNumber(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    let value = inputElement.value;
-
-    // 🔸 Remove invalid characters
-    value = value.replace(/[^0-9.]/g, '');
-
-    // 🔸 Prevent multiple decimal points
-    if (value.split('.').length > 2) {
-      value = value.substring(0, value.lastIndexOf('.'));
-    }
-
-    // 🔹 Set the cleaned value back
-    inputElement.value = value;
-  }
-
   onInputChange(): void {
-    // ya tengo pounds
-
+    const avgGrams = this.purchaseForm.controls.averageGrams?.value || 0;
+    const avgGrams2 = this.purchaseForm.controls.averageGrams2?.value || 0;
     const pounds = this.purchaseForm.controls.pounds?.value || 0;
     const pounds2 = this.purchaseForm.controls.pounds2?.value || 0;
     const price = this.purchaseForm.controls.price?.value || 0;
@@ -288,8 +266,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     const subtotal = pounds * price;
     const subtotal2 = pounds2 * price2;
     const grandTotal = subtotal + subtotal2;
-    const sizeInCompany = pounds > 0 ? 1000/pounds : 0;
-    const sizeInCompany2 = pounds2 > 0 ? 1000/pounds2 : 0;
+    const sizeInCompany = avgGrams > 0 ? 1000 / avgGrams : 0;
+    const sizeInCompany2 = avgGrams2 > 0 ? 1000 / avgGrams2 : 0;
 
     // Set calculated values in the form
     this.purchaseForm.controls.totalPounds?.setValue(totalPounds);
@@ -298,6 +276,31 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     this.purchaseForm.controls.grandTotal?.setValue(grandTotal);
     this.purchaseForm.controls.shrimpFarmSize?.setValue(sizeInCompany);
     this.purchaseForm.controls.shrimpFarmSize2?.setValue(sizeInCompany2);
+
+    // Format disabled fields
+    this.formatDecimal('totalPounds');
+    this.formatDecimal('subtotal');
+    this.formatDecimal('subtotal2');
+    this.formatDecimal('grandTotal');
+    this.formatDecimal('shrimpFarmSize');
+    this.formatDecimal('shrimpFarmSize2');
+  }
+
+  /**
+   * 👉 Formats price input value
+   */
+  formatDecimal(controlName: string) {
+    const control = this.purchaseForm.controls[controlName];
+    if (control) {
+      this.formUtils.formatDecimal(control); // ✅ Use utility function
+    }
+  }
+
+  /**
+   * 👉 Validates numeric input (prevents invalid characters)
+   */
+  validateNumber(event: KeyboardEvent) {
+    this.formUtils.validateNumber(event); // ✅ Use utility function
   }
 
   private showSuccessAlert() {

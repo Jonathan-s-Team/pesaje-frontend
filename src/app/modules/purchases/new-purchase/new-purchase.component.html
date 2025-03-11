@@ -176,7 +176,7 @@
             <mat-form-field class="w-100">
               <mat-label>Gramo promedio (g)</mat-label>
               <input matInput type="number" name="averageGrams" ngModel required #averageGrams="ngModel"
-                (keydown)="preventNegative($event)" (input)="validateNumber($event); onInputChange()">
+                (keypress)="validateNumber($event)" (input)="onInputChange()" (blur)="formatDecimal('averageGrams')">
             </mat-form-field>
             <div *ngIf="purchaseForm.submitted && averageGrams.invalid" class="text-danger small">
               Debe ingresar el gramo promedio.
@@ -196,7 +196,7 @@
             <mat-form-field class="w-100">
               <mat-label>Precio ($)</mat-label>
               <input matInput type="number" name="price" ngModel required #price="ngModel"
-                (keydown)="preventNegative($event)" (input)="validateNumber($event); onInputChange()">
+                (keypress)="validateNumber($event)" (input)="onInputChange()" (blur)="formatDecimal('price')">
             </mat-form-field>
             <div *ngIf="purchaseForm.submitted && price.invalid" class="text-danger small">
               Debe ingresar el precio del camarón.
@@ -208,7 +208,7 @@
             <mat-form-field class="w-100">
               <mat-label>Libras compradas (lb)</mat-label>
               <input matInput type="number" name="pounds" ngModel required #pounds="ngModel"
-                (keydown)="preventNegative($event)" (input)="validateNumber($event); onInputChange()">
+                (keypress)="validateNumber($event)" (input)="onInputChange()" (blur)="formatDecimal('pounds')">
             </mat-form-field>
             <div *ngIf="purchaseForm.submitted && pounds.invalid" class="text-danger small">
               Debe ingresar las libras compradas.
@@ -220,7 +220,7 @@
             <mat-form-field class="w-100">
               <mat-label>Gramo promedio 2 (g)</mat-label>
               <input matInput type="number" name="averageGrams2" ngModel #averageGrams2="ngModel"
-                (keydown)="preventNegative($event)" (input)="validateNumber($event); onInputChange()">
+                (keypress)="validateNumber($event)" (input)="onInputChange()" (blur)="formatDecimal('averageGrams2')">
             </mat-form-field>
           </div>
 
@@ -236,8 +236,8 @@
           <div class="col-md-6">
             <mat-form-field class="w-100">
               <mat-label>Precio 2 ($)</mat-label>
-              <input matInput type="number" name="price2" ngModel #price2="ngModel" (keydown)="preventNegative($event)"
-                (input)="validateNumber($event); onInputChange()">
+              <input matInput type="number" name="price2" ngModel #price2="ngModel" (keypress)="validateNumber($event)"
+                (input)="onInputChange()" (blur)="formatDecimal('price2')">
             </mat-form-field>
           </div>
 
@@ -246,7 +246,7 @@
             <mat-form-field class="w-100">
               <mat-label>Libras compradas 2 (lb)</mat-label>
               <input matInput type="number" name="pounds2" ngModel #pounds2="ngModel"
-                (keydown)="preventNegative($event)" (input)="validateNumber($event); onInputChange()">
+                (keypress)="validateNumber($event)" (input)="onInputChange()" (blur)="formatDecimal('pounds2')">
             </mat-form-field>
           </div>
 
@@ -283,13 +283,16 @@
             </mat-form-field>
           </div>
 
-          <!-- Total acordado por el comprador ($) (Enabled) -->
+          <!-- Total acordado por el comprador ($) -->
           <div class="col-md-6">
             <mat-form-field class="w-100">
               <mat-label>Total acordado por el comprador ($)</mat-label>
               <input matInput type="number" name="totalAgreedToPay" ngModel required #totalAgreedToPay="ngModel"
-                (keydown)="preventNegative($event)" (input)="validateNumber($event)">
+                (keypress)="validateNumber($event)" (blur)="formatDecimal('totalAgreedToPay')">
             </mat-form-field>
+            <div *ngIf="purchaseForm.submitted && totalAgreedToPay.invalid" class="text-danger small">
+              Debe ingresar el total acordado.
+            </div>
           </div>
         </div>
       </div>

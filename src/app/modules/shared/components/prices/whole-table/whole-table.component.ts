@@ -112,7 +112,7 @@ export class WholeTableComponent implements OnInit, OnChanges, OnDestroy {
   formatPrice(id: string) {
     const control = this.form.get(id);
     if (control) {
-      this.formUtils.formatPrice(control); // ✅ Use utility function
+      this.formUtils.formatDecimal(control); // ✅ Use utility function
     }
   }
 

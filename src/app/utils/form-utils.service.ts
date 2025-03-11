@@ -8,7 +8,7 @@ export class FormUtilsService {
   /**
    * 👉 Ensures value is properly formatted to 2 decimal places.
    */
-  formatPrice(control: AbstractControl): void {
+  formatDecimal(control: AbstractControl): void {
     if (!control || !control.value) return;
 
     const value = parseFloat(control.value);
