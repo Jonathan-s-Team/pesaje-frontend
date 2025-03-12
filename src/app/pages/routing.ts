@@ -27,6 +27,13 @@ const Routing: Routes = [
       ),
   },
   {
+    path: 'settings',
+    loadChildren: () =>
+      import('../modules/settings/settings.module').then(
+        (m) => m.SettingsModule
+      ),
+  },
+  {
     path: 'prices',
     loadChildren: () =>
       import('./prices/prices.module').then((m) => m.PricesModule),

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Resolve } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UserService } from 'src/app/modules/personal-profile/services/user.service';
+import { UserService } from '../../settings/services/user.service';
 
 @Injectable({
   providedIn: 'root',

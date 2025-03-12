@@ -1,11 +1,11 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
-import { UserService } from '../../../services/user.service';
 import { UserModel } from 'src/app/modules/auth';
 import { ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
-import { IUpdateUserModel } from '../../../interfaces/user.interface';
+import { UserService } from 'src/app/modules/settings/services/user.service';
+import { IUpdateUserModel } from 'src/app/modules/settings/interfaces/user.interface';
 
 @Component({
   selector: 'app-personal-profile-details',

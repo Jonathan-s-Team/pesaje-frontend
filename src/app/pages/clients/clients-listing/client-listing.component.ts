@@ -19,12 +19,11 @@ import {
   IReadClientModel,
 } from 'src/app/modules/shared/interfaces/client.interface';
 import { IRoleModel } from 'src/app/modules/auth/interfaces/role.interface';
-import { ActivatedRoute, Router } from '@angular/router';
-import { IPaymentInfoModel } from 'src/app/modules/shared/interfaces/payment-info.interface';
+import { Router } from '@angular/router';
 import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
 import { ClientService } from '../../../modules/shared/services/client.service';
-import { UserService } from 'src/app/modules/personal-profile/services/user.service';
-import { IReadUserModel } from 'src/app/modules/personal-profile/interfaces/user.interface';
+import { IReadUserModel } from 'src/app/modules/settings/interfaces/user.interface';
+import { UserService } from 'src/app/modules/settings/services/user.service';
 
 @Component({
   selector: 'app-client-listing',

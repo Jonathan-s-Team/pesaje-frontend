@@ -12,11 +12,9 @@ import { NgForm } from '@angular/forms';
 import { distinctUntilChanged, Observable, Subscription } from 'rxjs';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 import { PurchaseService } from '../services/purchase.service';
-import { IReadUserModel } from '../../personal-profile/interfaces/user.interface';
 import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
 import { IRoleModel } from '../../auth/interfaces/role.interface';
 import { AuthService } from '../../auth';
-import { UserService } from '../../personal-profile/services/user.service';
 import { CompanyService } from '../../shared/services/company.service';
 import { BrokerService } from '../../personal-profile/services/broker.service';
 import { IReadBrokerModel } from '../../personal-profile/interfaces/broker.interface';
@@ -31,6 +29,8 @@ import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { AlertService } from 'src/app/utils/alert.service';
 import {PaymentListingComponent} from "../payment-listing/payment-listing.component";
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
+import { IReadUserModel } from '../../settings/interfaces/user.interface';
+import { UserService } from '../../settings/services/user.service';
 
 type Tabs = 'Details' | 'Payment Info';
 
