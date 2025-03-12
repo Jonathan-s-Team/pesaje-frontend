@@ -93,7 +93,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
 
   loadYears() {
     const currentYear = new Date().getFullYear();
-    this.years = Array.from({ length: 4 }, (_, i) => currentYear - i);
+    this.years = Array.from({ length: 3 }, (_, i) => currentYear - 1 + i);
   }
 
   loadCompanies(): void {
