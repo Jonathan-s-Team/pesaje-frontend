@@ -30,6 +30,7 @@ import { ICreatePurchaseModel } from '../interfaces/purchase.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { AlertService } from 'src/app/utils/alert.service';
 import {PaymentListingComponent} from "../payment-listing/payment-listing.component";
+import { DateUtilsService } from 'src/app/utils/date-utils.service';
 
 type Tabs = 'Details' | 'Payment Info';
 
@@ -77,11 +78,18 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
     private alertService: AlertService,
+    private dateUtils: DateUtilsService,
     private route: ActivatedRoute,
     private router: Router,
     private changeDetectorRef: ChangeDetectorRef
   ) {
     this.isLoading$ = this.purchaseService.isLoading$;
+  }
+
+  get purchaseDateFormatted(): string | null {
+    return this.dateUtils.formatDateForInput(
+      this.createPurchaseModel.purchaseDate
+    );
   }
 
   ngOnInit(): void {
@@ -195,6 +203,12 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     }
   }
 
+  onDateChange(event: any): void {
+    if (!event) return;
+
+    this.createPurchaseModel.purchaseDate = this.dateUtils.convertToUTC(event);
+  }
+
   submitForm(): void {
     console.log('Submitting purchase data:', this.createPurchaseModel);
 
@@ -249,21 +263,32 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   onInputChange(): void {
-    const avgGrams = this.createPurchaseModel.averageGrams || 0;
-    const avgGrams2 = this.createPurchaseModel.averageGrams2 || 0;
-    const pounds = this.createPurchaseModel.pounds || 0;
-    const pounds2 = this.createPurchaseModel.pounds2 || 0;
-    const price = this.createPurchaseModel.price || 0;
-    const price2 = this.createPurchaseModel.price2 || 0;
+    const avgGrams = +this.purchaseForm.controls.averageGrams?.value || 0;
+    const avgGrams2 = +this.purchaseForm.controls.averageGrams2?.value || 0;
+    const pounds = +this.purchaseForm.controls.pounds?.value || 0;
+    const pounds2 = +this.purchaseForm.controls.pounds2?.value || 0;
+    const price = +this.purchaseForm.controls.price?.value || 0;
+    const price2 = +this.purchaseForm.controls.price2?.value || 0;
 
     // Calculate values
-    this.createPurchaseModel.totalPounds = pounds + pounds2;
-    this.createPurchaseModel.subtotal = pounds * price;
-    this.createPurchaseModel.subtotal2 = pounds2 * price2;
-    this.createPurchaseModel.grandTotal =
-      this.createPurchaseModel.subtotal + this.createPurchaseModel.subtotal2;
+    const totalPounds = pounds + pounds2;
+    const subtotal = pounds * price;
+    const subtotal2 = pounds2 * price2;
+    const grandTotal = subtotal + subtotal2;
 
-    // Calculate shrimp size in company
+    // Set calculated values in the form
+    this.purchaseForm.controls.totalPounds?.setValue(totalPounds);
+    this.purchaseForm.controls.subtotal?.setValue(subtotal);
+    this.purchaseForm.controls.subtotal2?.setValue(subtotal2);
+    this.purchaseForm.controls.grandTotal?.setValue(grandTotal);
+
+    // Format disabled fields
+    this.formatDecimal('totalPounds');
+    this.formatDecimal('subtotal');
+    this.formatDecimal('subtotal2');
+    this.formatDecimal('grandTotal');
+
+    // Format shrimp size calculations
     this.shrimpFarmSize = this.inputUtils.formatToDecimal(
       avgGrams > 0 ? 1000 / avgGrams : 0
     );

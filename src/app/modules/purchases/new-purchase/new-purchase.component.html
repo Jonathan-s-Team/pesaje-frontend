@@ -30,7 +30,7 @@
           <div class="col-md-6">
             <label for="purchaseDate" class="required fw-semibold fs-6 mb-2">Fecha de la compra</label>
             <input type="date" class="form-control form-control-sm" id="purchaseDate" name="purchaseDate"
-              [(ngModel)]="createPurchaseModel.purchaseDate" required #purchaseDate="ngModel">
+              [ngModel]="purchaseDateFormatted" (ngModelChange)="onDateChange($event)" required #purchaseDate="ngModel">
             <div
               *ngIf="(purchaseForm.submitted || purchaseDate.dirty || purchaseDate.touched) && purchaseDate.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -303,8 +303,7 @@
           <div class="col-md-4">
             <label for="totalPounds" class="fw-semibold fs-6 mb-2">Total (lb) compradas</label>
             <input type="text" id="totalPounds" name="totalPounds" class="form-control"
-              [(ngModel)]="createPurchaseModel.totalPounds" #totalPounds="ngModel" disabled
-              (keypress)="validateNumber($event)" (blur)="formatDecimal('totalPounds')" />
+              [(ngModel)]="createPurchaseModel.totalPounds" #totalPounds="ngModel" disabled />
           </div>
 
           <!-- Subtotal a pagar ($) (Disabled) -->
@@ -313,8 +312,7 @@
             <div class="input-group">
               <span class="input-group-text">$</span>
               <input type="text" id="subtotal" name="subtotal" class="form-control text-end"
-                [(ngModel)]="createPurchaseModel.subtotal" #subtotal="ngModel" disabled
-                (keypress)="validateNumber($event)" (blur)="formatDecimal('subtotal')" />
+                [(ngModel)]="createPurchaseModel.subtotal" #subtotal="ngModel" disabled />
             </div>
           </div>
 
@@ -324,8 +322,7 @@
             <div class="input-group">
               <span class="input-group-text">$</span>
               <input type="text" id="subtotal2" name="subtotal2" class="form-control text-end"
-                [(ngModel)]="createPurchaseModel.subtotal2" #subtotal2="ngModel" disabled
-                (keypress)="validateNumber($event)" (blur)="formatDecimal('subtotal2')" />
+                [(ngModel)]="createPurchaseModel.subtotal2" #subtotal2="ngModel" disabled />
             </div>
           </div>
 
@@ -335,8 +332,7 @@
             <div class="input-group">
               <span class="input-group-text">$</span>
               <input type="text" id="grandTotal" name="grandTotal" class="form-control text-end"
-                [(ngModel)]="createPurchaseModel.grandTotal" #grandTotal="ngModel" disabled
-                (keypress)="validateNumber($event)" (blur)="formatDecimal('grandTotal')" />
+                [(ngModel)]="createPurchaseModel.grandTotal" #grandTotal="ngModel" disabled />
             </div>
           </div>
 

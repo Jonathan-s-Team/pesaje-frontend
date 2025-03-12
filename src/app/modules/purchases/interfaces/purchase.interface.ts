@@ -26,7 +26,7 @@ export interface ICreatePurchaseModel {
   totalAgreedToPay: number;
   hasInvoice: boolean;
   invoice?: string;
-  purchaseDate: Date;
+  purchaseDate: string;
 }
 
 export interface IReadPurchaseModel {
