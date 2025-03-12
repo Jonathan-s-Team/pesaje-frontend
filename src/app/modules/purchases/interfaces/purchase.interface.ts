@@ -1,5 +1,5 @@
 import { IReadBrokerModel } from '../../personal-profile/interfaces/broker.interface';
-import { IReadUserModel } from '../../personal-profile/interfaces/user.interface';
+import { IReadUserModel } from '../../settings/interfaces/user.interface';
 import { IReadClientModel } from '../../shared/interfaces/client.interface';
 import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
 import { IReadPeriodModel } from '../../shared/interfaces/period.interface';
@@ -26,7 +26,7 @@ export interface ICreatePurchaseModel {
   totalAgreedToPay: number;
   hasInvoice: boolean;
   invoice?: string;
-  purchaseDate: Date;
+  purchaseDate: string;
 }
 
 export interface IReadPurchaseModel {

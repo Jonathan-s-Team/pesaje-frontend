@@ -21,10 +21,9 @@ import {
 } from '../../interfaces/broker.interface';
 import { IRoleModel } from 'src/app/modules/auth/interfaces/role.interface';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IPaymentInfoModel } from 'src/app/modules/shared/interfaces/payment-info.interface';
 import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
-import { IReadUserModel } from '../../interfaces/user.interface';
-import { UserService } from '../../services/user.service';
+import { IReadUserModel } from 'src/app/modules/settings/interfaces/user.interface';
+import { UserService } from 'src/app/modules/settings/services/user.service';
 
 @Component({
   selector: 'app-broker-listing',

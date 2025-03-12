@@ -2,7 +2,6 @@ export const PERMISSION_ROUTES = {
   HOME: '/home',
   PERSONAL_PROFILE: {
     MY_PROFILE: '/personal-profile/my-profile',
-    USERS: '/personal-profile/users',
     BROKERS: '/personal-profile/brokers',
   },
   CLIENTS: '/clients',
@@ -10,5 +9,9 @@ export const PERMISSION_ROUTES = {
   PURCHASES: {
     NEW_PURCHASE: '/purchases/new',
     RECENT_PRUCHASES: '/purchases/list',
+  },
+  SETTINGS: {
+    USERS: '/settings/users',
+    CLIENTS: '/settings/clients',
   },
 };

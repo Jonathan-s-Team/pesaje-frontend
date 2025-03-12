@@ -1,7 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { UserService } from '../services/user.service';
+import { Component, OnInit } from '@angular/core';
 import { UserModel } from '../../auth';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
+import { UserService } from '../../settings/services/user.service';
 
 @Component({
   selector: 'app-personal-information',

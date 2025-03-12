@@ -15,9 +15,9 @@ import {
   IReadClientModel,
 } from '../../../modules/shared/interfaces/client.interface';
 import { ClientService } from '../../../modules/shared/services/client.service';
-import { UserService } from '../../../modules/personal-profile/services/user.service';
-import { IReadUserModel } from '../../../modules/personal-profile/interfaces/user.interface';
 import { PERMISSION_ROUTES } from '../../../constants/routes.constants';
+import { IReadUserModel } from 'src/app/modules/settings/interfaces/user.interface';
+import { UserService } from 'src/app/modules/settings/services/user.service';
 
 type Tabs = 'Details' | 'Shrimp Farms' | 'Payment Info';
 
