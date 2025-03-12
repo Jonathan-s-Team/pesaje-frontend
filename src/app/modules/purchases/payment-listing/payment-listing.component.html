@@ -1,8 +1,8 @@
-<ng-template #paymentsModal>
+<ng-template #paymentsModal let-paymentModal>
 <div class="modal-content">
   <div class="modal-header">
     <h4 class="modal-title" id="paymentModal-title">Gestión de Pagos</h4>
-    <!--<button type="button" class="btn-close" aria-label="Cerrar" (click)="modal.dismiss('Cross click')"></button> -->
+    <button type="button" class="btn-close" aria-label="Cerrar" (click)="paymentModal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
     <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
