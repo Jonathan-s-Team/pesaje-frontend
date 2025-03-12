@@ -29,6 +29,7 @@ import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { ICreatePurchaseModel } from '../interfaces/purchase.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { AlertService } from 'src/app/utils/alert.service';
+import {PaymentListingComponent} from "../payment-listing/payment-listing.component";
 
 type Tabs = 'Details' | 'Payment Info';
 
@@ -41,6 +42,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
 
   @ViewChild('purchaseForm') purchaseForm!: NgForm;
+  @ViewChild('paymentsModal') private modalComponent: PaymentListingComponent;
 
   isLoading$: Observable<boolean>;
 
@@ -290,5 +292,13 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */
   ngOnDestroy(): void {
     this.unsubscribe.forEach((sub) => sub.unsubscribe());
+  }
+
+  async openModal() {
+    if (this.modalComponent) {
+      return await this.modalComponent.open();
+    } else {
+      console.error('Modal component is not initialized');
+    }
   }
 }

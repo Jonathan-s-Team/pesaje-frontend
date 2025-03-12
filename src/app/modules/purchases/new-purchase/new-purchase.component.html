@@ -362,13 +362,20 @@
 
 
     <!-- Buttons Section -->
-    <div class="d-flex justify-content-center align-items-center mt-4"> <!-- 🔹 Increased spacing -->
+    <div class="d-flex justify-content-center align-items-center gap-4"> <!-- 🔹 Increased spacing -->
+
+      <!-- Payments List Button -->
+      <button type="button" (click)="openModal()" class="btn btn-primary" [disabled]="isLoading$ | async">
+        Pagos
+      </button>
 
       <!-- Submit Button -->
       <button type="submit" class="btn btn-primary" [disabled]="isLoading$ | async">
         Guardar
       </button>
     </div>
+
+    <app-payment-listing #paymentsModal></app-payment-listing>
 
   </form>
 </div>

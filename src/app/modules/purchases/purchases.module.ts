@@ -15,9 +15,10 @@ import { SharedModule } from '../shared/shared.module';
 import { PurchasesRoutingModule } from './purchases-routing.module';
 import { NewPurchaseComponent } from './new-purchase/new-purchase.component';
 import { MaterialModule } from 'src/app/material.module';
+import { PaymentListingComponent } from './payment-listing/payment-listing.component';
 
 @NgModule({
-  declarations: [NewPurchaseComponent],
+  declarations: [NewPurchaseComponent, PaymentListingComponent],
   imports: [
     CommonModule,
     SharedModule,
