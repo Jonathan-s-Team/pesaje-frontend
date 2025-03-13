@@ -22,7 +22,7 @@ import { ClientService } from '../../shared/services/client.service';
 import { IReadClientModel } from '../../shared/interfaces/client.interface';
 import { IReadShrimpFarmModel } from '../../shared/interfaces/shrimp-farm.interface';
 import { ShrimpFarmService } from '../../shared/services/shrimp-farm.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { ICreatePurchaseModel } from '../interfaces/purchase.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
@@ -44,6 +44,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
   @ViewChild('purchaseForm') purchaseForm!: NgForm;
   @ViewChild('paymentsModal') private modalComponent: PaymentListingComponent;
+  private modalRef: NgbModalRef;
 
   isLoading$: Observable<boolean>;
 
@@ -321,9 +322,16 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
   async openModal() {
     if (this.modalComponent) {
-      return await this.modalComponent.open();
+      this.modalRef = this.modalService.open(this.modalComponent.modalContent, {
+        size: 'lg',
+        centered: true,
+        backdrop: 'static',
+      });
+      this.modalRef.componentInstance.purchaseId = this.purchaseId;
+      return this.modalRef.result;
     } else {
       console.error('Modal component is not initialized');
+      return false;
     }
   }
 }

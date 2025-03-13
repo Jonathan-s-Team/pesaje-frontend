@@ -10,11 +10,11 @@ import {NgForm} from "@angular/forms";
   styleUrls: ['./payment-listing.component.scss']
 })
 export class PaymentListingComponent implements OnInit {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.CLIENTS;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
 
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  @ViewChild('paymentsModal') private modalContent: TemplateRef<PaymentListingComponent>;
+  @ViewChild('paymentsModal') public modalContent: TemplateRef<PaymentListingComponent>;
   private modalRef: NgbModalRef;
 
   datatableConfig: Config = {
@@ -55,29 +55,11 @@ export class PaymentListingComponent implements OnInit {
 
   constructor(private modalService: NgbModal) { }
 
-  ngOnInit(): void {
-  }
-
-  open(): Promise<boolean> {
-    return new Promise<boolean>((resolve) => {
-      if (this.modalContent) {
-        this.modalRef = this.modalService.open(this.modalContent, {
-          size: 'lg',
-          centered: true,
-          backdrop: 'static',
-        });
-        this.modalRef.result.then(resolve, resolve);
-      } else {
-        console.error('Modal content is not initialized');
-        resolve(false);
-      }
-    });
-  }
+  ngOnInit(): void { }
 
   create() {}
   delete(id: string): void {}
   edit(id: string): void {}
-
   onSubmitPayment(event: Event, myForm: NgForm) {}
 
 }
