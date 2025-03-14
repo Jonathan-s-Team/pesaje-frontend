@@ -1,8 +1,11 @@
-import {Component, EventEmitter, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {NgbModal, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
+import {ChangeDetectorRef, Component, EventEmitter, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {PERMISSION_ROUTES} from "../../../constants/routes.constants";
 import {Config} from "datatables.net";
 import {NgForm} from "@angular/forms";
+import {SweetAlertOptions} from "sweetalert2";
+import {PurchasePaymentMethodService} from "../../shared/services/purchase-payment-method.service";
+import {ICreateUpdatePurchasePaymentModel} from "../../shared/interfaces/purchase-payment-method.interface";
+import {SwalComponent} from "@sweetalert2/ngx-sweetalert2";
 
 @Component({
   selector: 'app-payment-listing',
@@ -12,10 +15,15 @@ import {NgForm} from "@angular/forms";
 export class PaymentListingComponent implements OnInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
 
+  isLoading = false;
+
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
+  createPurchasePaymentModel: ICreateUpdatePurchasePaymentModel;
+
   @ViewChild('paymentsModal') public modalContent: TemplateRef<PaymentListingComponent>;
-  private modalRef: NgbModalRef;
+  noticeSwal!: SwalComponent;
+  swalOptions: SweetAlertOptions = {};
 
   datatableConfig: Config = {
     serverSide: false,
@@ -53,13 +61,72 @@ export class PaymentListingComponent implements OnInit {
     },
   };
 
-  constructor(private modalService: NgbModal) { }
+  constructor(
+    private purchasePaymentService: PurchasePaymentMethodService,
+    private cdr: ChangeDetectorRef,
+  ) { }
 
   ngOnInit(): void { }
 
+  loadPurchasePayments(): void {}
   create() {}
   delete(id: string): void {}
   edit(id: string): void {}
-  onSubmitPayment(event: Event, myForm: NgForm) {}
+  onSubmitPayment(event: Event, myForm: NgForm) {
+    if(myForm && myForm.valid) {
+      return
+    }
 
+    this.isLoading = true;
+
+    const successAlert: SweetAlertOptions = {
+      icon: 'success',
+      title: '¡Éxito!',
+      text: '¡Pago creado exitosamente!',
+    };
+
+    const errorAlert: SweetAlertOptions = {
+      icon: 'error',
+      title: '¡Error!',
+      text: 'Hubo un problema al guardar los cambios.',
+    };
+
+    const completeFn = () => {
+      this.isLoading = false;
+    };
+
+    const createFn = () => {
+      this.purchasePaymentService.createPurchasePayment(this.createPurchasePaymentModel).subscribe({
+        next: () => {
+          this.showAlert(successAlert);
+          this.loadPurchasePayments();
+        },
+        error: (error) => {
+          errorAlert.text = 'No se pudo crear el cliente.';
+          this.showAlert(errorAlert);
+          this.isLoading = false;
+        },
+        complete: completeFn,
+      });
+    };
+  }
+
+  showAlert(swalOptions: SweetAlertOptions) {
+    let style = swalOptions.icon?.toString() || 'success';
+    if (swalOptions.icon === 'error') {
+      style = 'danger';
+    }
+    this.swalOptions = Object.assign(
+      {
+        buttonsStyling: false,
+        confirmButtonText: 'Ok, got it!',
+        customClass: {
+          confirmButton: 'btn btn-' + style,
+        },
+      },
+      swalOptions
+    );
+    this.cdr.detectChanges();
+    this.noticeSwal.fire();
+  }
 }
