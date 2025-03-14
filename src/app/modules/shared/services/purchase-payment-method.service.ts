@@ -3,19 +3,20 @@ import {BehaviorSubject, Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {finalize} from "rxjs/operators";
 import {environment} from "../../../../environments/environment";
+import {ICreateUpdatePurchasePaymentModel} from "../interfaces/purchase-payment-method.interface";
 
 const API_PAYMENT_URL = `${environment.apiUrl}/purchase-payment-method`;
 
 @Injectable({
   providedIn: 'root'
 })
-export class PaymentService {
+export class PurchasePaymentMethodService {
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
 
   constructor(private http: HttpClient) { }
 
-  createPayment(
-    paymentData: Partial<any>
+  createPurchasePayment(
+    paymentData: Partial<ICreateUpdatePurchasePaymentModel>
   ): Observable<{ message: string }> {
     this.isLoadingSubject.next(true);
     return this.http
