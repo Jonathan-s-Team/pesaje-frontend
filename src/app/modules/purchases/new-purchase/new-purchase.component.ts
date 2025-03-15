@@ -27,7 +27,7 @@ import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { ICreatePurchaseModel } from '../interfaces/purchase.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { AlertService } from 'src/app/utils/alert.service';
-import {PaymentListingComponent} from "../payment-listing/payment-listing.component";
+import {PurchasePaymentListingComponent} from "../purchase-payment-listing/purchase-payment-listing.component";
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { IReadUserModel } from '../../settings/interfaces/user.interface';
 import { UserService } from '../../settings/services/user.service';
@@ -43,7 +43,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
 
   @ViewChild('purchaseForm') purchaseForm!: NgForm;
-  @ViewChild('paymentsModal') private modalComponent: PaymentListingComponent;
+  @ViewChild('paymentsModal') private modalComponent: PurchasePaymentListingComponent;
   private modalRef: NgbModalRef;
 
   isLoading$: Observable<boolean>;

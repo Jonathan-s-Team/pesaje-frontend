@@ -3,14 +3,14 @@ import {BehaviorSubject, Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {finalize} from "rxjs/operators";
 import {environment} from "../../../../environments/environment";
-import {ICreateUpdatePurchasePaymentModel} from "../interfaces/purchase-payment-method.interface";
+import {ICreateUpdatePurchasePaymentModel} from "../interfaces/purchase-payment.interface";
 
 const API_PAYMENT_URL = `${environment.apiUrl}/purchase-payment-method`;
 
 @Injectable({
   providedIn: 'root'
 })
-export class PurchasePaymentMethodService {
+export class PurchasePaymentService {
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
 
   constructor(private http: HttpClient) { }

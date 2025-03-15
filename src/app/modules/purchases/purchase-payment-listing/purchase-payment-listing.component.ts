@@ -3,16 +3,16 @@ import {PERMISSION_ROUTES} from "../../../constants/routes.constants";
 import {Config} from "datatables.net";
 import {NgForm} from "@angular/forms";
 import {SweetAlertOptions} from "sweetalert2";
-import {PurchasePaymentMethodService} from "../../shared/services/purchase-payment-method.service";
-import {ICreateUpdatePurchasePaymentModel} from "../../shared/interfaces/purchase-payment-method.interface";
+import {PurchasePaymentService} from "../../shared/services/purchase-payment.service";
+import {ICreateUpdatePurchasePaymentModel} from "../../shared/interfaces/purchase-payment.interface";
 import {SwalComponent} from "@sweetalert2/ngx-sweetalert2";
 
 @Component({
-  selector: 'app-payment-listing',
-  templateUrl: './payment-listing.component.html',
-  styleUrls: ['./payment-listing.component.scss']
+  selector: 'app-purchase-payment-listing',
+  templateUrl: './purchase-payment-listing.component.html',
+  styleUrls: ['./purchase-payment-listing.component.scss']
 })
-export class PaymentListingComponent implements OnInit {
+export class PurchasePaymentListingComponent implements OnInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
 
   isLoading = false;
@@ -21,7 +21,7 @@ export class PaymentListingComponent implements OnInit {
 
   createPurchasePaymentModel: ICreateUpdatePurchasePaymentModel;
 
-  @ViewChild('paymentsModal') public modalContent: TemplateRef<PaymentListingComponent>;
+  @ViewChild('paymentsModal') public modalContent: TemplateRef<PurchasePaymentListingComponent>;
   noticeSwal!: SwalComponent;
   swalOptions: SweetAlertOptions = {};
 
@@ -62,7 +62,7 @@ export class PaymentListingComponent implements OnInit {
   };
 
   constructor(
-    private purchasePaymentService: PurchasePaymentMethodService,
+    private purchasePaymentService: PurchasePaymentService,
     private cdr: ChangeDetectorRef,
   ) { }
 
@@ -73,6 +73,7 @@ export class PaymentListingComponent implements OnInit {
   delete(id: string): void {}
   edit(id: string): void {}
   onSubmitPayment(event: Event, myForm: NgForm) {
+    debugger
     if(myForm && myForm.valid) {
       return
     }
@@ -109,6 +110,8 @@ export class PaymentListingComponent implements OnInit {
         complete: completeFn,
       });
     };
+
+    createFn();
   }
 
   showAlert(swalOptions: SweetAlertOptions) {
