@@ -69,7 +69,10 @@ export class PurchasePaymentListingComponent implements OnInit {
   ngOnInit(): void { }
 
   loadPurchasePayments(): void {}
-  create() {}
+  create() {
+    this.createPurchasePaymentModel = {} as ICreateUpdatePurchasePaymentModel;
+
+  }
   delete(id: string): void {}
   edit(id: string): void {}
   onSubmitPayment(event: Event, myForm: NgForm) {

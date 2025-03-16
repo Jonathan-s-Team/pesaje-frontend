@@ -327,7 +327,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
         centered: true,
         backdrop: 'static',
       });
-      this.modalRef.componentInstance.purchaseId = this.purchaseId;
+      //this.modalRef.componentInstance.purchaseId = this.purchaseId;
       return this.modalRef.result;
     } else {
       console.error('Modal component is not initialized');
