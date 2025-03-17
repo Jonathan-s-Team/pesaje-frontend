@@ -66,8 +66,10 @@ export class PurchasePaymentListingComponent implements OnInit {
         title: 'Fecha de Pago',
         data: 'paymentDate',
         render: function (data) {
-          return data ? data : '-';
-        },
+          if (!data) return '-';
+          const date = new Date(data);
+          return date.toLocaleDateString('es-ES');
+        }
       },
     ],
     language: {
