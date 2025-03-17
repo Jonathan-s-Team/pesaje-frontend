@@ -4,7 +4,10 @@ import {Config} from "datatables.net";
 import {NgForm} from "@angular/forms";
 import {SweetAlertOptions} from "sweetalert2";
 import {PurchasePaymentService} from "../../shared/services/purchase-payment.service";
-import {ICreateUpdatePurchasePaymentModel} from "../../shared/interfaces/purchase-payment.interface";
+import {
+  ICreateUpdatePurchasePaymentModel,
+  IPurchasePaymentModel
+} from "../../shared/interfaces/purchase-payment.interface";
 import {SwalComponent} from "@sweetalert2/ngx-sweetalert2";
 import {FormUtilsService} from "../../../utils/form-utils.service";
 import {InputUtilsService} from "../../../utils/input-utils.service";
@@ -22,6 +25,8 @@ import {Subscription} from "rxjs";
 })
 export class PurchasePaymentListingComponent implements OnInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
+  DEFAULT_PURCHASE = '67d352f2e3d7f125a2c0d47d';
+  private unsubscribe: Subscription[] = [];
 
   isLoading = false;
 
@@ -29,6 +34,7 @@ export class PurchasePaymentListingComponent implements OnInit {
 
   createPurchasePaymentModel: ICreateUpdatePurchasePaymentModel;
   purchasePaymentMethodList: IPurchasePaymentMethodModel[];
+  purchasePayments: IPurchasePaymentModel[] = [];
 
   @ViewChild('paymentsModal') public modalContent: TemplateRef<PurchasePaymentListingComponent>;
   @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
@@ -72,11 +78,9 @@ export class PurchasePaymentListingComponent implements OnInit {
     },
   };
 
-  private unsubscribe: Subscription[] = [];
-
   constructor(
     private purchasePaymentService: PurchasePaymentService,
-    private paymentMethodService: PurchasePaymentMethodService,
+    private purchasePaymentMethodService: PurchasePaymentMethodService,
     private cdr: ChangeDetectorRef,
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
@@ -85,10 +89,11 @@ export class PurchasePaymentListingComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadPurchasePaymentsMethods();
+    this.loadPurchasePaymentsById(this.DEFAULT_PURCHASE);
   }
 
   loadPurchasePaymentsMethods(): void {
-    const purchasePaymentsSub = this.paymentMethodService.getAllPaymentsMethods().subscribe({
+    const purchasePaymentMethodsSub = this.purchasePaymentMethodService.getAllPaymentsMethods().subscribe({
       next: (purchasePaymentMethods: IPurchasePaymentMethodModel[]) => {
         this.purchasePaymentMethodList = purchasePaymentMethods;
         this.changeDetectorRef.detectChanges();
@@ -98,10 +103,29 @@ export class PurchasePaymentListingComponent implements OnInit {
       },
     });
 
-    this.unsubscribe.push(purchasePaymentsSub);
+    this.unsubscribe.push(purchasePaymentMethodsSub);
   }
 
-  loadPurchasePayments() {}
+  loadPurchasePaymentsById(purchaseId: string): void {
+    const purchasePaymentMethodsObservable = this.purchasePaymentService.getPurchasePaymentsById(purchaseId)
+
+    const purchasePaymentMethodsSub = purchasePaymentMethodsObservable.subscribe({
+      next: (data) => {
+        this.purchasePayments = data;
+        this.datatableConfig = {
+          ...this.datatableConfig,
+          data: [...this.purchasePayments],
+        }
+      },
+      error: () => {
+        this.showAlert({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo cargar la información de clientes.',
+        });
+      }
+    });
+  }
 
   create() {
     this.createPurchasePaymentModel = {} as ICreateUpdatePurchasePaymentModel;
@@ -119,7 +143,7 @@ export class PurchasePaymentListingComponent implements OnInit {
     const paymentData = {
       ...this.createPurchasePaymentModel,
       amount: +this.createPurchasePaymentModel.amount,
-      purchase: "67d352f2e3d7f125a2c0d47d",
+      purchase: this.DEFAULT_PURCHASE
     };
 
     this.createPurchasePaymentModel.purchase = "67d352f2e3d7f125a2c0d47d";
@@ -144,7 +168,7 @@ export class PurchasePaymentListingComponent implements OnInit {
       this.purchasePaymentService.createPurchasePayment(paymentData).subscribe({
         next: () => {
           this.showAlert(successAlert);
-          this.loadPurchasePayments();
+          this.loadPurchasePaymentsById(this.DEFAULT_PURCHASE);
         },
         error: (error) => {
           errorAlert.text = 'No se pudo crear el cliente.';

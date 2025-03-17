@@ -1,9 +1,13 @@
 import { Injectable } from '@angular/core';
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject, map, Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {finalize} from "rxjs/operators";
 import {environment} from "../../../../environments/environment";
-import {ICreateUpdatePurchasePaymentModel} from "../interfaces/purchase-payment.interface";
+import {
+  ICreateUpdatePurchasePaymentModel,
+  IPurchasePaymentModel,
+  IReadPurchasePaymentModel
+} from "../interfaces/purchase-payment.interface";
 
 const API_PAYMENT_URL = `${environment.apiUrl}/purchase-payment-method`;
 
@@ -24,10 +28,12 @@ export class PurchasePaymentService {
       .pipe(finalize(() => this.isLoadingSubject.next(false)));
   }
 
-  getAllPurchasePayments(): Observable<ICreateUpdatePurchasePaymentModel[]> {
+  getPurchasePaymentsById(purchaseId: string): Observable<IPurchasePaymentModel[]> {
     this.isLoadingSubject.next(true);
     return this.http
-      .get<ICreateUpdatePurchasePaymentModel[]>(`${API_PAYMENT_URL}`)
-      .pipe(finalize(() => this.isLoadingSubject.next(false)));
+      .get<IReadPurchasePaymentModel>(`${API_PAYMENT_URL}?purchaseId=${purchaseId}`)
+      .pipe(
+        map((response) => response.data || []),
+        finalize(() => this.isLoadingSubject.next(false)));
   }
 }
