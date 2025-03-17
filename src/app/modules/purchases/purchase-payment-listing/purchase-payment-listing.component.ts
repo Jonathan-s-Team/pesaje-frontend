@@ -6,6 +6,8 @@ import {SweetAlertOptions} from "sweetalert2";
 import {PurchasePaymentService} from "../../shared/services/purchase-payment.service";
 import {ICreateUpdatePurchasePaymentModel} from "../../shared/interfaces/purchase-payment.interface";
 import {SwalComponent} from "@sweetalert2/ngx-sweetalert2";
+import {FormUtilsService} from "../../../utils/form-utils.service";
+import {InputUtilsService} from "../../../utils/input-utils.service";
 
 @Component({
   selector: 'app-purchase-payment-listing',
@@ -23,6 +25,7 @@ export class PurchasePaymentListingComponent implements OnInit {
 
   @ViewChild('paymentsModal') public modalContent: TemplateRef<PurchasePaymentListingComponent>;
   @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
+  @ViewChild('paymentForm') paymentForm!: NgForm;
 
   swalOptions: SweetAlertOptions = {};
 
@@ -65,6 +68,8 @@ export class PurchasePaymentListingComponent implements OnInit {
   constructor(
     private purchasePaymentService: PurchasePaymentService,
     private cdr: ChangeDetectorRef,
+    private formUtils: FormUtilsService,
+    private inputUtils: InputUtilsService,
   ) { }
 
   ngOnInit(): void { }
@@ -142,5 +147,16 @@ export class PurchasePaymentListingComponent implements OnInit {
   initialize() {
     this.reloadEvent = new EventEmitter<boolean>();
     this.createPurchasePaymentModel = {} as ICreateUpdatePurchasePaymentModel;
+  }
+
+  formatDecimal(controlName: string) {
+    const control = this.paymentForm.controls[controlName];
+    if (control) {
+      this.formUtils.formatControlToDecimal(control); // ✅ Use utility function
+    }
+  }
+
+  validateNumber(event: KeyboardEvent) {
+    this.inputUtils.validateNumber(event); // ✅ Use utility function
   }
 }
