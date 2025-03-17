@@ -5,18 +5,16 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { Subscription } from 'rxjs';
-import { SweetAlertOptions } from 'sweetalert2';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 import { IReadCompanyModel } from 'src/app/modules/shared/interfaces/company.interface';
 import { CompanyService } from 'src/app/modules/shared/services/company.service';
 import { WholeTableComponent } from 'src/app/modules/shared/components/prices/whole-table/whole-table.component';
 import { HeadlessTableComponent } from 'src/app/modules/shared/components/prices/headless-table/headless-table.component';
 import {
-  ICreatePeriodModel,
   IReadPeriodModel,
   IUpdatePeriodModel,
+  TimeOfDayEnum,
 } from 'src/app/modules/shared/interfaces/period.interface';
 import { PeriodService } from 'src/app/modules/shared/services/period.service';
 import {
@@ -29,6 +27,8 @@ import {
   IUpdateSizePriceModel,
 } from 'src/app/modules/shared/interfaces/size-price.interface';
 import { AlertService } from 'src/app/utils/alert.service';
+import { InputUtilsService } from 'src/app/utils/input-utils.service';
+import { DateUtilsService } from 'src/app/utils/date-utils.service';
 
 @Component({
   selector: 'app-size-price',
@@ -41,36 +41,23 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   @ViewChild(HeadlessTableComponent)
   headlessTableComponent!: HeadlessTableComponent;
 
-  swalOptions: SweetAlertOptions = {};
-
-  months = [
-    { label: 'Enero', value: '01' },
-    { label: 'Febrero', value: '02' },
-    { label: 'Marzo', value: '03' },
-    { label: 'Abril', value: '04' },
-    { label: 'Mayo', value: '05' },
-    { label: 'Junio', value: '06' },
-    { label: 'Julio', value: '07' },
-    { label: 'Agosto', value: '08' },
-    { label: 'Septiembre', value: '09' },
-    { label: 'Octubre', value: '10' },
-    { label: 'Noviembre', value: '11' },
-    { label: 'Diciembre', value: '12' },
-  ];
   years: number[] = [];
   companies: IReadCompanyModel[] = [];
   existingPeriods: IReadPeriodModel[] = [];
 
   selectedPeriod = '';
   selectedCompany = '';
-  selectedMonth = '';
   selectedYear = '';
+  periodNumber = '';
 
-  receivedDate: Date | null = null;
+  fromDate: string = '';
+  timeOfDay: TimeOfDayEnum | '';
+  receivedDate: string = '';
   receivedTime: string = '';
 
   isAdding = false;
   isEditing = false;
+  isSearching = false;
   showEditButton = false;
   showErrors = false;
 
@@ -83,6 +70,8 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     private companyService: CompanyService,
     private periodService: PeriodService,
     private alertService: AlertService,
+    private inputUtils: InputUtilsService,
+    private dateUtils: DateUtilsService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -133,6 +122,8 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   }
 
   search() {
+    this.isSearching = true;
+
     if (!this.selectedCompany || !this.selectedPeriod) {
       this.showErrors = true;
       return;
@@ -156,7 +147,16 @@ export class SizePriceComponent implements OnInit, OnDestroy {
           ) || []),
         ];
 
-        this.setReceivedDateTime(periodDetails.receivedDateTime);
+        const { date, time } = this.dateUtils.parseISODateTime(
+          periodDetails.receivedDateTime
+        );
+        this.receivedDate = date;
+        this.receivedTime = time;
+
+        this.fromDate = this.dateUtils.formatISOToDateInput(
+          periodDetails.fromDate
+        );
+        this.timeOfDay = periodDetails.timeOfDay;
 
         if (this.wholeTableComponent) {
           this.wholeTableComponent.disableForm();
@@ -178,11 +178,12 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     this.isAdding = !this.isAdding;
 
     this.selectedCompany = '';
-    this.selectedMonth = '';
     this.selectedYear = '';
     this.selectedPeriod = '';
-    this.receivedDate = null;
+    this.receivedDate = '';
     this.receivedTime = '';
+    this.fromDate = '';
+    this.timeOfDay = '';
     this.showErrors = false;
     this.showEditButton = false;
 
@@ -252,7 +253,12 @@ export class SizePriceComponent implements OnInit, OnDestroy {
 
   savePeriod() {
     const periodPayload: IUpdatePeriodModel = {
-      receivedDateTime: this.getReceivedDateTime(),
+      receivedDateTime: this.dateUtils.toISODateTime(
+        this.receivedDate,
+        this.receivedTime
+      ),
+      fromDate: this.dateUtils.convertLocalDateToUTC(this.fromDate),
+      timeOfDay: this.timeOfDay as TimeOfDayEnum,
       sizePrices: [
         ...this.extractSizePrices(this.wholeTableComponent),
         ...this.extractSizePrices(this.headlessTableComponent),
@@ -286,8 +292,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
       // ✅ Create new period
       const createPeriodSub = this.periodService
         .createPeriod({
-          name: `${this.selectedMonth}-${this.selectedYear}`,
-          receivedDateTime: this.getReceivedDateTime(),
+          name: `${this.periodNumber}/${this.selectedYear}`,
           company: this.selectedCompany,
           ...periodPayload,
         })
@@ -314,19 +319,25 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   }
 
   confirmSave() {
+    this.isSearching = false;
+
     if (this.isEditing) {
       this.showErrors =
         !this.selectedCompany ||
         !this.selectedPeriod ||
         !this.receivedDate ||
-        !this.receivedTime;
+        !this.receivedTime ||
+        !this.fromDate ||
+        !this.timeOfDay;
     } else {
       this.showErrors =
         !this.selectedCompany ||
-        !this.selectedMonth ||
         !this.selectedYear ||
+        !this.periodNumber ||
         !this.receivedDate ||
-        !this.receivedTime;
+        !this.receivedTime ||
+        !this.fromDate ||
+        !this.timeOfDay;
     }
 
     // ✅ Trigger form validation checks
@@ -366,6 +377,13 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * 👉 Validates numeric input (prevents invalid characters)
+   */
+  validateNumber(event: KeyboardEvent) {
+    this.inputUtils.validateNumber(event); // ✅ Use utility function
+  }
+
   private getSizeControlKey(size: IReadSizeModel): string {
     switch (size.type) {
       case SizeTypeEnum['TAIL-A']:
@@ -377,44 +395,6 @@ export class SizePriceComponent implements OnInit, OnDestroy {
       default:
         return size.id;
     }
-  }
-
-  /**
-   * 👉 Method to set date & time from an ISO datetime string
-   */
-  private setReceivedDateTime(isoString: string): void {
-    this.receivedDate = null;
-    this.receivedTime = '';
-
-    if (!isoString) return;
-
-    const dateObj = new Date(isoString); // Convert ISO string to Date object
-
-    // Extract date (YYYY-MM-DD)
-    this.receivedDate = new Date(
-      dateObj.getFullYear(),
-      dateObj.getMonth(),
-      dateObj.getDate()
-    );
-
-    // Extract time (HH:mm)
-    const hours = dateObj.getHours().toString().padStart(2, '0'); // Ensure 2 digits
-    const minutes = dateObj.getMinutes().toString().padStart(2, '0');
-    this.receivedTime = `${hours}:${minutes}`;
-  }
-
-  /**
-   * 👉 Returns a formatted ISO 8601 string combining the selected date and time
-   */
-  private getReceivedDateTime(): string {
-    if (!this.receivedDate || !this.receivedTime) return '';
-
-    const date = new Date(this.receivedDate);
-    const [hours, minutes] = this.receivedTime.split(':').map(Number);
-
-    date.setHours(hours, minutes, 0, 0); // Set time on the date object
-
-    return date.toISOString(); // Convert to ISO format
   }
 
   ngOnDestroy(): void {

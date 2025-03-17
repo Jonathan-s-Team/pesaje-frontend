@@ -88,7 +88,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   get purchaseDateFormatted(): string | null {
-    return this.dateUtils.formatDateForInput(
+    return this.dateUtils.formatISOToDateInput(
       this.createPurchaseModel.purchaseDate
     );
   }
@@ -207,7 +207,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   onDateChange(event: any): void {
     if (!event) return;
 
-    this.createPurchaseModel.purchaseDate = this.dateUtils.convertToUTC(event);
+    this.createPurchaseModel.purchaseDate =
+      this.dateUtils.convertLocalDateToUTC(event);
   }
 
   submitForm(): void {

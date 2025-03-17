@@ -35,9 +35,6 @@
   </div>
 </div>
 
-<swal #noticeSwal [swalOptions]="swalOptions">
-</swal>
-
 <ng-template #formModal let-modal>
   <form #myForm="ngForm" (ngSubmit)="onSubmit($event, myForm)">
     <div class="modal-header">
@@ -88,13 +85,9 @@
 
           <!-- Fecha de Nacimiento -->
           <div class="mb-3">
-            <label for="birthDate" class="required fw-semibold fs-6 mb-2">Fecha de Nacimiento</label>
+            <label for="birthDate" class="fw-semibold fs-6 mb-2">Fecha de Nacimiento</label>
             <input type="date" class="form-control" id="birthDate" name="birthDate"
-              [(ngModel)]="createClientModel.person.birthDate" required #birthDate="ngModel">
-            <div *ngIf="(myForm.submitted || birthDate.dirty || birthDate.touched) && birthDate.errors?.['required']"
-              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>La fecha de nacimiento es obligatoria.</div>
-            </div>
+              [(ngModel)]="createClientModel.person.birthDate" #birthDate="ngModel">
             <!-- Si necesitas validar el formato ISO8601, deberás implementar un validador personalizado -->
           </div>
 
@@ -137,13 +130,9 @@
 
           <!-- Correo Electrónico -->
           <div class="mb-3">
-            <label for="email" class="required fw-semibold fs-6 mb-2">Correo Electrónico</label>
+            <label for="email" class="fw-semibold fs-6 mb-2">Correo Electrónico</label>
             <input type="email" class="form-control" id="email" name="email"
-              [(ngModel)]="createClientModel.person.email" required #email="ngModel">
-            <div *ngIf="(myForm.submitted || email.dirty || email.touched) && email.errors?.['required']"
-              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>El correo electrónico es obligatorio.</div>
-            </div>
+              [(ngModel)]="createClientModel.person.email" #email="ngModel">
             <div *ngIf="(myForm.submitted || email.dirty || email.touched) && email.errors?.['email']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div>El correo electrónico no es válido.</div>
@@ -152,26 +141,16 @@
 
           <!-- Contacto de Emergencia -->
           <div class="mb-3">
-            <label for="emergencyContactName" class="required fw-semibold fs-6 mb-2">Contacto de Emergencia</label>
+            <label for="emergencyContactName" class="fw-semibold fs-6 mb-2">Contacto de Emergencia</label>
             <input type="text" class="form-control" id="emergencyContactName" name="emergencyContactName"
-              [(ngModel)]="createClientModel.person.emergencyContactName" required #emergencyContactName="ngModel">
-            <div
-              *ngIf="(myForm.submitted || emergencyContactName.dirty || emergencyContactName.touched) && emergencyContactName.errors?.['required']"
-              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>El nombre del contacto de emergencia es obligatorio.</div>
-            </div>
+              [(ngModel)]="createClientModel.person.emergencyContactName" #emergencyContactName="ngModel">
           </div>
 
           <!-- Teléfono de Emergencia -->
           <div class="mb-3">
-            <label for="emergencyContactPhone" class="required fw-semibold fs-6 mb-2">Teléfono de Emergencia</label>
+            <label for="emergencyContactPhone" class="fw-semibold fs-6 mb-2">Teléfono de Emergencia</label>
             <input type="text" class="form-control" id="emergencyContactPhone" name="emergencyContactPhone"
-              [(ngModel)]="createClientModel.person.emergencyContactPhone" required #emergencyContactPhone="ngModel">
-            <div
-              *ngIf="(myForm.submitted || emergencyContactPhone.dirty || emergencyContactPhone.touched) && emergencyContactPhone.errors?.['required']"
-              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>El teléfono de contacto de emergencia es obligatorio.</div>
-            </div>
+              [(ngModel)]="createClientModel.person.emergencyContactPhone" #emergencyContactPhone="ngModel">
           </div>
 
           <!-- Multi-select de Compradores -->

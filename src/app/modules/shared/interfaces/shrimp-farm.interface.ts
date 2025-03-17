@@ -6,6 +6,7 @@ export interface ICreateShrimpFarmModel {
   distanceToGate: number;
   timeFromPedernales: number;
   client: string;
+  buyerItBelongs: string;
 }
 
 export interface IUpdateShrimpFarmModel {
@@ -15,6 +16,7 @@ export interface IUpdateShrimpFarmModel {
   transportationMethod: TransportationMethodEnum;
   distanceToGate: number;
   timeFromPedernales: number;
+  buyerItBelongs: string;
 }
 
 export interface IReadShrimpFarmModel {
@@ -25,6 +27,7 @@ export interface IReadShrimpFarmModel {
   distanceToGate: number;
   timeFromPedernales: number;
   client: string;
+  buyerItBelongs: string;
   deletedAt: string | null;
   id: string;
 }

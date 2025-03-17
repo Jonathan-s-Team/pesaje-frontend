@@ -4,12 +4,12 @@ export interface IPersonModel {
   names: string;
   lastNames: string;
   identification: string;
-  birthDate: Date;
+  birthDate?: string | null;
   address: string;
   phone?: string;
   mobilePhone: string;
   mobilePhone2?: string;
-  email: string;
-  emergencyContactName: string;
-  emergencyContactPhone: string;
+  email?: string | null;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
 }

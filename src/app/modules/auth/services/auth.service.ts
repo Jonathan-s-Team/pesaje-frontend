@@ -32,6 +32,15 @@ export class AuthService implements OnDestroy {
     this.currentUserSubject.next(user);
   }
 
+  get isOnlyBuyer(): boolean {
+    return (
+      this.currentUserSubject.value!.roles.length > 0 &&
+      this.currentUserSubject.value!.roles.every(
+        (role) => role.name === 'Comprador'
+      )
+    );
+  }
+
   constructor(
     private authHttpService: AuthHTTPService,
     private router: Router,

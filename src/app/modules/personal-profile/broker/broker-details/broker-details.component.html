@@ -15,6 +15,13 @@
         flex-nowrap
       " role="tablist">
 
+      <!-- 🔹 Back Button Tab -->
+      <li class="nav-item">
+        <a class="nav-link cursor-pointer" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i> <!-- FontAwesome icon -->
+        </a>
+      </li>
+
       <li class="nav-item">
         <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Details' }"
           (click)="setActiveTab('Details')" role="tab">
@@ -100,16 +107,10 @@
 
                 <!-- Fecha de Nacimiento -->
                 <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Fecha de Nacimiento</label>
+                  <label class="col-lg-4 col-form-label fw-bold fs-6">Fecha de Nacimiento</label>
                   <div class="col-lg-8 fv-row">
                     <input type="date" class="form-control form-control-lg form-control-solid" name="birthDate"
-                      [(ngModel)]="formattedBirthDate" (ngModelChange)="brokerData.person.birthDate = $event"
-                      #birthDate="ngModel" required>
-                    <div
-                      *ngIf="(brokerForm.submitted || birthDate.dirty || birthDate.touched) && birthDate.errors?.['required']"
-                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                      <div>La fecha de nacimiento es obligatoria.</div>
-                    </div>
+                      [(ngModel)]="formattedBirthDate" (ngModelChange)="onChangeBirthDate($event)" #birthDate="ngModel">
                   </div>
                 </div>
 
@@ -169,15 +170,12 @@
 
                 <!-- Correo Electrónico -->
                 <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Correo Electrónico</label>
+                  <label class="col-lg-4 col-form-label fw-bold fs-6">Correo Electrónico</label>
                   <div class="col-lg-8 fv-row">
                     <input type="email" class="form-control form-control-lg form-control-solid"
                       placeholder="Correo electrónico" name="email" [(ngModel)]="brokerData.person.email"
-                      #email="ngModel" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
-                    <div *ngIf="(brokerForm.submitted || email.dirty || email.touched) && email.errors?.['required']"
-                      class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                      <div>El correo electrónico es obligatorio.</div>
-                    </div>
+                      (ngModelChange)="onChangeEmail($event)" #email="ngModel"
+                      pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
                     <div *ngIf="(brokerForm.submitted || email.dirty || email.touched) && email.errors?.['pattern']"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                       <div>Debe ingresar un correo válido.</div>
@@ -187,20 +185,15 @@
 
                 <!-- Contacto de Emergencia -->
                 <div class="row mb-6">
-                  <label class="col-lg-4 col-form-label required fw-bold fs-6">Contacto de Emergencia</label>
+                  <label class="col-lg-4 col-form-label fw-bold fs-6">Contacto de Emergencia</label>
                   <div class="col-lg-8">
                     <div class="row">
                       <!-- Nombre del contacto -->
                       <div class="col-lg-6 fv-row">
                         <input type="text" class="form-control form-control-lg form-control-solid mb-3"
                           placeholder="Nombre contacto" name="emergencyContactName"
-                          [(ngModel)]="brokerData.person.emergencyContactName" #emergencyContactName="ngModel" required
+                          [(ngModel)]="brokerData.person.emergencyContactName" #emergencyContactName="ngModel"
                           minlength="3">
-                        <div
-                          *ngIf="(brokerForm.submitted || emergencyContactName.dirty || emergencyContactName.touched) && emergencyContactName.errors?.['required']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>El nombre del contacto de emergencia es obligatorio.</div>
-                        </div>
                         <div
                           *ngIf="(brokerForm.submitted || emergencyContactName.dirty || emergencyContactName.touched) && emergencyContactName.errors?.['minlength']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -212,12 +205,7 @@
                         <input type="tel" class="form-control form-control-lg form-control-solid"
                           placeholder="Teléfono contacto" name="emergencyContactPhone"
                           [(ngModel)]="brokerData.person.emergencyContactPhone" #emergencyContactPhone="ngModel"
-                          required pattern="^\+?[0-9\s\-\(\)]{7,15}$">
-                        <div
-                          *ngIf="(brokerForm.submitted || emergencyContactPhone.dirty || emergencyContactPhone.touched) && emergencyContactPhone.errors?.['required']"
-                          class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                          <div>El teléfono del contacto es obligatorio.</div>
-                        </div>
+                          pattern="^\+?[0-9\s\-\(\)]{7,15}$">
                         <div
                           *ngIf="(brokerForm.submitted || emergencyContactPhone.dirty || emergencyContactPhone.touched) && emergencyContactPhone.errors?.['pattern']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">

@@ -5,10 +5,8 @@ import {
   EventEmitter,
   OnDestroy,
   OnInit,
-  ViewChild,
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { Subscription } from 'rxjs';
 import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
@@ -18,12 +16,13 @@ import {
   ICreateUpdateClientModel,
   IReadClientModel,
 } from 'src/app/modules/shared/interfaces/client.interface';
-import { IRoleModel } from 'src/app/modules/auth/interfaces/role.interface';
 import { Router } from '@angular/router';
 import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
 import { ClientService } from '../../../modules/shared/services/client.service';
 import { IReadUserModel } from 'src/app/modules/settings/interfaces/user.interface';
 import { UserService } from 'src/app/modules/settings/services/user.service';
+import { AlertService } from 'src/app/utils/alert.service';
+import { DateUtilsService } from 'src/app/utils/date-utils.service';
 
 @Component({
   selector: 'app-client-listing',
@@ -40,8 +39,6 @@ export class ClientListingComponent
   buyers: IReadUserModel[];
   selectedBuyers: IReadUserModel[] = [];
 
-  roles: IRoleModel[];
-
   private unsubscribe: Subscription[] = [];
 
   // Reload emitter inside datatable
@@ -53,13 +50,6 @@ export class ClientListingComponent
   };
 
   clients: IReadClientModel[] = [];
-
-  // Single model
-  // aBroker: Observable<IReadBrokerModel>;
-
-  @ViewChild('noticeSwal')
-  noticeSwal!: SwalComponent;
-  swalOptions: SweetAlertOptions = {};
 
   datatableConfig: Config = {
     serverSide: false,
@@ -130,6 +120,8 @@ export class ClientListingComponent
     private clientService: ClientService,
     private authService: AuthService,
     private userService: UserService,
+    private alertService: AlertService,
+    private dateUtils: DateUtilsService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -137,11 +129,11 @@ export class ClientListingComponent
   ngAfterViewInit(): void {}
 
   ngOnInit(): void {
-    this.roles = this.authService.currentUserValue?.roles!;
+    this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
-    this.isOnlyBuyer =
-      this.roles.length > 0 &&
-      this.roles.every((role) => role.name === 'Comprador');
+    if (!this.isOnlyBuyer) {
+      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.CLIENTS;
+    }
 
     this.loadUsers();
     this.loadBuyers();
@@ -179,7 +171,7 @@ export class ClientListingComponent
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.showAlert({
+        this.alertService.showAlert({
           icon: 'error',
           title: 'Error',
           text: 'No se pudo cargar la información de clientes.',
@@ -197,7 +189,7 @@ export class ClientListingComponent
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.showAlert({
+        this.alertService.showAlert({
           icon: 'error',
           title: 'Error',
           text: 'No se pudo eliminar el cliente.',
@@ -235,6 +227,12 @@ export class ClientListingComponent
       );
     }
 
+    const convertedDate = this.dateUtils.convertLocalDateToUTC(
+      this.createClientModel.person.birthDate!
+    );
+    this.createClientModel.person.birthDate =
+      convertedDate === '' ? null : convertedDate;
+
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: '¡Éxito!',
@@ -249,17 +247,18 @@ export class ClientListingComponent
 
     const completeFn = () => {
       this.isLoading = false;
+      this.selectedBuyers = [];
     };
 
     const createFn = () => {
       this.clientService.createClient(this.createClientModel).subscribe({
         next: () => {
-          this.showAlert(successAlert);
+          this.alertService.showAlert(successAlert);
           this.loadUsers();
         },
         error: (error) => {
           errorAlert.text = 'No se pudo crear el cliente.';
-          this.showAlert(errorAlert);
+          this.alertService.showAlert(errorAlert);
           this.isLoading = false;
         },
         complete: completeFn,
@@ -267,25 +266,6 @@ export class ClientListingComponent
     };
 
     createFn();
-  }
-
-  showAlert(swalOptions: SweetAlertOptions) {
-    let style = swalOptions.icon?.toString() || 'success';
-    if (swalOptions.icon === 'error') {
-      style = 'danger';
-    }
-    this.swalOptions = Object.assign(
-      {
-        buttonsStyling: false,
-        confirmButtonText: 'Ok, got it!',
-        customClass: {
-          confirmButton: 'btn btn-' + style,
-        },
-      },
-      swalOptions
-    );
-    this.cdr.detectChanges();
-    this.noticeSwal.fire();
   }
 
   ngOnDestroy(): void {
