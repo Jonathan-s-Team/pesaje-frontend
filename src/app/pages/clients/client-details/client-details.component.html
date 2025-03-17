@@ -64,7 +64,7 @@
                       <div class="col-lg-6 fv-row">
                         <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                           placeholder="Nombres" name="names" [(ngModel)]="clientData.person.names" #names="ngModel"
-                          required minlength="3">
+                          required minlength="3" [disabled]="isOnlyBuyer">
                         <div
                           *ngIf="(clientForm.submitted || names.dirty || names.touched) && names.errors?.['required']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -80,7 +80,7 @@
                       <div class="col-lg-6 fv-row">
                         <input type="text" class="form-control form-control-lg form-control-solid"
                           placeholder="Apellidos" name="lastNames" [(ngModel)]="clientData.person.lastNames"
-                          #lastNames="ngModel" required minlength="3">
+                          #lastNames="ngModel" required minlength="3" [disabled]="isOnlyBuyer">
                         <div
                           *ngIf="(clientForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['required']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -102,7 +102,7 @@
                   <div class="col-lg-8 fv-row">
                     <input type="text" class="form-control form-control-lg form-control-solid"
                       placeholder="Identificación" name="identification" [(ngModel)]="clientData.person.identification"
-                      #identification="ngModel" required>
+                      #identification="ngModel" required [disabled]="isOnlyBuyer">
                     <div
                       *ngIf="(clientForm.submitted || identification.dirty || identification.touched) && identification.errors?.['required']"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -116,7 +116,8 @@
                   <label class="col-lg-4 col-form-label fw-bold fs-6">Fecha de Nacimiento</label>
                   <div class="col-lg-8 fv-row">
                     <input type="date" class="form-control form-control-lg form-control-solid" name="birthDate"
-                      [(ngModel)]="formattedBirthDate" (ngModelChange)="onChangeBirthDate($event)" #birthDate="ngModel">
+                      [(ngModel)]="formattedBirthDate" (ngModelChange)="onChangeBirthDate($event)" #birthDate="ngModel"
+                      [disabled]="isOnlyBuyer">
                   </div>
                 </div>
 
@@ -125,7 +126,8 @@
                   <label class="col-lg-4 col-form-label required fw-bold fs-6">Dirección</label>
                   <div class="col-lg-8 fv-row">
                     <input type="text" class="form-control form-control-lg form-control-solid" placeholder="Dirección"
-                      name="address" [(ngModel)]="clientData.person.address" #address="ngModel" required minlength="3">
+                      name="address" [(ngModel)]="clientData.person.address" #address="ngModel" required minlength="3"
+                      [disabled]="isOnlyBuyer">
                     <div
                       *ngIf="(clientForm.submitted || address.dirty || address.touched) && address.errors?.['required']"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -147,13 +149,14 @@
                       <!-- Teléfono fijo (opcional) -->
                       <div class="col-lg-4 fv-row">
                         <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
-                          placeholder="Teléfono fijo" name="phone" [(ngModel)]="clientData.person.phone">
+                          placeholder="Teléfono fijo" name="phone" [(ngModel)]="clientData.person.phone"
+                          [disabled]="isOnlyBuyer">
                       </div>
                       <!-- Celular 1 (requerido) -->
                       <div class="col-lg-4 fv-row">
                         <input type="tel" class="form-control form-control-lg form-control-solid mb-3"
                           placeholder="Celular 1" name="mobilePhone" [(ngModel)]="clientData.person.mobilePhone"
-                          #mobilePhone="ngModel" required pattern="^\+?[0-9\s\-\(\)]{7,15}$">
+                          #mobilePhone="ngModel" required pattern="^\+?[0-9\s\-\(\)]{7,15}$" [disabled]="isOnlyBuyer">
                         <div
                           *ngIf="(clientForm.submitted || mobilePhone.dirty || mobilePhone.touched) && mobilePhone.errors?.['required']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -168,7 +171,8 @@
                       <!-- Celular 2 (opcional) -->
                       <div class="col-lg-4 fv-row">
                         <input type="tel" class="form-control form-control-lg form-control-solid"
-                          placeholder="Celular 2" name="mobilePhone2" [(ngModel)]="clientData.person.mobilePhone2">
+                          placeholder="Celular 2" name="mobilePhone2" [(ngModel)]="clientData.person.mobilePhone2"
+                          [disabled]="isOnlyBuyer">
                       </div>
                     </div>
                   </div>
@@ -181,7 +185,7 @@
                     <input type="email" class="form-control form-control-lg form-control-solid"
                       placeholder="Correo electrónico" name="email" [(ngModel)]="clientData.person.email"
                       (ngModelChange)="onChangeEmail($event)" #email="ngModel"
-                      pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
+                      pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" [disabled]="isOnlyBuyer">
                     <div *ngIf="(clientForm.submitted || email.dirty || email.touched) && email.errors?.['pattern']"
                       class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
                       <div>Debe ingresar un correo válido.</div>
@@ -199,7 +203,7 @@
                         <input type="text" class="form-control form-control-lg form-control-solid mb-3"
                           placeholder="Nombre contacto" name="emergencyContactName"
                           [(ngModel)]="clientData.person.emergencyContactName" #emergencyContactName="ngModel"
-                          minlength="3">
+                          minlength="3" [disabled]="isOnlyBuyer">
                         <div
                           *ngIf="(clientForm.submitted || emergencyContactName.dirty || emergencyContactName.touched) && emergencyContactName.errors?.['minlength']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -212,7 +216,7 @@
                         <input type="tel" class="form-control form-control-lg form-control-solid"
                           placeholder="Teléfono contacto" name="emergencyContactPhone"
                           [(ngModel)]="clientData.person.emergencyContactPhone" #emergencyContactPhone="ngModel"
-                          pattern="^\+?[0-9\s\-\(\)]{7,15}$">
+                          pattern="^\+?[0-9\s\-\(\)]{7,15}$" [disabled]="isOnlyBuyer">
                         <div
                           *ngIf="(clientForm.submitted || emergencyContactPhone.dirty || emergencyContactPhone.touched) && emergencyContactPhone.errors?.['pattern']"
                           class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -231,7 +235,7 @@
                   <div class="form-control p-0 border rounded"
                     [ngClass]="{'is-invalid': (clientForm.submitted || compradores.touched) && compradores.errors?.['required']}">
                     <mat-selection-list id="compradores" name="compradores" class="w-100 d-block" #compradores="ngModel"
-                      [(ngModel)]="selectedBuyers" required>
+                      [(ngModel)]="selectedBuyers" required [disabled]="isOnlyBuyer">
                       <div style="max-height: 200px; overflow-y: auto;">
                         @for (buyer of buyers; track buyer) {
                         <mat-list-option [value]="buyer">
@@ -254,7 +258,8 @@
 
               <!-- Botón para guardar -->
               <div class="card-footer d-flex justify-content-end py-6 px-9">
-                <button type="button" class="btn btn-primary" [disabled]="isLoading$|async" (click)="saveClient()">
+                <button *ngIf="!isOnlyBuyer" type="button" class="btn btn-primary" [disabled]="isLoading$|async"
+                  (click)="saveClient()">
                   <span *ngIf="!(isLoading$|async)">Guardar Cambios</span>
                   <span *ngIf="isLoading$|async" class="indicator-progress">
                     Por favor, espere...
