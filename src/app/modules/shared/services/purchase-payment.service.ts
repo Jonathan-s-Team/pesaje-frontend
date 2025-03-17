@@ -23,4 +23,11 @@ export class PurchasePaymentService {
       .post<{ message: string }>(`${API_PAYMENT_URL}`, paymentData)
       .pipe(finalize(() => this.isLoadingSubject.next(false)));
   }
+
+  getAllPurchasePayments(): Observable<ICreateUpdatePurchasePaymentModel[]> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .get<ICreateUpdatePurchasePaymentModel[]>(`${API_PAYMENT_URL}`)
+      .pipe(finalize(() => this.isLoadingSubject.next(false)));
+  }
 }

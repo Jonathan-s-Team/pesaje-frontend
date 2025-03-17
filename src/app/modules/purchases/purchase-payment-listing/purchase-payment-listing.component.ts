@@ -8,6 +8,12 @@ import {ICreateUpdatePurchasePaymentModel} from "../../shared/interfaces/purchas
 import {SwalComponent} from "@sweetalert2/ngx-sweetalert2";
 import {FormUtilsService} from "../../../utils/form-utils.service";
 import {InputUtilsService} from "../../../utils/input-utils.service";
+import {PurchasePaymentMethodService} from "../../shared/services/payment-method.service";
+import {
+  IPurchasePaymentMethodModel,
+  IReadPurchasePaymentMethodModel
+} from "../../shared/interfaces/payment-method.interface";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-purchase-payment-listing',
@@ -22,6 +28,7 @@ export class PurchasePaymentListingComponent implements OnInit {
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
   createPurchasePaymentModel: ICreateUpdatePurchasePaymentModel;
+  purchasePaymentMethodList: IPurchasePaymentMethodModel[];
 
   @ViewChild('paymentsModal') public modalContent: TemplateRef<PurchasePaymentListingComponent>;
   @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
@@ -65,16 +72,37 @@ export class PurchasePaymentListingComponent implements OnInit {
     },
   };
 
+  private unsubscribe: Subscription[] = [];
+
   constructor(
     private purchasePaymentService: PurchasePaymentService,
+    private paymentMethodService: PurchasePaymentMethodService,
     private cdr: ChangeDetectorRef,
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
+    private changeDetectorRef: ChangeDetectorRef
   ) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.loadPurchasePaymentsMethods();
+  }
 
-  loadPurchasePayments(): void {}
+  loadPurchasePaymentsMethods(): void {
+    const purchasePaymentsSub = this.paymentMethodService.getAllPaymentsMethods().subscribe({
+      next: (purchasePaymentMethods: IPurchasePaymentMethodModel[]) => {
+        this.purchasePaymentMethodList = purchasePaymentMethods;
+        this.changeDetectorRef.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error fetching payment methods:', error);
+      },
+    });
+
+    this.unsubscribe.push(purchasePaymentsSub);
+  }
+
+  loadPurchasePayments() {}
+
   create() {
     this.createPurchasePaymentModel = {} as ICreateUpdatePurchasePaymentModel;
 

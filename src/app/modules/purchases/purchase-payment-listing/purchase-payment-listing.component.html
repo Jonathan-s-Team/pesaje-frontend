@@ -66,8 +66,14 @@
 
           <!-- Tipo de Pago -->
           <div class="mb-3">
-            <label for="lastNames" class="required fw-semibold fs-6 mb-2">Tipo de Pago</label>
-            <input type="text" class="form-control" id="lastNames" name="paymentMethod" [(ngModel)]="createPurchasePaymentModel.paymentMethod" required>
+            <label for="purchasePaymentMethod" class="required fw-semibold fs-6 mb-2">Tipo de Pago</label>
+            <select id="purchasePaymentMethod" name="purchasePaymentMethod" class="form-select form-select-sm" [(ngModel)]="createPurchasePaymentModel.paymentMethod"
+                    #purchasePaymentMethod="ngModel" required>
+              <option [ngValue]="null" disabled selected>Seleccione una opción</option>
+              <option *ngFor="let purchasePaymentMethod of purchasePaymentMethodList" [value]="purchasePaymentMethod.id">
+                {{ purchasePaymentMethod.name }}
+              </option>
+            </select>
             <!--<div *ngIf="(myForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['required']"
                  class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div>Los apellidos son obligatorios.</div>
