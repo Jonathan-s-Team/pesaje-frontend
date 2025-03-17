@@ -50,21 +50,21 @@ export class PurchasePaymentListingComponent implements OnInit {
     columns: [
       {
         title: 'Tipo de Pago',
-        data: 'person.identification',
+        data: 'paymentMethod',
         render: function (data) {
           return data ? data : '-';
         },
       },
       {
         title: 'Monto',
-        data: 'person.mobilePhone',
+        data: 'amount',
         render: function (data) {
           return data ? data : '-';
         },
       },
       {
         title: 'Fecha de Pago',
-        data: 'person.identification',
+        data: 'paymentDate',
         render: function (data) {
           return data ? data : '-';
         },
