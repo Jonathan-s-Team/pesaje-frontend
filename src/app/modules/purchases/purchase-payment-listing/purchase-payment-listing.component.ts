@@ -82,12 +82,17 @@ export class PurchasePaymentListingComponent implements OnInit {
   delete(id: string): void {}
   edit(id: string): void {}
   onSubmitPayment(event: Event, myForm: NgForm) {
-    debugger
     if(myForm && myForm.invalid) {
       return
     }
 
     this.isLoading = true;
+
+    const paymentData = {
+      ...this.createPurchasePaymentModel,
+      amount: +this.createPurchasePaymentModel.amount,
+      purchase: "67d352f2e3d7f125a2c0d47d",
+    };
 
     this.createPurchasePaymentModel.purchase = "67d352f2e3d7f125a2c0d47d";
 
@@ -108,7 +113,7 @@ export class PurchasePaymentListingComponent implements OnInit {
     };
 
     const createFn = () => {
-      this.purchasePaymentService.createPurchasePayment(this.createPurchasePaymentModel).subscribe({
+      this.purchasePaymentService.createPurchasePayment(paymentData).subscribe({
         next: () => {
           this.showAlert(successAlert);
           this.loadPurchasePayments();
