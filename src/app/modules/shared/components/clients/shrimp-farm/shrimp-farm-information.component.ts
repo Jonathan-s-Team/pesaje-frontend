@@ -24,6 +24,9 @@ import {
   TransportationMethodEnum,
 } from '../../../interfaces/shrimp-farm.interface';
 import { ShrimpFarmService } from '../../../services/shrimp-farm.service';
+import { AuthService } from 'src/app/modules/auth';
+import { IReadUserModel } from 'src/app/modules/settings/interfaces/user.interface';
+import { AlertService } from 'src/app/utils/alert.service';
 
 @Component({
   selector: 'app-shrimp-farm-information',
@@ -43,9 +46,12 @@ export class ShrimpFarmInformationComponent
 
   transportationMethods = Object.values(TransportationMethodEnum);
 
-  @Input() clientId?: string;
-  @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
-  swalOptions: SweetAlertOptions = {};
+  buyers: IReadUserModel[];
+  selectedBuyer: IReadUserModel[];
+  isOnlyBuyer = false;
+
+  @Input() clientId: string;
+  @Input() buyersClientBelongs: IReadUserModel[];
 
   datatableConfig: Config = {
     serverSide: false,
@@ -86,7 +92,9 @@ export class ShrimpFarmInformationComponent
   };
 
   constructor(
+    private authService: AuthService,
     private shrimpFarmService: ShrimpFarmService,
+    private alertService: AlertService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {}
@@ -102,6 +110,12 @@ export class ShrimpFarmInformationComponent
       });
     } else {
       this.loadShrimpFarmInfos(); // ✅ Load if personId is provided as input
+    }
+
+    this.isOnlyBuyer = this.authService.isOnlyBuyer;
+
+    if (!this.isOnlyBuyer) {
+      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.CLIENTS;
     }
   }
 
@@ -131,7 +145,7 @@ export class ShrimpFarmInformationComponent
           this.reloadEvent.emit(true);
         },
         error: () => {
-          this.showAlert({
+          this.alertService.showAlert({
             icon: 'error',
             title: 'Error',
             text: 'No se pudo cargar la camaronera.',
@@ -151,7 +165,7 @@ export class ShrimpFarmInformationComponent
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.showAlert({
+        this.alertService.showAlert({
           icon: 'error',
           title: 'Error',
           text: 'No se pudo eliminar la camaronera.',
@@ -188,7 +202,12 @@ export class ShrimpFarmInformationComponent
 
     this.isLoading = true;
 
-    //const isUpdate = !!(this.shrimpFarmInfo as any).id;
+    if (this.isOnlyBuyer) {
+      this.shrimpFarmInfo.buyerItBelongs =
+        this.authService.currentUserValue!.id;
+    } else {
+      this.shrimpFarmInfo.buyerItBelongs = this.selectedBuyer[0].id;
+    }
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
@@ -210,7 +229,7 @@ export class ShrimpFarmInformationComponent
 
     const updateFn = () => {
       const updatePayload: IUpdateShrimpFarmModel = { ...this.shrimpFarmInfo };
-      console.log(updatePayload);
+      console.log(this.shrimpFarmData);
       this.shrimpFarmService
         .updateShrimpFarm(this.shrimpFarmInfo.id, updatePayload)
         .subscribe({
@@ -220,7 +239,7 @@ export class ShrimpFarmInformationComponent
             );
             if (index > -1) this.shrimpFarmData[index] = { ...updatedInfo };
 
-            this.showAlert(successAlert);
+            this.alertService.showAlert(successAlert);
 
             this.datatableConfig = {
               ...this.datatableConfig,
@@ -232,7 +251,7 @@ export class ShrimpFarmInformationComponent
           },
           error: (error) => {
             errorAlert.text = 'No se pudo actualizar la camaronera.';
-            this.showAlert(errorAlert);
+            this.alertService.showAlert(errorAlert);
             this.isLoading = false;
           },
           complete: completeFn,
@@ -243,12 +262,12 @@ export class ShrimpFarmInformationComponent
       const createPayload: ICreateShrimpFarmModel = { ...this.shrimpFarmInfo };
       this.shrimpFarmService.createShrimpFarm(createPayload).subscribe({
         next: () => {
-          this.showAlert(successAlert);
+          this.alertService.showAlert(successAlert);
           this.loadShrimpFarmInfos();
         },
         error: (error) => {
           errorAlert.text = 'No se pudo crear la camaronera.';
-          this.showAlert(errorAlert);
+          this.alertService.showAlert(errorAlert);
           this.isLoading = false;
         },
         complete: completeFn,
@@ -268,21 +287,6 @@ export class ShrimpFarmInformationComponent
       [TransportationMethodEnum.CARBOAT]: 'Carro y Bote',
     };
     return translations[method] || method;
-  }
-
-  // 🔹 Show SweetAlert Message
-  showAlert(swalOptions: SweetAlertOptions): void {
-    this.swalOptions = {
-      buttonsStyling: false,
-      confirmButtonText: 'Ok, entendido!',
-      customClass: {
-        confirmButton:
-          'btn btn-' + (swalOptions.icon === 'error' ? 'danger' : 'primary'),
-      },
-      ...swalOptions,
-    };
-    this.cdr.detectChanges();
-    this.noticeSwal.fire();
   }
 
   ngOnDestroy(): void {

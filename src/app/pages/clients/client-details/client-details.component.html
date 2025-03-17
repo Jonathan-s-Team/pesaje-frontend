@@ -275,7 +275,8 @@
 
       <!-- begin::Shrimp farms Info -->
       <div class="tab-pane" [ngClass]="{ active: activeTab === 'Shrimp Farms' }" *ngIf="activeTab === 'Shrimp Farms'">
-        <app-shrimp-farm-information [clientId]="clientId"></app-shrimp-farm-information>
+        <app-shrimp-farm-information [clientId]="clientId"
+          [buyersClientBelongs]="selectedBuyers"></app-shrimp-farm-information>
       </div>
       <!-- end::Shrimp farms Info -->
 

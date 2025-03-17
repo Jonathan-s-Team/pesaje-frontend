@@ -12,6 +12,7 @@ import { SharedModule as SharedModuleMetronic } from 'src/app/_metronic/shared/s
 import { WholeTableComponent } from './components/prices/whole-table/whole-table.component';
 import { HeadlessTableComponent } from './components/prices/headless-table/headless-table.component';
 import {ShrimpFarmInformationComponent} from "./components/clients/shrimp-farm/shrimp-farm-information.component";
+import { MaterialModule } from 'src/app/material.module';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import {ShrimpFarmInformationComponent} from "./components/clients/shrimp-farm/s
     CommonModule,
     CrudModule,
     FormsModule,
+    MaterialModule,
     ReactiveFormsModule,
     SharedModuleMetronic,
     SweetAlert2Module.forChild(),
