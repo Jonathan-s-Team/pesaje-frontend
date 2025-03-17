@@ -8,7 +8,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { Subscription } from 'rxjs';
 import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
@@ -22,6 +21,8 @@ import {
   IReadUserModel,
 } from '../../interfaces/user.interface';
 import { RoleService } from '../../../shared/services/role.service';
+import { AlertService } from 'src/app/utils/alert.service';
+import { DateUtilsService } from 'src/app/utils/date-utils.service';
 
 @Component({
   selector: 'app-broker-listing',
@@ -48,13 +49,6 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
   } as ICreateUserModel;
 
   users: IReadUserModel[] = [];
-
-  // Single model
-  // aBroker: Observable<IReadBrokerModel>;
-
-  @ViewChild('noticeSwal')
-  noticeSwal!: SwalComponent;
-  swalOptions: SweetAlertOptions = {};
 
   datatableConfig: Config = {
     serverSide: false,
@@ -138,6 +132,8 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private userService: UserService,
+    private alertService: AlertService,
+    private dateUtils: DateUtilsService,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private roleService: RoleService
@@ -165,7 +161,7 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.showAlert({
+        this.alertService.showAlert({
           icon: 'error',
           title: 'Error',
           text: 'No se pudo cargar la información de usuarios.',
@@ -207,7 +203,7 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.showAlert({
+        this.alertService.showAlert({
           icon: 'error',
           title: 'Error',
           text: 'No se pudo eliminar el broker.',
@@ -234,6 +230,12 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.isLoading = true;
 
+    const convertedDate = this.dateUtils.convertLocalDateToUTC(
+      this.userModel.person?.birthDate!
+    );
+    this.userModel.person!.birthDate =
+      convertedDate === '' ? null : convertedDate;
+
     const userPayload: ICreateUserModel = {
       username: this.userModel.username!,
       password: this.userModel.password!,
@@ -255,37 +257,18 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.userService.createUser(userPayload as any).subscribe({
       next: () => {
-        this.showAlert(successAlert);
+        this.alertService.showAlert(successAlert);
         this.loadUsers();
       },
       error: (error) => {
         errorAlert.text = 'No se pudo crear el usuario.';
-        this.showAlert(errorAlert);
+        this.alertService.showAlert(errorAlert);
         this.isLoading = false;
       },
       complete: () => {
         this.isLoading = false;
       },
     });
-  }
-
-  showAlert(swalOptions: SweetAlertOptions) {
-    let style = swalOptions.icon?.toString() || 'success';
-    if (swalOptions.icon === 'error') {
-      style = 'danger';
-    }
-    this.swalOptions = Object.assign(
-      {
-        buttonsStyling: false,
-        confirmButtonText: 'Ok, got it!',
-        customClass: {
-          confirmButton: 'btn btn-' + style,
-        },
-      },
-      swalOptions
-    );
-    this.cdr.detectChanges();
-    this.noticeSwal.fire();
   }
 
   ngOnDestroy(): void {

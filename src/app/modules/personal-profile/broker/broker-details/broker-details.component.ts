@@ -6,7 +6,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BrokerService } from '../../services/broker.service';
 import {
   BuyerModel,
@@ -14,9 +14,10 @@ import {
   IUpdateBrokerModel,
 } from '../../interfaces/broker.interface';
 import { NgForm } from '@angular/forms';
-import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { Observable, Subscription } from 'rxjs';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
+import { DateUtilsService } from 'src/app/utils/date-utils.service';
+import { AlertService } from 'src/app/utils/alert.service';
 
 type Tabs = 'Details' | 'Payment Info';
 
@@ -44,7 +45,10 @@ export class BrokerDetailsComponent
 
   constructor(
     private brokerService: BrokerService,
+    private dateUtils: DateUtilsService,
+    private alertService: AlertService,
     private route: ActivatedRoute,
+    private router: Router,
     private changeDetectorRef: ChangeDetectorRef
   ) {
     this.isLoading$ = this.brokerService.isLoading$;
@@ -70,9 +74,9 @@ export class BrokerDetailsComponent
         this.personId = broker.person?.id ?? '';
 
         if (this.brokerData.person?.birthDate) {
-          this.formattedBirthDate = new Date(this.brokerData.person.birthDate)
-            .toISOString()
-            .split('T')[0];
+          this.formattedBirthDate = this.dateUtils.formatISOToDateInput(
+            this.brokerData.person.birthDate
+          );
         }
 
         this.changeDetectorRef.detectChanges();
@@ -105,43 +109,44 @@ export class BrokerDetailsComponent
       .updateBroker(this.brokerData.id, payload)
       .subscribe({
         next: () => {
-          this.showSuccessAlert();
+          this.alertService.showAlert({
+            title: '¡Éxito!',
+            text: 'Los cambios se guardaron correctamente',
+            icon: 'success',
+            confirmButtonText: 'Aceptar',
+            timer: 5000,
+            timerProgressBar: true,
+          });
         },
         error: (error) => {
           console.error('Error updating broker', error);
-          this.showErrorAlert(error);
+          this.alertService.showAlert({
+            title: 'Error',
+            html: `<strong>${
+              error.message || 'Ocurrió un error inesperado.'
+            }</strong>`,
+            icon: 'error',
+            confirmButtonText: 'Entendido',
+            focusConfirm: false,
+          });
         },
       });
 
     this.unsubscribe.push(updateSub);
   }
 
-  private showSuccessAlert() {
-    const options: SweetAlertOptions = {
-      title: '¡Éxito!',
-      text: 'Los cambios se guardaron correctamente',
-      icon: 'success',
-      confirmButtonText: 'Aceptar',
-      confirmButtonColor: '#3085d6',
-      timer: 5000,
-      timerProgressBar: true,
-    };
-    Swal.fire(options);
+  onChangeBirthDate(value: string) {
+    const convertedDate = this.dateUtils.convertLocalDateToUTC(value);
+    this.brokerData.person.birthDate =
+      convertedDate === '' ? null : convertedDate;
   }
 
-  private showErrorAlert(error: any) {
-    const options: SweetAlertOptions = {
-      title: 'Error',
-      html: `<strong>${
-        error.message || 'Ocurrió un error inesperado.'
-      }</strong>`,
-      icon: 'error',
-      confirmButtonText: 'Entendido',
-      confirmButtonColor: '#d33',
-      showCloseButton: true,
-      focusConfirm: false,
-    };
-    Swal.fire(options);
+  onChangeEmail(value: string): void {
+    this.brokerData.person.email = value.trim() === '' ? null : value;
+  }
+
+  goBack(): void {
+    this.router.navigate(['personal-profile', 'brokers']);
   }
 
   /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */

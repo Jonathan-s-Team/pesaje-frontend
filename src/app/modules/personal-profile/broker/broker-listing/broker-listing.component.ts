@@ -5,10 +5,8 @@ import {
   EventEmitter,
   OnDestroy,
   OnInit,
-  ViewChild,
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { Subscription } from 'rxjs';
 import { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
@@ -19,11 +17,12 @@ import {
   ICreateBrokerModel,
   IReadBrokerModel,
 } from '../../interfaces/broker.interface';
-import { IRoleModel } from 'src/app/modules/auth/interfaces/role.interface';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { IPersonModel } from 'src/app/modules/shared/interfaces/person.interface';
 import { IReadUserModel } from 'src/app/modules/settings/interfaces/user.interface';
 import { UserService } from 'src/app/modules/settings/services/user.service';
+import { AlertService } from 'src/app/utils/alert.service';
+import { DateUtilsService } from 'src/app/utils/date-utils.service';
 
 @Component({
   selector: 'app-broker-listing',
@@ -41,8 +40,6 @@ export class BrokerListingComponent
   buyers: IReadUserModel[];
   selectedBuyer: IReadUserModel[];
 
-  roles: IRoleModel[];
-
   private unsubscribe: Subscription[] = [];
 
   // Reload emitter inside datatable
@@ -53,13 +50,6 @@ export class BrokerListingComponent
   } as ICreateBrokerModel;
 
   brokers: IReadBrokerModel[] = [];
-
-  // Single model
-  // aBroker: Observable<IReadBrokerModel>;
-
-  @ViewChild('noticeSwal')
-  noticeSwal!: SwalComponent;
-  swalOptions: SweetAlertOptions = {};
 
   datatableConfig: Config = {
     serverSide: false,
@@ -137,19 +127,16 @@ export class BrokerListingComponent
     private brokerService: BrokerService,
     private authService: AuthService,
     private userService: UserService,
+    private alertService: AlertService,
+    private dateUtils: DateUtilsService,
     private router: Router,
-    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngAfterViewInit(): void {}
 
   ngOnInit(): void {
-    this.roles = this.authService.currentUserValue?.roles!;
-
-    this.isOnlyBuyer =
-      this.roles.length > 0 &&
-      this.roles.every((role) => role.name === 'Comprador');
+    this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     // Agregar la columna "Comprador" solo si el usuario no es solo Comprador
     if (!this.isOnlyBuyer) {
@@ -198,7 +185,7 @@ export class BrokerListingComponent
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.showAlert({
+        this.alertService.showAlert({
           icon: 'error',
           title: 'Error',
           text: 'No se pudo cargar la información de brokers.',
@@ -216,7 +203,7 @@ export class BrokerListingComponent
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.showAlert({
+        this.alertService.showAlert({
           icon: 'error',
           title: 'Error',
           text: 'No se pudo eliminar el broker.',
@@ -251,6 +238,12 @@ export class BrokerListingComponent
       this.createBrokerModel.buyerItBelongs = this.selectedBuyer[0].id;
     }
 
+    const convertedDate = this.dateUtils.convertLocalDateToUTC(
+      this.createBrokerModel.person.birthDate!
+    );
+    this.createBrokerModel.person.birthDate =
+      convertedDate === '' ? null : convertedDate;
+
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: '¡Éxito!',
@@ -265,17 +258,18 @@ export class BrokerListingComponent
 
     const completeFn = () => {
       this.isLoading = false;
+      this.selectedBuyer = [];
     };
 
     const createFn = () => {
       this.brokerService.createBroker(this.createBrokerModel).subscribe({
         next: () => {
-          this.showAlert(successAlert);
+          this.alertService.showAlert(successAlert);
           this.loadBrokers();
         },
         error: (error) => {
           errorAlert.text = 'No se pudo crear el bròker.';
-          this.showAlert(errorAlert);
+          this.alertService.showAlert(errorAlert);
           this.isLoading = false;
         },
         complete: completeFn,
@@ -283,25 +277,6 @@ export class BrokerListingComponent
     };
 
     createFn();
-  }
-
-  showAlert(swalOptions: SweetAlertOptions) {
-    let style = swalOptions.icon?.toString() || 'success';
-    if (swalOptions.icon === 'error') {
-      style = 'danger';
-    }
-    this.swalOptions = Object.assign(
-      {
-        buttonsStyling: false,
-        confirmButtonText: 'Ok, got it!',
-        customClass: {
-          confirmButton: 'btn btn-' + style,
-        },
-      },
-      swalOptions
-    );
-    this.cdr.detectChanges();
-    this.noticeSwal.fire();
   }
 
   ngOnDestroy(): void {

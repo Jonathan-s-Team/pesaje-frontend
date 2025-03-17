@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
-import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { Observable, Subscription } from 'rxjs';
 import {
   ICreateUpdateClientModel,
@@ -18,6 +17,9 @@ import { ClientService } from '../../../modules/shared/services/client.service';
 import { PERMISSION_ROUTES } from '../../../constants/routes.constants';
 import { IReadUserModel } from 'src/app/modules/settings/interfaces/user.interface';
 import { UserService } from 'src/app/modules/settings/services/user.service';
+import { DateUtilsService } from 'src/app/utils/date-utils.service';
+import { AlertService } from 'src/app/utils/alert.service';
+import { AuthService } from 'src/app/modules/auth';
 
 type Tabs = 'Details' | 'Shrimp Farms' | 'Payment Info';
 
@@ -40,6 +42,8 @@ export class ClientDetailsComponent
   clientId: string = '';
   formattedBirthDate: string = '';
 
+  isOnlyBuyer = false;
+
   /** Propiedades para el multi-select de compradores */
   buyers: IReadUserModel[] = [];
   selectedBuyers: IReadUserModel[] = [];
@@ -49,7 +53,10 @@ export class ClientDetailsComponent
 
   constructor(
     private clientService: ClientService,
+    private authService: AuthService,
     private userService: UserService,
+    private dateUtils: DateUtilsService,
+    private alertService: AlertService,
     private route: ActivatedRoute,
     private router: Router,
     private changeDetectorRef: ChangeDetectorRef
@@ -65,6 +72,12 @@ export class ClientDetailsComponent
       }
     });
     this.unsubscribe.push(routeSub);
+
+    this.isOnlyBuyer = this.authService.isOnlyBuyer;
+
+    if (!this.isOnlyBuyer) {
+      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.CLIENTS;
+    }
   }
 
   ngAfterViewInit(): void {}
@@ -138,19 +151,48 @@ export class ClientDetailsComponent
       .updateClient(this.clientData.id, payload)
       .subscribe({
         next: () => {
-          this.showSuccessAlert();
+          this.alertService.showAlert({
+            title: '¡Éxito!',
+            text: 'Los cambios se guardaron correctamente',
+            icon: 'success',
+            confirmButtonText: 'Aceptar',
+            timer: 5000,
+            timerProgressBar: true,
+          });
         },
         error: (error) => {
-          console.error('Error updating broker', error);
-          this.showErrorAlert(error);
+          console.error('Error updating client', error);
+          this.alertService.showAlert({
+            title: 'Error',
+            html: `<strong>${
+              error.message || 'Ocurrió un error inesperado.'
+            }</strong>`,
+            icon: 'error',
+            confirmButtonText: 'Entendido',
+            focusConfirm: false,
+          });
         },
       });
 
     this.unsubscribe.push(updateSub);
   }
 
+  onChangeBirthDate(value: string) {
+    const convertedDate = this.dateUtils.convertLocalDateToUTC(value);
+    this.clientData.person.birthDate =
+      convertedDate === '' ? null : convertedDate;
+  }
+
+  onChangeEmail(value: string): void {
+    this.clientData.person.email = value.trim() === '' ? null : value;
+  }
+
   goBack(): void {
-    this.router.navigate(['clients']);
+    if (this.isOnlyBuyer) {
+      this.router.navigate(['clients']);
+    } else {
+      this.router.navigate(['settings', 'clients']);
+    }
   }
 
   private processSelectedBuyers(): void {
@@ -163,34 +205,6 @@ export class ClientDetailsComponent
     this.selectedBuyers = this.buyers.filter((buyer) =>
       selectedBuyerIds.has(buyer.id)
     );
-  }
-
-  private showSuccessAlert() {
-    const options: SweetAlertOptions = {
-      title: '¡Éxito!',
-      text: 'Los cambios se guardaron correctamente',
-      icon: 'success',
-      confirmButtonText: 'Aceptar',
-      confirmButtonColor: '#3085d6',
-      timer: 5000,
-      timerProgressBar: true,
-    };
-    Swal.fire(options);
-  }
-
-  private showErrorAlert(error: any) {
-    const options: SweetAlertOptions = {
-      title: 'Error',
-      html: `<strong>${
-        error.message || 'Ocurrió un error inesperado.'
-      }</strong>`,
-      icon: 'error',
-      confirmButtonText: 'Entendido',
-      confirmButtonColor: '#d33',
-      showCloseButton: true,
-      focusConfirm: false,
-    };
-    Swal.fire(options);
   }
 
   /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */

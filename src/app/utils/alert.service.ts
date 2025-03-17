@@ -34,14 +34,17 @@ export class AlertService {
    */
   showAlert(swalOptions: SweetAlertOptions): void {
     let style = swalOptions.icon?.toString() || 'success';
+    let confirmButtonText =
+      swalOptions.confirmButtonText?.toString() || 'Aceptar';
     if (swalOptions.icon === 'error') {
       style = 'danger';
+      confirmButtonText = 'Entendido';
     }
 
     Swal.fire({
       ...swalOptions,
       buttonsStyling: false,
-      confirmButtonText: 'Ok, got it!',
+      confirmButtonText: confirmButtonText,
       customClass: { confirmButton: 'btn btn-' + style },
     });
   }
