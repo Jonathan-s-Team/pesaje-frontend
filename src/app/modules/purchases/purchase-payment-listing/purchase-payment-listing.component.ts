@@ -22,7 +22,8 @@ export class PurchasePaymentListingComponent implements OnInit {
   createPurchasePaymentModel: ICreateUpdatePurchasePaymentModel;
 
   @ViewChild('paymentsModal') public modalContent: TemplateRef<PurchasePaymentListingComponent>;
-  noticeSwal!: SwalComponent;
+  @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
+
   swalOptions: SweetAlertOptions = {};
 
   datatableConfig: Config = {
@@ -77,11 +78,13 @@ export class PurchasePaymentListingComponent implements OnInit {
   edit(id: string): void {}
   onSubmitPayment(event: Event, myForm: NgForm) {
     debugger
-    if(myForm && myForm.valid) {
+    if(myForm && myForm.invalid) {
       return
     }
 
     this.isLoading = true;
+
+    this.createPurchasePaymentModel.purchase = "67d352f2e3d7f125a2c0d47d";
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
@@ -134,5 +137,10 @@ export class PurchasePaymentListingComponent implements OnInit {
     );
     this.cdr.detectChanges();
     this.noticeSwal.fire();
+  }
+
+  initialize() {
+    this.reloadEvent = new EventEmitter<boolean>();
+    this.createPurchasePaymentModel = {} as ICreateUpdatePurchasePaymentModel;
   }
 }

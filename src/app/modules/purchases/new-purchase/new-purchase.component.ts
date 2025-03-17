@@ -322,6 +322,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
   async openModal() {
     if (this.modalComponent) {
+      this.modalComponent.initialize();
+
       this.modalRef = this.modalService.open(this.modalComponent.modalContent, {
         size: 'lg',
         centered: true,

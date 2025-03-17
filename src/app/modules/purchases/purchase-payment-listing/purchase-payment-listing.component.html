@@ -49,6 +49,9 @@
     </div>
 </ng-template>
 
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>
+
 <ng-template #formPaymentModal let-formPaymentModal>
   <form #paymentForm="ngForm" (ngSubmit)="onSubmitPayment($event, paymentForm)">
     <div class="modal-header">
@@ -64,7 +67,7 @@
           <!-- Tipo de Pago -->
           <div class="mb-3">
             <label for="lastNames" class="required fw-semibold fs-6 mb-2">Tipo de Pago</label>
-            <input type="text" class="form-control" id="lastNames" name="lastNames" required>
+            <input type="text" class="form-control" id="lastNames" name="paymentMethod" [(ngModel)]="createPurchasePaymentModel.paymentMethod" required>
             <!--<div *ngIf="(myForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['required']"
                  class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div>Los apellidos son obligatorios.</div>
@@ -74,7 +77,7 @@
           <!-- Monto -->
           <div class="mb-3">
             <label for="lastNames" class="required fw-semibold fs-6 mb-2">Monto</label>
-            <input type="text" class="form-control" id="amount" name="amount" required>
+            <input type="text" class="form-control" id="amount" name="amount" [(ngModel)]="createPurchasePaymentModel.amount" required>
             <!--<div *ngIf="(myForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['required']"
                  class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div>Los apellidos son obligatorios.</div>
@@ -84,7 +87,7 @@
           <!-- Fecha de Pago -->
           <div class="mb-3">
             <label for="lastNames" class="required fw-semibold fs-6 mb-2">Fecha de Pago</label>
-            <input type="text" class="form-control" id="paymentDate" name="paymentDate" required>
+            <input type="text" class="form-control" id="paymentDate" name="paymentDate" [(ngModel)]="createPurchasePaymentModel.paymentDate" required>
             <!--<div *ngIf="(myForm.submitted || lastNames.dirty || lastNames.touched) && lastNames.errors?.['required']"
                  class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div>Los apellidos son obligatorios.</div>
