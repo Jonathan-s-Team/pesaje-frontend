@@ -84,7 +84,7 @@
           <!-- Metodo de Transporte -->
           <div class="fv-row mb-7">
             <label class="required fw-semibold fs-6 mb-2">Método de Transporte</label>
-            <select class="form-control form-control-solid" name="transportationMethod"
+            <select class="form-select form-control-solid" name="transportationMethod"
               [(ngModel)]="shrimpFarmInfo.transportationMethod" #transportationMethod="ngModel" required>
               <option *ngFor="let method of transportationMethods" [value]="method">
                 {{ getTranslatedTransportationMethod(method) }}
@@ -120,9 +120,9 @@
             </div>
           </div>
 
-          <!-- Select de Compradores -->
+          <!-- Single-Select de Compradores -->
           <div *ngIf="!isOnlyBuyer" class="mb-3">
-            <label for="compradores" class="required fw-semibold fs-6 mb-2">Compradores Asociados</label>
+            <label for="compradores" class="required fw-semibold fs-6 mb-2">Comprador Asociado</label>
 
             <!-- Wrapper to make it look like an input -->
             <div class="form-control p-0 border rounded"

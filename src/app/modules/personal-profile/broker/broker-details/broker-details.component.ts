@@ -18,6 +18,9 @@ import { Observable, Subscription } from 'rxjs';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { AlertService } from 'src/app/utils/alert.service';
+import { AuthService } from 'src/app/modules/auth';
+import { IReadUserModel } from 'src/app/modules/settings/interfaces/user.interface';
+import { UserService } from 'src/app/modules/settings/services/user.service';
 
 type Tabs = 'Details' | 'Payment Info';
 
@@ -36,6 +39,11 @@ export class BrokerDetailsComponent
   isLoading$: Observable<boolean>;
   activeTab: Tabs = 'Details';
 
+  isOnlyBuyer = false;
+
+  buyers: IReadUserModel[];
+  selectedBuyer: IReadUserModel[];
+
   brokerData: IReadBrokerModel = {} as IReadBrokerModel;
   personId: string = '';
   formattedBirthDate: string = '';
@@ -45,6 +53,8 @@ export class BrokerDetailsComponent
 
   constructor(
     private brokerService: BrokerService,
+    private authService: AuthService,
+    private userService: UserService,
     private dateUtils: DateUtilsService,
     private alertService: AlertService,
     private route: ActivatedRoute,
@@ -55,6 +65,8 @@ export class BrokerDetailsComponent
   }
 
   ngOnInit(): void {
+    this.isOnlyBuyer = this.authService.isOnlyBuyer;
+
     const routeSub = this.route.paramMap.subscribe((params) => {
       const brokerId = params.get('brokerId');
       if (brokerId) {
@@ -79,6 +91,10 @@ export class BrokerDetailsComponent
           );
         }
 
+        if (!this.isOnlyBuyer) {
+          this.loadBuyersAndSetSelectedBuyer(broker.buyerItBelongs as string);
+        }
+
         this.changeDetectorRef.detectChanges();
       },
       error: (err) => {
@@ -87,6 +103,21 @@ export class BrokerDetailsComponent
     });
 
     this.unsubscribe.push(brokerSub);
+  }
+
+  loadBuyersAndSetSelectedBuyer(buyerId: string) {
+    const userSub = this.userService.getAllUsers(true, 'Comprador').subscribe({
+      next: (users: IReadUserModel[]) => {
+        this.buyers = users;
+        this.selectedBuyer =
+          this.buyers.filter((buyer) => buyer.id === buyerId) || [];
+        this.changeDetectorRef.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error fetching users:', error);
+      },
+    });
+    this.unsubscribe.push(userSub);
   }
 
   setActiveTab(tab: Tabs) {
@@ -98,10 +129,17 @@ export class BrokerDetailsComponent
       return;
     }
 
+    if (this.isOnlyBuyer) {
+      this.brokerData.buyerItBelongs = this.authService.currentUserValue!.id;
+    } else {
+      this.brokerData.buyerItBelongs = this.selectedBuyer.map(
+        (buyer) => buyer.id
+      )[0];
+    }
+
     const payload: IUpdateBrokerModel = {
       id: this.brokerData.id,
-      deletedAt: this.brokerData.deletedAt,
-      buyerItBelongs: (this.brokerData.buyerItBelongs as BuyerModel).id,
+      buyerItBelongs: this.brokerData.buyerItBelongs as string,
       person: this.brokerData.person,
     };
 

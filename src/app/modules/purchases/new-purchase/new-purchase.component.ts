@@ -22,12 +22,12 @@ import { ClientService } from '../../shared/services/client.service';
 import { IReadClientModel } from '../../shared/interfaces/client.interface';
 import { IReadShrimpFarmModel } from '../../shared/interfaces/shrimp-farm.interface';
 import { ShrimpFarmService } from '../../shared/services/shrimp-farm.service';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { ICreatePurchaseModel } from '../interfaces/purchase.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { AlertService } from 'src/app/utils/alert.service';
-import {PurchasePaymentListingComponent} from "../purchase-payment-listing/purchase-payment-listing.component";
+import { PurchasePaymentListingComponent } from '../purchase-payment-listing/purchase-payment-listing.component';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { IReadUserModel } from '../../settings/interfaces/user.interface';
 import { UserService } from '../../settings/services/user.service';
@@ -43,7 +43,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
 
   @ViewChild('purchaseForm') purchaseForm!: NgForm;
-  @ViewChild('paymentsModal') private modalComponent: PurchasePaymentListingComponent;
+  @ViewChild('paymentsModal')
+  private modalComponent: PurchasePaymentListingComponent;
   private modalRef: NgbModalRef;
 
   isLoading$: Observable<boolean>;
@@ -94,11 +95,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.roles = this.authService.currentUserValue?.roles!;
-
-    this.isOnlyBuyer =
-      this.roles.length > 0 &&
-      this.roles.every((role) => role.name === 'Comprador');
+    this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     if (this.isOnlyBuyer) {
       this.createPurchaseModel.buyer = this.authService.currentUserValue?.id!;
@@ -166,8 +163,13 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   loadShrimpFarms(clientId: string): void {
+    let userId: string | undefined = undefined;
+    if (this.isOnlyBuyer) {
+      userId = this.authService.currentUserValue!.id;
+    }
+
     const shrimpFarmSub = this.shrimpFarmService
-      .getFarmsByClient(clientId)
+      .getFarmsByClientAndBuyer(clientId, userId)
       .subscribe({
         next: (farms: IReadShrimpFarmModel[]) => {
           this.shrimpFarmsList = farms;

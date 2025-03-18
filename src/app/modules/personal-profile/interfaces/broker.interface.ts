@@ -6,7 +6,6 @@ export interface ICreateBrokerModel {
 }
 
 export interface IUpdateBrokerModel {
-  deletedAt: string;
   id: string;
   person: IPersonModel;
   buyerItBelongs: string;

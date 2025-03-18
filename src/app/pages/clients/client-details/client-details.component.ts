@@ -142,8 +142,16 @@ export class ClientDetailsComponent
       return;
     }
 
+    if (this.isOnlyBuyer) {
+      this.clientData.buyersItBelongs = [this.authService.currentUserValue!.id];
+    } else {
+      this.clientData.buyersItBelongs = this.selectedBuyers.map(
+        (buyer) => buyer.id
+      );
+    }
+
     const payload: ICreateUpdateClientModel = {
-      buyersItBelongs: this.selectedBuyers.map((buyer) => buyer.id),
+      buyersItBelongs: this.clientData.buyersItBelongs,
       person: this.clientData.person,
     };
 

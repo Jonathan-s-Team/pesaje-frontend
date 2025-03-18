@@ -147,10 +147,11 @@ export class BrokerListingComponent
           return data ? data : '-';
         },
       });
+
+      this.loadBuyers();
     }
 
     this.loadBrokers();
-    this.loadBuyers();
   }
 
   loadBuyers() {

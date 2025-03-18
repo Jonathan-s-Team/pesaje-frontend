@@ -1,13 +1,13 @@
-import {environment} from "../../../../environments/environment";
-import {Injectable} from "@angular/core";
-import {BehaviorSubject, map, Observable} from "rxjs";
-import {HttpClient} from "@angular/common/http";
+import { environment } from '../../../../environments/environment';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, map, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import {
   IUpdateShrimpFarmModel,
   IReadShrimpFarmModel,
-  ICreateShrimpFarmModel
-} from "../interfaces/shrimp-farm.interface";
-import {finalize} from "rxjs/operators";
+  ICreateShrimpFarmModel,
+} from '../interfaces/shrimp-farm.interface';
+import { finalize } from 'rxjs/operators';
 
 const API_SHRIMP_FARM_URL = `${environment.apiUrl}/shrimp-farm`;
 
@@ -33,9 +33,12 @@ export class ShrimpFarmService {
   ): Observable<IReadShrimpFarmModel> {
     this.isLoadingSubject.next(true);
     return this.http
-      .put<{ updatedFarm: IReadShrimpFarmModel }>(`${API_SHRIMP_FARM_URL}/${shrimpFarmId}`, updateData)
+      .put<{ data: IReadShrimpFarmModel }>(
+        `${API_SHRIMP_FARM_URL}/${shrimpFarmId}`,
+        updateData
+      )
       .pipe(
-        map(response => response.updatedFarm),
+        map((response) => response.data),
         finalize(() => this.isLoadingSubject.next(false))
       );
   }
@@ -47,12 +50,24 @@ export class ShrimpFarmService {
       .pipe(finalize(() => this.isLoadingSubject.next(false)));
   }
 
-  getFarmsByClient(clientId: string): Observable<IReadShrimpFarmModel[]> {
+  getFarmsByClientAndBuyer(
+    clientId: string,
+    userId?: string | null // Optional parameter
+  ): Observable<IReadShrimpFarmModel[]> {
     this.isLoadingSubject.next(true);
+
+    // Construct query parameters dynamically
+    let params = `clientId=${clientId}`;
+    if (userId) {
+      params += `&userId=${userId}`;
+    }
+
     return this.http
-      .get<{ ok: boolean; data: IReadShrimpFarmModel[] }>(`${API_SHRIMP_FARM_URL}?clientId=${clientId}`)
+      .get<{ ok: boolean; data: IReadShrimpFarmModel[] }>(
+        `${API_SHRIMP_FARM_URL}?${params}`
+      )
       .pipe(
-        map(response => response.data || []),
+        map((response) => response.data || []),
         finalize(() => this.isLoadingSubject.next(false))
       );
   }
@@ -60,9 +75,11 @@ export class ShrimpFarmService {
   getFarmById(id: string): Observable<IReadShrimpFarmModel> {
     this.isLoadingSubject.next(true);
     return this.http
-      .get<{ ok: boolean; data: IReadShrimpFarmModel }>(`${API_SHRIMP_FARM_URL}/${id}`)
+      .get<{ ok: boolean; data: IReadShrimpFarmModel }>(
+        `${API_SHRIMP_FARM_URL}/${id}`
+      )
       .pipe(
-        map(response => response.data),
+        map((response) => response.data),
         finalize(() => this.isLoadingSubject.next(false))
       );
   }
@@ -70,9 +87,11 @@ export class ShrimpFarmService {
   getAllFarms(includeDeleted: boolean): Observable<IReadShrimpFarmModel[]> {
     this.isLoadingSubject.next(true);
     return this.http
-      .get<{ ok: boolean; data: IReadShrimpFarmModel[] }>(`${API_SHRIMP_FARM_URL}/all?includeDeleted=${includeDeleted}`)
+      .get<{ ok: boolean; data: IReadShrimpFarmModel[] }>(
+        `${API_SHRIMP_FARM_URL}/all?includeDeleted=${includeDeleted}`
+      )
       .pipe(
-        map(response => response.data || []),
+        map((response) => response.data || []),
         finalize(() => this.isLoadingSubject.next(false))
       );
   }
