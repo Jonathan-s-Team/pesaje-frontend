@@ -166,6 +166,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     let userId: string | undefined = undefined;
     if (this.isOnlyBuyer) {
       userId = this.authService.currentUserValue!.id;
+    } else {
+      userId = this.createPurchaseModel.buyer;
     }
 
     const shrimpFarmSub = this.shrimpFarmService
@@ -184,6 +186,10 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   onBuyerChange(event: Event): void {
+    this.createPurchaseModel.broker = '';
+    this.createPurchaseModel.client = '';
+    this.createPurchaseModel.shrimpFarm = '';
+
     const buyerId = (event.target as HTMLSelectElement).value;
     if (buyerId) {
       this.loadBrokers(buyerId); // Load brokers when buyer changes
@@ -192,6 +198,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   onClientChange(event: Event): void {
+    this.createPurchaseModel.shrimpFarm = '';
+
     const clientId = (event.target as HTMLSelectElement).value;
     if (clientId) {
       this.loadShrimpFarms(clientId);
@@ -216,35 +224,36 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   submitForm(): void {
     console.log('Submitting purchase data:', this.createPurchaseModel);
 
-    // if (this.purchaseId) {
-    //   // ✅ Update Purchase if ID exists
-    //   this.purchaseService
-    //     .updatePurchase(this.purchaseId, purchaseData)
-    //     .subscribe({
-    //       next: (response) => {
-    //         console.log('Purchase updated successfully:', response);
-    //         this.showSuccessAlert();
-    //       },
-    //       error: (error) => {
-    //         console.error('Error updating purchase:', error);
-    //         this.showErrorAlert(error);
-    //       },
-    //     });
-    // } else {
-    //   // ✅ Create New Purchase if ID does NOT exist
-    //   this.purchaseService.createPurchase(purchaseData).subscribe({
-    //     next: (response) => {
-    //       console.log('Purchase created successfully:', response);
-    //       this.purchaseId = response.id; // ✅ Store the new ID for future updates
-    //       this.showSuccessAlert();
-    //       form.resetForm(); // Reset form after successful creation
-    //     },
-    //     error: (error) => {
-    //       console.error('Error creating purchase:', error);
-    //       this.showErrorAlert(error);
-    //     },
-    //   });
-    // }
+    if (this.purchaseId) {
+      // ✅ Update Purchase if ID exists
+      this.purchaseService
+        .updatePurchase(this.purchaseId, this.createPurchaseModel)
+        .subscribe({
+          next: (response) => {
+            console.log('Purchase updated successfully:', response);
+            this.alertService.showSuccessAlert({});
+          },
+          error: (error) => {
+            console.error('Error updating purchase:', error);
+            this.alertService.showErrorAlert({ error });
+          },
+        });
+    } else {
+      // ✅ Create New Purchase if ID does NOT exist
+      this.purchaseService.createPurchase(this.createPurchaseModel).subscribe({
+        next: (response) => {
+          this.purchaseId = response.id; // ✅ Store the new ID for future updates
+          this.createPurchaseModel.controlNumber = response.controlNumber;
+          this.createPurchaseModel.status = response.status;
+          this.alertService.showSuccessAlert({});
+          // form.resetForm(); // Reset form after successful creation
+        },
+        error: (error) => {
+          console.error('Error creating purchase:', error);
+          this.alertService.showErrorAlert({ error });
+        },
+      });
+    }
   }
 
   confirmSave(event: Event, form: NgForm): void {
@@ -263,7 +272,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   addNewClient() {
-    this.router.navigate(['clients']);
+    if (this.isOnlyBuyer) this.router.navigate(['clients']);
+    else this.router.navigate(['settings', 'clients']);
   }
 
   onInputChange(): void {

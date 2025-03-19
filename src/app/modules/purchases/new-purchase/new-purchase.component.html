@@ -43,7 +43,7 @@
           <div class="col-md-6">
             <label for="controlNumber" class="fw-semibold fs-6 mb-2">Número de control</label>
             <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
-              disabled />
+              [(ngModel)]="createPurchaseModel.controlNumber" disabled />
           </div>
 
           <!-- Has Invoice Selector & Invoice Number (Second Row) -->
@@ -353,23 +353,22 @@
           </div>
         </div>
       </div>
+
+      <div class="card-footer d-flex justify-content-end py-6 px-9">
+        <!-- Payments List Button -->
+        <button *ngIf="createPurchaseModel.status" type="button" (click)="openModal()" class="btn btn-secondary"
+          [disabled]="isLoading$ | async">
+          Pagos
+        </button>
+
+        <!-- Submit Button -->
+        <button *ngIf="!createPurchaseModel.status" type="submit" class="btn btn-primary"
+          [disabled]="isLoading$ | async">
+          Guardar
+        </button>
+      </div>
     </div>
     <!-- end::Third Section: Details -->
-
-
-    <!-- Buttons Section -->
-    <div class="d-flex justify-content-center align-items-center gap-4"> <!-- 🔹 Increased spacing -->
-
-      <!-- Payments List Button -->
-      <button type="button" (click)="openModal()" class="btn btn-primary" [disabled]="isLoading$ | async">
-        Pagos
-      </button>
-
-      <!-- Submit Button -->
-      <button type="submit" class="btn btn-primary" [disabled]="isLoading$ | async">
-        Guardar
-      </button>
-    </div>
 
     <app-purchase-payment-listing #paymentsModal></app-purchase-payment-listing>
 

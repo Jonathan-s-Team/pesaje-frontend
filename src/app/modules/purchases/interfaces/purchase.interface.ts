@@ -11,7 +11,7 @@ export interface ICreatePurchaseModel {
   period: string;
   broker: string;
   client: string;
-  // status: PurchaseStatusEnum;
+  status?: PurchaseStatusEnum;
   shrimpFarm: string;
   averageGrams: number;
   price: number;
@@ -27,6 +27,7 @@ export interface ICreatePurchaseModel {
   hasInvoice: boolean;
   invoice?: string;
   purchaseDate: string;
+  controlNumber?: number;
 }
 
 export interface IBasePurchaseModel {
@@ -48,6 +49,7 @@ export interface IBasePurchaseModel {
   purchaseDate: string;
   controlNumber: number;
   id: string;
+  controlNumber: number;
 }
 
 export interface IDetailedPurchaseModel extends IBasePurchaseModel {
