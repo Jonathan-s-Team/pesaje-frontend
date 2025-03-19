@@ -29,13 +29,7 @@ export interface ICreatePurchaseModel {
   purchaseDate: string;
 }
 
-export interface IReadPurchaseModel {
-  buyer: IReadUserModel | string;
-  company: IReadCompanyModel | string;
-  period: IReadPeriodModel | string;
-  broker: IReadBrokerModel | string;
-  client: IReadClientModel | string;
-  shrimpFarm: IReadShrimpFarmModel | string;
+export interface IBasePurchaseModel {
   averageGrams: number;
   price: number;
   pounds: number;
@@ -51,7 +45,28 @@ export interface IReadPurchaseModel {
   invoice?: string;
   status: PurchaseStatusEnum;
   deletedAt: string | null;
+  purchaseDate: string;
+  controlNumber: number;
   id: string;
+}
+
+export interface IDetailedPurchaseModel extends IBasePurchaseModel {
+  buyer: IReadUserModel;
+  company: IReadCompanyModel;
+  period?: IReadPeriodModel;
+  broker: IReadBrokerModel;
+  client: IReadClientModel;
+  shrimpFarm: IReadShrimpFarmModel;
+}
+
+export interface IListPurchaseModel extends IBasePurchaseModel {
+  buyer: string;
+  company: string;
+  period?: string;
+  broker: string;
+  client: string;
+  shrimpFarm: string;
+  totalPayed?: number;
 }
 
 export interface IUpdatePurchaseModel {
