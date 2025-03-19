@@ -24,7 +24,10 @@ import { IReadShrimpFarmModel } from '../../shared/interfaces/shrimp-farm.interf
 import { ShrimpFarmService } from '../../shared/services/shrimp-farm.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
-import { ICreatePurchaseModel } from '../interfaces/purchase.interface';
+import {
+  ICreatePurchaseModel,
+  IReadPurchaseModel,
+} from '../interfaces/purchase.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { AlertService } from 'src/app/utils/alert.service';
 import { PurchasePaymentListingComponent } from '../purchase-payment-listing/purchase-payment-listing.component';
@@ -95,7 +98,25 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.purchaseId = this.route.snapshot.paramMap.get('id') || '';
+
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
+
+    if (this.purchaseId) {
+      const purchaseSub = this.purchaseService
+        .getPurchaseById(this.purchaseId)
+        .subscribe({
+          next: (purchase: IReadPurchaseModel) => {
+            this.createPurchaseModel = { ...purchase };
+            this.changeDetectorRef.detectChanges();
+          },
+          error: (error) => {
+            console.error('Error fetching users:', error);
+          },
+        });
+
+      this.unsubscribe.push(purchaseSub);
+    }
 
     if (this.isOnlyBuyer) {
       this.createPurchaseModel.buyer = this.authService.currentUserValue?.id!;
@@ -328,25 +349,33 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     this.inputUtils.validateNumber(event); // ✅ Use utility function
   }
 
+  async openModal(): Promise<any> {
+    // if (!this.modalComponent) {
+    //   console.error('Modal component is not initialized');
+    //   return Promise.reject('Modal component not initialized');
+    // }
+
+    // this.modalComponent.initialize(); // Ensure initialization
+
+    this.modalRef = this.modalService.open(PurchasePaymentListingComponent, {
+      size: 'lg',
+      centered: true,
+      backdrop: 'static',
+    });
+
+    // ✅ Pass purchaseId to the modal instance
+    this.modalRef.componentInstance.purchaseId = this.purchaseId;
+
+    try {
+      return await this.modalRef.result; // ✅ Wait for modal close
+    } catch (error) {
+      console.error('Modal dismissed:', error);
+      return Promise.reject(error); // Handle modal dismissal
+    }
+  }
+
   /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */
   ngOnDestroy(): void {
     this.unsubscribe.forEach((sub) => sub.unsubscribe());
-  }
-
-  async openModal() {
-    if (this.modalComponent) {
-      this.modalComponent.initialize();
-
-      this.modalRef = this.modalService.open(this.modalComponent.modalContent, {
-        size: 'lg',
-        centered: true,
-        backdrop: 'static',
-      });
-      //this.modalRef.componentInstance.purchaseId = this.purchaseId;
-      return this.modalRef.result;
-    } else {
-      console.error('Modal component is not initialized');
-      return false;
-    }
   }
 }

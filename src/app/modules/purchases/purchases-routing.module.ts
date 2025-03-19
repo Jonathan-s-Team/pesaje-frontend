@@ -9,6 +9,10 @@ const routes: Routes = [
     component: NewPurchaseComponent,
   },
   {
+    path: ':id',
+    component: NewPurchaseComponent,
+  },
+  {
     path: 'list',
     component: RecentPurchasesComponent,
   },

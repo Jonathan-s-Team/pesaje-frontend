@@ -2,13 +2,11 @@ import { IReadBrokerModel } from '../../personal-profile/interfaces/broker.inter
 import { IReadUserModel } from '../../settings/interfaces/user.interface';
 import { IReadClientModel } from '../../shared/interfaces/client.interface';
 import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
-import { IReadPeriodModel } from '../../shared/interfaces/period.interface';
 import { IReadShrimpFarmModel } from '../../shared/interfaces/shrimp-farm.interface';
 
 export interface ICreatePurchaseModel {
   buyer: string;
   company: string;
-  period: string;
   broker: string;
   client: string;
   status?: PurchaseStatusEnum;
@@ -47,15 +45,31 @@ export interface IBasePurchaseModel {
   status: PurchaseStatusEnum;
   deletedAt: string | null;
   purchaseDate: string;
-  controlNumber: number;
   id: string;
-  controlNumber: number;
+  controlNumber?: number;
 }
 
 export interface IDetailedPurchaseModel extends IBasePurchaseModel {
   buyer: IReadUserModel;
   company: IReadCompanyModel;
-  period?: IReadPeriodModel;
+  broker: IReadBrokerModel;
+  client: IReadClientModel;
+  shrimpFarm: IReadShrimpFarmModel;
+}
+
+export interface IListPurchaseModel extends IBasePurchaseModel {
+  buyer: string;
+  company: string;
+  period?: string;
+  broker: string;
+  client: string;
+  shrimpFarm: string;
+  totalPayed?: number;
+}
+
+export interface IDetailedPurchaseModel extends IBasePurchaseModel {
+  buyer: IReadUserModel;
+  company: IReadCompanyModel;
   broker: IReadBrokerModel;
   client: IReadClientModel;
   shrimpFarm: IReadShrimpFarmModel;
