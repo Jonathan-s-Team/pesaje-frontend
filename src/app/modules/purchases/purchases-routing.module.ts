@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { NewPurchaseComponent } from './new-purchase/new-purchase.component';
+import {RecentPurchasesComponent} from "./recent-purchases/recent-purchases.component";
 
 const routes: Routes = [
   {
@@ -9,7 +10,7 @@ const routes: Routes = [
   },
   {
     path: 'list',
-    component: NewPurchaseComponent,
+    component: RecentPurchasesComponent,
   },
   { path: '', redirectTo: 'new', pathMatch: 'full' },
   { path: '**', redirectTo: 'new', pathMatch: 'full' },

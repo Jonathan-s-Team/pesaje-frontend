@@ -4,8 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import {
-  ICreatePurchaseModel,
-  IReadPurchaseModel,
+  ICreatePurchaseModel, IDetailedPurchaseModel, IListPurchaseModel,
   IUpdatePurchaseModel,
 } from '../interfaces/purchase.interface';
 
@@ -20,11 +19,11 @@ export class PurchaseService {
 
   createPurchase(
     payload: ICreatePurchaseModel
-  ): Observable<IReadPurchaseModel> {
+  ): Observable<IDetailedPurchaseModel> {
     this.isLoadingSubject.next(true);
 
     return this.http
-      .post<{ data: IReadPurchaseModel }>(`${API_PURCHASE_URL}`, payload)
+      .post<{ data: IDetailedPurchaseModel }>(`${API_PURCHASE_URL}`, payload)
       .pipe(
         map((response) => response.data),
         finalize(() => this.isLoadingSubject.next(false))
@@ -35,7 +34,7 @@ export class PurchaseService {
     userId: string | null,
     periodId: string | null,
     clientId: string | null
-  ): Observable<IReadPurchaseModel[]> {
+  ): Observable<IDetailedPurchaseModel[]> {
     this.isLoadingSubject.next(true);
 
     // Build query parameters dynamically
@@ -45,7 +44,7 @@ export class PurchaseService {
     if (clientId) params.append('clientId', clientId);
 
     return this.http
-      .get<{ ok: boolean; data: IReadPurchaseModel[] }>(
+      .get<{ ok: boolean; data: IDetailedPurchaseModel[] }>(
         `${API_PURCHASE_URL}?${params.toString()}`
       )
       .pipe(
@@ -54,10 +53,10 @@ export class PurchaseService {
       );
   }
 
-  getPurchaseById(id: string): Observable<IReadPurchaseModel> {
+  getPurchaseById(id: string): Observable<IDetailedPurchaseModel> {
     this.isLoadingSubject.next(true);
     return this.http
-      .get<{ ok: boolean; data: IReadPurchaseModel }>(
+      .get<{ ok: boolean; data: IDetailedPurchaseModel }>(
         `${API_PURCHASE_URL}/${id}`
       )
       .pipe(
@@ -66,13 +65,37 @@ export class PurchaseService {
       );
   }
 
+  getPurchaseByParams(
+    includeDeleted: boolean,
+    userId: string | null,
+    clientId: string | null,
+    controlNumber: number | null
+  ): Observable<IListPurchaseModel[]> {
+    this.isLoadingSubject.next(true);
+
+    const params = new URLSearchParams();
+    params.append('includeDeleted', includeDeleted.toString());
+    if (userId) params.append('userId', userId);
+    if (clientId) params.append('clientId', clientId);
+    if (controlNumber !== null) params.append('controlNumber', controlNumber.toString());
+
+    return this.http
+      .get<{ ok: boolean; data: IListPurchaseModel[] }>(
+        `${API_PURCHASE_URL}/by-params?${params.toString()}`
+      )
+      .pipe(
+        map((response) => response.data || []),
+        finalize(() => this.isLoadingSubject.next(false))
+      );
+  }
+
   updatePurchase(
     id: string,
     payload: IUpdatePurchaseModel
-  ): Observable<IReadPurchaseModel> {
+  ): Observable<IDetailedPurchaseModel> {
     this.isLoadingSubject.next(true);
     return this.http
-      .put<{ updatedPurchase: IReadPurchaseModel }>(
+      .put<{ updatedPurchase: IDetailedPurchaseModel }>(
         `${API_PURCHASE_URL}/${id}`,
         payload
       )
