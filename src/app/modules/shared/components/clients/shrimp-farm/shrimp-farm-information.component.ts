@@ -100,6 +100,8 @@ export class ShrimpFarmInformationComponent
   ) {}
 
   ngOnInit(): void {
+    this.isOnlyBuyer = this.authService.isOnlyBuyer;
+
     // If personId is not provided as an input, get it from route resolver
     if (!this.clientId) {
       this.route.data.subscribe((data) => {
@@ -111,8 +113,6 @@ export class ShrimpFarmInformationComponent
     } else {
       this.loadShrimpFarmInfos(); // ✅ Load if personId is provided as input
     }
-
-    this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     if (!this.isOnlyBuyer) {
       this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.CLIENTS;
@@ -131,8 +131,13 @@ export class ShrimpFarmInformationComponent
   loadShrimpFarmInfos(): void {
     if (!this.clientId) return;
 
+    let userId: string | undefined = undefined;
+    if (this.isOnlyBuyer) {
+      userId = this.authService.currentUserValue!.id;
+    }
+
     const paymentSub = this.shrimpFarmService
-      .getFarmsByClient(this.clientId)
+      .getFarmsByClientAndBuyer(this.clientId, userId)
       .subscribe({
         next: (data) => {
           this.shrimpFarmData = data;
@@ -183,6 +188,10 @@ export class ShrimpFarmInformationComponent
     this.shrimpFarmInfo = foundItem
       ? { ...foundItem }
       : ({} as IReadShrimpFarmModel);
+
+    this.selectedBuyer = this.buyersClientBelongs.filter(
+      (buyer) => buyer.id === foundItem?.buyerItBelongs
+    );
   }
 
   // 🔹 Create a new Shrimp Farm Info
@@ -229,7 +238,7 @@ export class ShrimpFarmInformationComponent
 
     const updateFn = () => {
       const updatePayload: IUpdateShrimpFarmModel = { ...this.shrimpFarmInfo };
-      console.log(this.shrimpFarmData);
+
       this.shrimpFarmService
         .updateShrimpFarm(this.shrimpFarmInfo.id, updatePayload)
         .subscribe({
@@ -237,6 +246,7 @@ export class ShrimpFarmInformationComponent
             const index = this.shrimpFarmData.findIndex(
               (item) => item.id === updatedInfo.id
             );
+
             if (index > -1) this.shrimpFarmData[index] = { ...updatedInfo };
 
             this.alertService.showAlert(successAlert);

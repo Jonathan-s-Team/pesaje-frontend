@@ -31,6 +31,7 @@ export class AlertService {
   /**
    * Show a notification alert (Success, Error, Info, etc.)
    * @param swalOptions Custom SweetAlert options
+   * @deprecated This method is deprecated. Use `showErrorAlert({ title, error })` instead.
    */
   showAlert(swalOptions: SweetAlertOptions): void {
     let style = swalOptions.icon?.toString() || 'success';
@@ -46,6 +47,45 @@ export class AlertService {
       buttonsStyling: false,
       confirmButtonText: confirmButtonText,
       customClass: { confirmButton: 'btn btn-' + style },
+    });
+  }
+
+  showSuccessAlert({
+    title = '¡Éxito!',
+    text = 'Los cambios se guardaron correctamente',
+  }: {
+    title?: string;
+    text?: string;
+  }): void {
+    Swal.fire({
+      title: title,
+      text: text,
+      icon: 'success',
+      timer: 5000,
+      timerProgressBar: true,
+      buttonsStyling: false,
+      confirmButtonText: 'Aceptar',
+      customClass: { confirmButton: 'btn btn-success' },
+    });
+  }
+
+  showErrorAlert({
+    title = 'Error',
+    error,
+  }: {
+    title?: string;
+    error?: any;
+  }): void {
+    Swal.fire({
+      title: title,
+      html: `<strong>${
+        error?.message || 'Ocurrió un error inesperado.'
+      }</strong>`,
+      icon: 'error',
+      focusConfirm: false,
+      buttonsStyling: false,
+      confirmButtonText: 'Entendido',
+      customClass: { confirmButton: 'btn btn-danger' },
     });
   }
 }

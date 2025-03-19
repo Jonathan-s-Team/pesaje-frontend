@@ -4,6 +4,7 @@ import {
   Component,
   OnDestroy,
   OnInit,
+  TemplateRef,
   ViewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,12 +23,16 @@ import { ClientService } from '../../shared/services/client.service';
 import { IReadClientModel } from '../../shared/interfaces/client.interface';
 import { IReadShrimpFarmModel } from '../../shared/interfaces/shrimp-farm.interface';
 import { ShrimpFarmService } from '../../shared/services/shrimp-farm.service';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
-import { ICreatePurchaseModel } from '../interfaces/purchase.interface';
+import {
+  IBasePurchaseModel,
+  ICreatePurchaseModel,
+  IListPurchaseModel,
+} from '../interfaces/purchase.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { AlertService } from 'src/app/utils/alert.service';
-import {PurchasePaymentListingComponent} from "../purchase-payment-listing/purchase-payment-listing.component";
+import { PurchasePaymentListingComponent } from '../purchase-payment-listing/purchase-payment-listing.component';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { IReadUserModel } from '../../settings/interfaces/user.interface';
 import { UserService } from '../../settings/services/user.service';
@@ -43,7 +48,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
 
   @ViewChild('purchaseForm') purchaseForm!: NgForm;
-  @ViewChild('paymentsModal') private modalComponent: PurchasePaymentListingComponent;
+
+  @ViewChild('paymentsModal') paymentsModal!: TemplateRef<any>;
   private modalRef: NgbModalRef;
 
   isLoading$: Observable<boolean>;
@@ -94,11 +100,43 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.roles = this.authService.currentUserValue?.roles!;
+    this.purchaseId = this.route.snapshot.paramMap.get('id') || '';
 
-    this.isOnlyBuyer =
-      this.roles.length > 0 &&
-      this.roles.every((role) => role.name === 'Comprador');
+    this.isOnlyBuyer = this.authService.isOnlyBuyer;
+
+    if (this.purchaseId) {
+      const purchaseSub = this.purchaseService
+        .getPurchaseById(this.purchaseId)
+        .subscribe({
+          next: (purchase: IListPurchaseModel) => {
+            this.createPurchaseModel = { ...purchase };
+
+            this.loadBrokers(this.createPurchaseModel.buyer);
+            this.loadClients(this.createPurchaseModel.buyer);
+            this.loadShrimpFarms(this.createPurchaseModel.client);
+
+            // Format shrimp size calculations
+            this.shrimpFarmSize = this.inputUtils.formatToDecimal(
+              this.createPurchaseModel.averageGrams > 0
+                ? 1000 / this.createPurchaseModel.averageGrams
+                : 0
+            );
+            this.shrimpFarmSize2 = this.inputUtils.formatToDecimal(
+              this.createPurchaseModel.averageGrams2 &&
+                this.createPurchaseModel.averageGrams2! > 0
+                ? 1000 / this.createPurchaseModel.averageGrams2!
+                : 0
+            );
+
+            this.changeDetectorRef.detectChanges();
+          },
+          error: (error) => {
+            console.error('Error fetching purchases:', error);
+          },
+        });
+
+      this.unsubscribe.push(purchaseSub);
+    }
 
     if (this.isOnlyBuyer) {
       this.createPurchaseModel.buyer = this.authService.currentUserValue?.id!;
@@ -166,11 +204,27 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   loadShrimpFarms(clientId: string): void {
+    let userId: string | undefined = undefined;
+    if (this.isOnlyBuyer) {
+      userId = this.authService.currentUserValue!.id;
+    } else {
+      userId = this.createPurchaseModel.buyer;
+    }
+
     const shrimpFarmSub = this.shrimpFarmService
-      .getFarmsByClient(clientId)
+      .getFarmsByClientAndBuyer(clientId, userId)
       .subscribe({
         next: (farms: IReadShrimpFarmModel[]) => {
           this.shrimpFarmsList = farms;
+
+          if (this.purchaseId) {
+            const farm = this.shrimpFarmsList.filter(
+              (sf) => sf.id === this.createPurchaseModel.shrimpFarm
+            )[0];
+            if (farm) {
+              this.farmPlace = (farm as IReadShrimpFarmModel).place;
+            }
+          }
           this.changeDetectorRef.detectChanges();
         },
         error: (error) => {
@@ -182,6 +236,10 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   onBuyerChange(event: Event): void {
+    this.createPurchaseModel.broker = '';
+    this.createPurchaseModel.client = '';
+    this.createPurchaseModel.shrimpFarm = '';
+
     const buyerId = (event.target as HTMLSelectElement).value;
     if (buyerId) {
       this.loadBrokers(buyerId); // Load brokers when buyer changes
@@ -190,6 +248,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   onClientChange(event: Event): void {
+    this.createPurchaseModel.shrimpFarm = '';
+
     const clientId = (event.target as HTMLSelectElement).value;
     if (clientId) {
       this.loadShrimpFarms(clientId);
@@ -214,35 +274,36 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   submitForm(): void {
     console.log('Submitting purchase data:', this.createPurchaseModel);
 
-    // if (this.purchaseId) {
-    //   // ✅ Update Purchase if ID exists
-    //   this.purchaseService
-    //     .updatePurchase(this.purchaseId, purchaseData)
-    //     .subscribe({
-    //       next: (response) => {
-    //         console.log('Purchase updated successfully:', response);
-    //         this.showSuccessAlert();
-    //       },
-    //       error: (error) => {
-    //         console.error('Error updating purchase:', error);
-    //         this.showErrorAlert(error);
-    //       },
-    //     });
-    // } else {
-    //   // ✅ Create New Purchase if ID does NOT exist
-    //   this.purchaseService.createPurchase(purchaseData).subscribe({
-    //     next: (response) => {
-    //       console.log('Purchase created successfully:', response);
-    //       this.purchaseId = response.id; // ✅ Store the new ID for future updates
-    //       this.showSuccessAlert();
-    //       form.resetForm(); // Reset form after successful creation
-    //     },
-    //     error: (error) => {
-    //       console.error('Error creating purchase:', error);
-    //       this.showErrorAlert(error);
-    //     },
-    //   });
-    // }
+    if (this.purchaseId) {
+      // ✅ Update Purchase if ID exists
+      this.purchaseService
+        .updatePurchase(this.purchaseId, this.createPurchaseModel)
+        .subscribe({
+          next: (response) => {
+            console.log('Purchase updated successfully:', response);
+            this.alertService.showSuccessAlert({});
+          },
+          error: (error) => {
+            console.error('Error updating purchase:', error);
+            this.alertService.showErrorAlert({ error });
+          },
+        });
+    } else {
+      // ✅ Create New Purchase if ID does NOT exist
+      this.purchaseService.createPurchase(this.createPurchaseModel).subscribe({
+        next: (response) => {
+          this.purchaseId = response.id; // ✅ Store the new ID for future updates
+          this.createPurchaseModel.controlNumber = response.controlNumber;
+          this.createPurchaseModel.status = response.status;
+          this.alertService.showSuccessAlert({});
+          // form.resetForm(); // Reset form after successful creation
+        },
+        error: (error) => {
+          console.error('Error creating purchase:', error);
+          this.alertService.showErrorAlert({ error });
+        },
+      });
+    }
   }
 
   confirmSave(event: Event, form: NgForm): void {
@@ -261,7 +322,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   addNewClient() {
-    this.router.navigate(['clients']);
+    if (this.isOnlyBuyer) this.router.navigate(['clients']);
+    else this.router.navigate(['settings', 'clients']);
   }
 
   onInputChange(): void {
@@ -316,25 +378,40 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     this.inputUtils.validateNumber(event); // ✅ Use utility function
   }
 
-  /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */
-  ngOnDestroy(): void {
-    this.unsubscribe.forEach((sub) => sub.unsubscribe());
-  }
+  async openModal(): Promise<any> {
+    if (this.modalRef) {
+      console.warn(
+        '⚠️ Modal is already open. Ignoring duplicate open request.'
+      );
+      return;
+    }
 
-  async openModal() {
-    if (this.modalComponent) {
-      this.modalComponent.initialize();
+    if (!this.purchaseId) {
+      console.error('❌ purchaseId is missing. Modal cannot be opened.');
+      return;
+    }
 
-      this.modalRef = this.modalService.open(this.modalComponent.modalContent, {
+    if (!this.paymentsModal) {
+      console.error('❌ paymentsModal template is missing.');
+      return;
+    }
+
+    try {
+      this.modalRef = this.modalService.open(this.paymentsModal, {
         size: 'lg',
         centered: true,
         backdrop: 'static',
       });
-      //this.modalRef.componentInstance.purchaseId = this.purchaseId;
-      return this.modalRef.result;
-    } else {
-      console.error('Modal component is not initialized');
-      return false;
+
+      return await this.modalRef.result;
+    } catch (error) {
+      console.error('❌ Modal dismissed:', error);
+      return Promise.reject(error);
     }
+  }
+
+  /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */
+  ngOnDestroy(): void {
+    this.unsubscribe.forEach((sub) => sub.unsubscribe());
   }
 }

@@ -1,31 +1,42 @@
-import {ChangeDetectorRef, Component, EventEmitter, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {PERMISSION_ROUTES} from "../../../constants/routes.constants";
-import {Config} from "datatables.net";
-import {NgForm} from "@angular/forms";
-import {SweetAlertOptions} from "sweetalert2";
-import {PurchasePaymentService} from "../../shared/services/purchase-payment.service";
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
+import { PERMISSION_ROUTES } from '../../../constants/routes.constants';
+import { Config } from 'datatables.net';
+import { NgForm } from '@angular/forms';
+import { SweetAlertOptions } from 'sweetalert2';
+import { PurchasePaymentService } from '../../shared/services/purchase-payment.service';
 import {
   ICreateUpdatePurchasePaymentModel,
-  IPurchasePaymentModel
-} from "../../shared/interfaces/purchase-payment.interface";
-import {SwalComponent} from "@sweetalert2/ngx-sweetalert2";
-import {FormUtilsService} from "../../../utils/form-utils.service";
-import {InputUtilsService} from "../../../utils/input-utils.service";
-import {PurchasePaymentMethodService} from "../../shared/services/payment-method.service";
+  IPurchasePaymentModel,
+} from '../../shared/interfaces/purchase-payment.interface';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { FormUtilsService } from '../../../utils/form-utils.service';
+import { InputUtilsService } from '../../../utils/input-utils.service';
+import { PurchasePaymentMethodService } from '../../shared/services/payment-method.service';
 import {
   IPurchasePaymentMethodModel,
-  IReadPurchasePaymentMethodModel
-} from "../../shared/interfaces/payment-method.interface";
-import {Subscription} from "rxjs";
+  IReadPurchasePaymentMethodModel,
+} from '../../shared/interfaces/payment-method.interface';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-purchase-payment-listing',
   templateUrl: './purchase-payment-listing.component.html',
-  styleUrls: ['./purchase-payment-listing.component.scss']
+  styleUrls: ['./purchase-payment-listing.component.scss'],
 })
-export class PurchasePaymentListingComponent implements OnInit {
+export class PurchasePaymentListingComponent implements OnInit, AfterViewInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
-  DEFAULT_PURCHASE = '67d352f2e3d7f125a2c0d47d';
+
+  @Input() purchaseId!: string;
+
   private unsubscribe: Subscription[] = [];
 
   isLoading = false;
@@ -36,7 +47,8 @@ export class PurchasePaymentListingComponent implements OnInit {
   purchasePaymentMethodList: IPurchasePaymentMethodModel[];
   purchasePayments: IPurchasePaymentModel[] = [];
 
-  @ViewChild('paymentsModal') public modalContent: TemplateRef<PurchasePaymentListingComponent>;
+  @ViewChild('paymentsModal')
+  public modalContent: TemplateRef<PurchasePaymentListingComponent>;
   @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
   @ViewChild('paymentForm') paymentForm!: NgForm;
 
@@ -69,7 +81,7 @@ export class PurchasePaymentListingComponent implements OnInit {
           if (!data) return '-';
           const date = new Date(data);
           return date.toLocaleDateString('es-ES');
-        }
+        },
       },
     ],
     language: {
@@ -87,57 +99,62 @@ export class PurchasePaymentListingComponent implements OnInit {
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
     private changeDetectorRef: ChangeDetectorRef
-  ) { }
+  ) {}
 
-  ngOnInit(): void {
+  ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
     this.loadPurchasePaymentsMethods();
-    this.loadPurchasePaymentsById(this.DEFAULT_PURCHASE);
+    this.loadPurchasePaymentsById(this.purchaseId);
   }
 
   loadPurchasePaymentsMethods(): void {
-    const purchasePaymentMethodsSub = this.purchasePaymentMethodService.getAllPaymentsMethods().subscribe({
-      next: (purchasePaymentMethods: IPurchasePaymentMethodModel[]) => {
-        this.purchasePaymentMethodList = purchasePaymentMethods;
-        this.changeDetectorRef.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error fetching payment methods:', error);
-      },
-    });
+    const purchasePaymentMethodsSub = this.purchasePaymentMethodService
+      .getAllPaymentsMethods()
+      .subscribe({
+        next: (purchasePaymentMethods: IPurchasePaymentMethodModel[]) => {
+          this.purchasePaymentMethodList = purchasePaymentMethods;
+          this.changeDetectorRef.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching payment methods:', error);
+        },
+      });
 
     this.unsubscribe.push(purchasePaymentMethodsSub);
   }
 
   loadPurchasePaymentsById(purchaseId: string): void {
-    const purchasePaymentMethodsObservable = this.purchasePaymentService.getPurchasePaymentsById(purchaseId)
+    const purchasePaymentMethodsObservable =
+      this.purchasePaymentService.getPurchasePaymentsById(purchaseId);
 
-    const purchasePaymentMethodsSub = purchasePaymentMethodsObservable.subscribe({
-      next: (data) => {
-        this.purchasePayments = data;
-        this.datatableConfig = {
-          ...this.datatableConfig,
-          data: [...this.purchasePayments],
-        }
-      },
-      error: () => {
-        this.showAlert({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo cargar la información de clientes.',
-        });
-      }
-    });
+    const purchasePaymentMethodsSub =
+      purchasePaymentMethodsObservable.subscribe({
+        next: (data) => {
+          this.purchasePayments = data;
+          this.datatableConfig = {
+            ...this.datatableConfig,
+            data: [...this.purchasePayments],
+          };
+        },
+        error: () => {
+          this.showAlert({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo cargar la información de clientes.',
+          });
+        },
+      });
   }
 
   create() {
     this.createPurchasePaymentModel = {} as ICreateUpdatePurchasePaymentModel;
-
   }
   delete(id: string): void {}
   edit(id: string): void {}
   onSubmitPayment(event: Event, myForm: NgForm) {
-    if(myForm && myForm.invalid) {
-      return
+    if (myForm && myForm.invalid) {
+      return;
     }
 
     this.isLoading = true;
@@ -145,10 +162,10 @@ export class PurchasePaymentListingComponent implements OnInit {
     const paymentData = {
       ...this.createPurchasePaymentModel,
       amount: +this.createPurchasePaymentModel.amount,
-      purchase: this.DEFAULT_PURCHASE
+      purchase: this.purchaseId,
     };
 
-    this.createPurchasePaymentModel.purchase = "67d352f2e3d7f125a2c0d47d";
+    this.createPurchasePaymentModel.purchase = '67d352f2e3d7f125a2c0d47d';
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
@@ -170,7 +187,7 @@ export class PurchasePaymentListingComponent implements OnInit {
       this.purchasePaymentService.createPurchasePayment(paymentData).subscribe({
         next: () => {
           this.showAlert(successAlert);
-          this.loadPurchasePaymentsById(this.DEFAULT_PURCHASE);
+          this.loadPurchasePaymentsById(this.purchaseId);
         },
         error: (error) => {
           errorAlert.text = 'No se pudo crear el cliente.';
