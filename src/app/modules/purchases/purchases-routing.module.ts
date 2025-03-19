@@ -9,7 +9,7 @@ const routes: Routes = [
     component: NewPurchaseComponent,
   },
   {
-    path: ':id',
+    path: 'edit/:id',
     component: NewPurchaseComponent,
   },
   {

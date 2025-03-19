@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   EventEmitter,
@@ -31,7 +32,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './purchase-payment-listing.component.html',
   styleUrls: ['./purchase-payment-listing.component.scss'],
 })
-export class PurchasePaymentListingComponent implements OnInit {
+export class PurchasePaymentListingComponent implements OnInit, AfterViewInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
 
   @Input() purchaseId!: string;
@@ -100,7 +101,9 @@ export class PurchasePaymentListingComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
     this.loadPurchasePaymentsMethods();
     this.loadPurchasePaymentsById(this.purchaseId);
   }

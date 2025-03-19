@@ -53,10 +53,10 @@ export class PurchaseService {
       );
   }
 
-  getPurchaseById(id: string): Observable<IDetailedPurchaseModel> {
+  getPurchaseById(id: string): Observable<IListPurchaseModel> {
     this.isLoadingSubject.next(true);
     return this.http
-      .get<{ ok: boolean; data: IDetailedPurchaseModel }>(
+      .get<{ ok: boolean; data: IListPurchaseModel }>(
         `${API_PURCHASE_URL}/${id}`
       )
       .pipe(

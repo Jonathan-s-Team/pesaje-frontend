@@ -4,6 +4,7 @@ import {
   Component,
   OnDestroy,
   OnInit,
+  TemplateRef,
   ViewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -25,8 +26,9 @@ import { ShrimpFarmService } from '../../shared/services/shrimp-farm.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import {
+  IBasePurchaseModel,
   ICreatePurchaseModel,
-  IReadPurchaseModel,
+  IListPurchaseModel,
 } from '../interfaces/purchase.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { AlertService } from 'src/app/utils/alert.service';
@@ -46,8 +48,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
 
   @ViewChild('purchaseForm') purchaseForm!: NgForm;
-  @ViewChild('paymentsModal')
-  private modalComponent: PurchasePaymentListingComponent;
+
+  @ViewChild('paymentsModal') paymentsModal!: TemplateRef<any>;
   private modalRef: NgbModalRef;
 
   isLoading$: Observable<boolean>;
@@ -106,12 +108,30 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       const purchaseSub = this.purchaseService
         .getPurchaseById(this.purchaseId)
         .subscribe({
-          next: (purchase: IReadPurchaseModel) => {
+          next: (purchase: IListPurchaseModel) => {
             this.createPurchaseModel = { ...purchase };
+
+            this.loadBrokers(this.createPurchaseModel.buyer);
+            this.loadClients(this.createPurchaseModel.buyer);
+            this.loadShrimpFarms(this.createPurchaseModel.client);
+
+            // Format shrimp size calculations
+            this.shrimpFarmSize = this.inputUtils.formatToDecimal(
+              this.createPurchaseModel.averageGrams > 0
+                ? 1000 / this.createPurchaseModel.averageGrams
+                : 0
+            );
+            this.shrimpFarmSize2 = this.inputUtils.formatToDecimal(
+              this.createPurchaseModel.averageGrams2 &&
+                this.createPurchaseModel.averageGrams2! > 0
+                ? 1000 / this.createPurchaseModel.averageGrams2!
+                : 0
+            );
+
             this.changeDetectorRef.detectChanges();
           },
           error: (error) => {
-            console.error('Error fetching users:', error);
+            console.error('Error fetching purchases:', error);
           },
         });
 
@@ -196,6 +216,15 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (farms: IReadShrimpFarmModel[]) => {
           this.shrimpFarmsList = farms;
+
+          if (this.purchaseId) {
+            const farm = this.shrimpFarmsList.filter(
+              (sf) => sf.id === this.createPurchaseModel.shrimpFarm
+            )[0];
+            if (farm) {
+              this.farmPlace = (farm as IReadShrimpFarmModel).place;
+            }
+          }
           this.changeDetectorRef.detectChanges();
         },
         error: (error) => {
@@ -350,27 +379,34 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   async openModal(): Promise<any> {
-    // if (!this.modalComponent) {
-    //   console.error('Modal component is not initialized');
-    //   return Promise.reject('Modal component not initialized');
-    // }
+    if (this.modalRef) {
+      console.warn(
+        '⚠️ Modal is already open. Ignoring duplicate open request.'
+      );
+      return;
+    }
 
-    // this.modalComponent.initialize(); // Ensure initialization
+    if (!this.purchaseId) {
+      console.error('❌ purchaseId is missing. Modal cannot be opened.');
+      return;
+    }
 
-    this.modalRef = this.modalService.open(PurchasePaymentListingComponent, {
-      size: 'lg',
-      centered: true,
-      backdrop: 'static',
-    });
-
-    // ✅ Pass purchaseId to the modal instance
-    this.modalRef.componentInstance.purchaseId = this.purchaseId;
+    if (!this.paymentsModal) {
+      console.error('❌ paymentsModal template is missing.');
+      return;
+    }
 
     try {
-      return await this.modalRef.result; // ✅ Wait for modal close
+      this.modalRef = this.modalService.open(this.paymentsModal, {
+        size: 'lg',
+        centered: true,
+        backdrop: 'static',
+      });
+
+      return await this.modalRef.result;
     } catch (error) {
-      console.error('Modal dismissed:', error);
-      return Promise.reject(error); // Handle modal dismissal
+      console.error('❌ Modal dismissed:', error);
+      return Promise.reject(error);
     }
   }
 

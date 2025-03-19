@@ -67,24 +67,6 @@ export interface IListPurchaseModel extends IBasePurchaseModel {
   totalPayed?: number;
 }
 
-export interface IDetailedPurchaseModel extends IBasePurchaseModel {
-  buyer: IReadUserModel;
-  company: IReadCompanyModel;
-  broker: IReadBrokerModel;
-  client: IReadClientModel;
-  shrimpFarm: IReadShrimpFarmModel;
-}
-
-export interface IListPurchaseModel extends IBasePurchaseModel {
-  buyer: string;
-  company: string;
-  period?: string;
-  broker: string;
-  client: string;
-  shrimpFarm: string;
-  totalPayed?: number;
-}
-
 export interface IUpdatePurchaseModel {
   averageGrams: number;
   price: number;

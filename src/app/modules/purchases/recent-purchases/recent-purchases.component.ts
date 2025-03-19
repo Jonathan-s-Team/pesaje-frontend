@@ -1,15 +1,24 @@
-import {ChangeDetectorRef, Component, EventEmitter, OnInit} from '@angular/core';
-import {Config} from "datatables.net";
-import {PERMISSION_ROUTES} from "../../../constants/routes.constants";
-import {AuthService} from "../../auth";
-import {PurchaseService} from "../services/purchase.service";
-import {Subscription} from "rxjs";
-import {IDetailedPurchaseModel, IListPurchaseModel} from "../interfaces/purchase.interface";
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  OnInit,
+} from '@angular/core';
+import { Config } from 'datatables.net';
+import { PERMISSION_ROUTES } from '../../../constants/routes.constants';
+import { AuthService } from '../../auth';
+import { PurchaseService } from '../services/purchase.service';
+import { Subscription } from 'rxjs';
+import {
+  IDetailedPurchaseModel,
+  IListPurchaseModel,
+} from '../interfaces/purchase.interface';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-recent-purchases',
   templateUrl: './recent-purchases.component.html',
-  styleUrl: './recent-purchases.component.scss'
+  styleUrl: './recent-purchases.component.scss',
 })
 export class RecentPurchasesComponent implements OnInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PERSONAL_PROFILE.BROKERS;
@@ -34,7 +43,7 @@ export class RecentPurchasesComponent implements OnInit {
           if (!data) return '-';
           const date = new Date(data);
           return date.toLocaleDateString('es-ES');
-        }
+        },
       },
       {
         title: 'Subtotal',
@@ -85,7 +94,6 @@ export class RecentPurchasesComponent implements OnInit {
           return data ? data : '-';
         },
       },
-
     ],
     language: {
       url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
@@ -98,8 +106,9 @@ export class RecentPurchasesComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private purchaseService: PurchaseService,
+    private router: Router,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
@@ -107,30 +116,35 @@ export class RecentPurchasesComponent implements OnInit {
   }
 
   loadRecentPurchases() {
-    const userId: string | null = this.isOnlyBuyer ? this.authService.currentUserValue?.id ?? null : null;
+    const userId: string | null = this.isOnlyBuyer
+      ? this.authService.currentUserValue?.id ?? null
+      : null;
 
-    const purchaseSub = this.purchaseService.getPurchaseByParams(false, userId, null, null).subscribe({
-      next: (purchases: IListPurchaseModel[]) => {
-        this.recentPurchases = purchases;
-        this.datatableConfig = {
-          ...this.datatableConfig,
-          data: [...this.recentPurchases],
-        };
-        this.reloadEvent.emit(true);
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error fetching purchases:', error);
-      },
-    });
+    const purchaseSub = this.purchaseService
+      .getPurchaseByParams(false, userId, null, null)
+      .subscribe({
+        next: (purchases: IListPurchaseModel[]) => {
+          this.recentPurchases = purchases;
+          this.datatableConfig = {
+            ...this.datatableConfig,
+            data: [...this.recentPurchases],
+          };
+          this.reloadEvent.emit(true);
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching purchases:', error);
+        },
+      });
     this.unsubscribe.push(purchaseSub);
   }
 
-  edit(id: string) { }
+  edit(id: string) {
+    this.router.navigate(['purchases', 'edit', id]);
+  }
 
   ngOnDestroy(): void {
     this.unsubscribe.forEach((sub) => sub.unsubscribe());
     this.reloadEvent.unsubscribe();
   }
-
 }
