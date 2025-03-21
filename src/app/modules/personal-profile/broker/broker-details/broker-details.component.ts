@@ -184,7 +184,8 @@ export class BrokerDetailsComponent
   }
 
   goBack(): void {
-    this.router.navigate(['personal-profile', 'brokers']);
+    if (this.isOnlyBuyer) this.router.navigate(['personal-profile', 'brokers']);
+    else this.router.navigate(['settings', 'brokers']);
   }
 
   /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */
