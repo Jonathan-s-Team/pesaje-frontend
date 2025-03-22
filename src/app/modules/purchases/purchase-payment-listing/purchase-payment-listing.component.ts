@@ -4,6 +4,7 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit,
   TemplateRef,
   ViewChild,
@@ -26,29 +27,31 @@ import {
   IReadPurchasePaymentMethodModel,
 } from '../../shared/interfaces/payment-method.interface';
 import { Subscription } from 'rxjs';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { AlertService } from 'src/app/utils/alert.service';
 
 @Component({
   selector: 'app-purchase-payment-listing',
   templateUrl: './purchase-payment-listing.component.html',
   styleUrls: ['./purchase-payment-listing.component.scss'],
 })
-export class PurchasePaymentListingComponent implements OnInit, AfterViewInit {
+export class PurchasePaymentListingComponent implements OnInit, AfterViewInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
 
   @Input() purchaseId!: string;
 
   private unsubscribe: Subscription[] = [];
+  private formModalRef: NgbModalRef | null = null;
 
   isLoading = false;
 
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  createPurchasePaymentModel: ICreateUpdatePurchasePaymentModel;
-  purchasePaymentMethodList: IPurchasePaymentMethodModel[];
+  createPurchasePaymentModel: ICreateUpdatePurchasePaymentModel = {} as ICreateUpdatePurchasePaymentModel;
+  purchasePaymentMethodList: IPurchasePaymentMethodModel[] = [];
   purchasePayments: IPurchasePaymentModel[] = [];
 
-  @ViewChild('paymentsModal')
-  public modalContent: TemplateRef<PurchasePaymentListingComponent>;
+  @ViewChild('formPaymentModal') formPaymentModal!: TemplateRef<any>;
   @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
   @ViewChild('paymentForm') paymentForm!: NgForm;
 
@@ -98,14 +101,28 @@ export class PurchasePaymentListingComponent implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private modalService: NgbModal,
+    public activeModal: NgbActiveModal, // Inyectar NgbActiveModal para poder cerrar el modal
+    private alertService: AlertService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Verificar que el purchaseId esté disponible
+    console.log('PurchasePaymentListingComponent initialized with purchaseId:', this.purchaseId);
+    this.initialize();
+  }
 
   ngAfterViewInit(): void {
+    // Cargar datos necesarios
     this.loadPurchasePaymentsMethods();
-    this.loadPurchasePaymentsById(this.purchaseId);
+
+    // Solo cargar pagos si hay un purchaseId válido
+    if (this.purchaseId) {
+      this.loadPurchasePaymentsById(this.purchaseId);
+    } else {
+      console.error('No purchaseId provided to PurchasePaymentListingComponent');
+    }
   }
 
   loadPurchasePaymentsMethods(): void {
@@ -136,22 +153,53 @@ export class PurchasePaymentListingComponent implements OnInit, AfterViewInit {
             ...this.datatableConfig,
             data: [...this.purchasePayments],
           };
+          this.changeDetectorRef.detectChanges();
         },
-        error: () => {
+        error: (error) => {
+          console.error('Error loading purchase payments:', error);
           this.showAlert({
             icon: 'error',
             title: 'Error',
-            text: 'No se pudo cargar la información de clientes.',
+            text: 'No se pudo cargar la información de pagos.',
           });
         },
       });
+
+    this.unsubscribe.push(purchasePaymentMethodsSub);
   }
 
   create() {
     this.createPurchasePaymentModel = {} as ICreateUpdatePurchasePaymentModel;
+
+    // Abrir el modal interno para el formulario de pago
+    if (this.formPaymentModal) {
+      this.formModalRef = this.modalService.open(this.formPaymentModal, {
+        centered: true,
+        backdrop: 'static'
+      });
+    } else {
+      console.error('formPaymentModal template is not available');
+    }
   }
-  delete(id: string): void {}
-  edit(id: string): void {}
+
+  delete(id: string): void {
+    // Implementar lógica de eliminación si se requiere
+    console.log('Delete payment with ID:', id);
+    this.alertService.confirm().then((result) => {
+      if (result.isConfirmed) {
+        // Llamar al servicio para eliminar
+      }
+    });
+  }
+
+  edit(id: string): void {
+    // Implementar lógica de edición si se requiere
+    console.log('Edit payment with ID:', id);
+
+    // Cargar los datos del pago para editar
+    // Luego abrir el modal
+  }
+
   onSubmitPayment(event: Event, myForm: NgForm) {
     if (myForm && myForm.invalid) {
       return;
@@ -164,8 +212,6 @@ export class PurchasePaymentListingComponent implements OnInit, AfterViewInit {
       amount: +this.createPurchasePaymentModel.amount,
       purchase: this.purchaseId,
     };
-
-    this.createPurchasePaymentModel.purchase = '67d352f2e3d7f125a2c0d47d';
 
     const successAlert: SweetAlertOptions = {
       icon: 'success',
@@ -181,6 +227,11 @@ export class PurchasePaymentListingComponent implements OnInit, AfterViewInit {
 
     const completeFn = () => {
       this.isLoading = false;
+      // Cerrar el modal de formulario
+      if (this.formModalRef) {
+        this.formModalRef.close();
+        this.formModalRef = null;
+      }
     };
 
     const createFn = () => {
@@ -188,13 +239,14 @@ export class PurchasePaymentListingComponent implements OnInit, AfterViewInit {
         next: () => {
           this.showAlert(successAlert);
           this.loadPurchasePaymentsById(this.purchaseId);
+          completeFn();
         },
         error: (error) => {
-          errorAlert.text = 'No se pudo crear el cliente.';
+          console.error('Error creating payment:', error);
+          errorAlert.text = 'No se pudo crear el pago.';
           this.showAlert(errorAlert);
           this.isLoading = false;
-        },
-        complete: completeFn,
+        }
       });
     };
 
@@ -217,7 +269,11 @@ export class PurchasePaymentListingComponent implements OnInit, AfterViewInit {
       swalOptions
     );
     this.cdr.detectChanges();
-    this.noticeSwal.fire();
+    if (this.noticeSwal) {
+      this.noticeSwal.fire();
+    } else {
+      console.warn('noticeSwal component is not available');
+    }
   }
 
   initialize() {
@@ -226,13 +282,23 @@ export class PurchasePaymentListingComponent implements OnInit, AfterViewInit {
   }
 
   formatDecimal(controlName: string) {
-    const control = this.paymentForm.controls[controlName];
+    const control = this.paymentForm?.controls[controlName];
     if (control) {
-      this.formUtils.formatControlToDecimal(control); // ✅ Use utility function
+      this.formUtils.formatControlToDecimal(control);
     }
   }
 
   validateNumber(event: KeyboardEvent) {
-    this.inputUtils.validateNumber(event); // ✅ Use utility function
+    this.inputUtils.validateNumber(event);
+  }
+
+  ngOnDestroy(): void {
+    // Limpiar todas las suscripciones
+    this.unsubscribe.forEach(sub => sub.unsubscribe());
+
+    // Cerrar cualquier modal abierto
+    if (this.formModalRef) {
+      this.formModalRef.close();
+    }
   }
 }

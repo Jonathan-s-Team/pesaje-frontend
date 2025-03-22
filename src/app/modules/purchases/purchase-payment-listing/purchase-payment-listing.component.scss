@@ -1,0 +1,7 @@
+:host ::ng-deep .modal {
+  z-index: 1060 !important;
+}
+
+:host ::ng-deep .modal-backdrop.show:nth-of-type(2) {
+  opacity: 0;
+}

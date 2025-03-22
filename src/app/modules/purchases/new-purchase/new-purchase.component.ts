@@ -49,8 +49,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
   @ViewChild('purchaseForm') purchaseForm!: NgForm;
 
-  @ViewChild('paymentsModal') paymentsModal!: TemplateRef<any>;
-  private modalRef: NgbModalRef;
+  // Inicializa modalRef como null explícitamente
+  private modalRef: NgbModalRef | null = null;
 
   isLoading$: Observable<boolean>;
 
@@ -212,7 +212,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     }
 
     const shrimpFarmSub = this.shrimpFarmService
-      .getFarmsByClientAndBuyer(clientId, userId)
+      //.getFarmsByClientAndBuyer(clientId, userId)
+      .getFarmsByClientAndBuyer(clientId)
       .subscribe({
         next: (farms: IReadShrimpFarmModel[]) => {
           this.shrimpFarmsList = farms;
@@ -380,9 +381,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
   async openModal(): Promise<any> {
     if (this.modalRef) {
-      console.warn(
-        '⚠️ Modal is already open. Ignoring duplicate open request.'
-      );
+      console.warn('⚠️ Modal is already open. Ignoring duplicate open request.');
       return;
     }
 
@@ -391,21 +390,31 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.paymentsModal) {
-      console.error('❌ paymentsModal template is missing.');
-      return;
-    }
-
     try {
-      this.modalRef = this.modalService.open(this.paymentsModal, {
+      // Usar directamente el componente PurchasePaymentListingComponent como contenido del modal
+      const modalRef = this.modalService.open(PurchasePaymentListingComponent, {
         size: 'lg',
         centered: true,
         backdrop: 'static',
       });
 
-      return await this.modalRef.result;
+      // Pasar el purchaseId como input al componente
+      const componentInstance = modalRef.componentInstance as PurchasePaymentListingComponent;
+      componentInstance.purchaseId = this.purchaseId;
+
+      this.modalRef = modalRef;
+
+      // Cuando el modal se cierre, limpiar la referencia
+      const result = await modalRef.result.catch(error => {
+        console.warn('Modal dismissed:', error);
+        return null;
+      });
+
+      this.modalRef = null; // Usar null en lugar de undefined
+      return result;
     } catch (error) {
-      console.error('❌ Modal dismissed:', error);
+      console.error('❌ Modal error:', error);
+      this.modalRef = null; // Usar null en lugar de undefined
       return Promise.reject(error);
     }
   }
@@ -413,5 +422,11 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */
   ngOnDestroy(): void {
     this.unsubscribe.forEach((sub) => sub.unsubscribe());
+
+    // Cerrar el modal si está abierto
+    if (this.modalRef) {
+      this.modalRef.close();
+      this.modalRef = null;
+    }
   }
 }
