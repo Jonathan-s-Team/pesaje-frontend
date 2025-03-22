@@ -391,11 +391,13 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     }
 
     try {
-      // Usar directamente el componente PurchasePaymentListingComponent como contenido del modal
+      // Configurar el modal con opciones específicas para evitar problemas
       const modalRef = this.modalService.open(PurchasePaymentListingComponent, {
         size: 'lg',
         centered: true,
         backdrop: 'static',
+        keyboard: false, // Evitar cierre con tecla Escape
+        windowClass: 'payment-listing-modal' // Clase personalizada para estilos
       });
 
       // Pasar el purchaseId como input al componente
@@ -410,14 +412,15 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
         return null;
       });
 
-      this.modalRef = null; // Usar null en lugar de undefined
+      this.modalRef = null; // Limpiar la referencia al cerrar
       return result;
     } catch (error) {
       console.error('❌ Modal error:', error);
-      this.modalRef = null; // Usar null en lugar de undefined
+      this.modalRef = null;
       return Promise.reject(error);
     }
   }
+
 
   /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */
   ngOnDestroy(): void {

@@ -1,7 +1,17 @@
-:host ::ng-deep .modal {
-  z-index: 1060 !important;
+/* Estilos opcionales para mejorar la transición entre vistas */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
 }
 
-:host ::ng-deep .modal-backdrop.show:nth-of-type(2) {
-  opacity: 0;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-body {
+  min-height: 300px;
 }
