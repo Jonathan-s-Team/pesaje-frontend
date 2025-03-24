@@ -21,7 +21,7 @@ import { Router } from '@angular/router';
   styleUrl: './recent-purchases.component.scss',
 })
 export class RecentPurchasesComponent implements OnInit {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.PERSONAL_PROFILE.BROKERS;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.RECENT_PRUCHASES;
 
   private unsubscribe: Subscription[] = [];
 

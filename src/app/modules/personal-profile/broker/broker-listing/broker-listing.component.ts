@@ -140,6 +140,7 @@ export class BrokerListingComponent
 
     // Agregar la columna "Comprador" solo si el usuario no es solo Comprador
     if (!this.isOnlyBuyer) {
+      this.PERMISSION_ROUTE = PERMISSION_ROUTES.SETTINGS.BROKERS;
       this.datatableConfig.columns!.push({
         title: 'Comprador',
         data: 'buyerItBelongs.fullName',
