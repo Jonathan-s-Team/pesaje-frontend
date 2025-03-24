@@ -1,0 +1,68 @@
+<div class="modal-header">
+  <h4 class="modal-title">Detalles del Pago</h4>
+  <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.dismiss('Cross click')"></button>
+</div>
+
+<form #paymentForm="ngForm" (ngSubmit)="onSubmit(paymentForm)">
+  <div class="modal-body">
+    <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
+      <!--begin::Payment information form-->
+      <div class="collapse show">
+
+        <!-- Tipo de Pago -->
+        <div class="mb-3">
+          <label for="purchasePaymentMethod" class="required fw-semibold fs-6 mb-2">Tipo de Pago</label>
+          <select id="purchasePaymentMethod" name="purchasePaymentMethod" class="form-select form-select-sm" [(ngModel)]="createPurchasePaymentModel.paymentMethod"
+                  #purchasePaymentMethod="ngModel" required>
+            <option [ngValue]="null" disabled selected>Seleccione una opción</option>
+            <option *ngFor="let purchasePaymentMethod of purchasePaymentMethodList" [value]="purchasePaymentMethod.id">
+              {{ purchasePaymentMethod.name }}
+            </option>
+          </select>
+          <div *ngIf="(paymentForm.submitted || purchasePaymentMethod.dirty || purchasePaymentMethod.touched) && purchasePaymentMethod.errors?.['required']"
+               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>El tipo de pago es obligatorio.</div>
+          </div>
+        </div>
+
+        <!-- Monto -->
+        <div class="mb-3">
+          <label for="amount" class="required fw-semibold fs-6 mb-2">Monto</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="number" class="form-control" id="amount" name="amount" [(ngModel)]="createPurchasePaymentModel.amount"
+                   (blur)="formatDecimal('amount')" (keypress)="validateNumber($event)" required #amount="ngModel">
+            <div *ngIf="(paymentForm.submitted || amount.dirty || amount.touched) && amount.errors?.['required']"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>El monto es obligatorio.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fecha de Pago -->
+        <div class="mb-3">
+          <label for="paymentDate" class="required fw-semibold fs-6 mb-2">Fecha de Pago</label>
+          <input type="date" class="form-control" id="paymentDate" name="paymentDate" [(ngModel)]="createPurchasePaymentModel.paymentDate"
+                 required #paymentDate="ngModel">
+          <div *ngIf="(paymentForm.submitted || paymentDate.dirty || paymentDate.touched) && paymentDate.errors?.['required']"
+               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>La fecha de pago es obligatoria.</div>
+          </div>
+        </div>
+
+      </div>
+      <!--end::Payment information form-->
+    </div>
+  </div>
+
+  <div class="modal-footer flex-center">
+    <button type="button" class="btn btn-light me-3" (click)="activeModal.dismiss('cancel')">
+      Cancelar
+    </button>
+    <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+      <span *ngIf="!isLoading">Guardar</span>
+      <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      <span *ngIf="isLoading" class="visually-hidden">Guardando...</span>
+    </button>
+  </div>
+</form>
