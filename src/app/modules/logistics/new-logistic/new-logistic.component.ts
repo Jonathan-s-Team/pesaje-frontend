@@ -1,26 +1,34 @@
-import {ChangeDetectorRef, Component, EventEmitter} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, OnInit, ViewChild} from '@angular/core';
 import {Observable, Subscription} from "rxjs";
 import {NgForm} from "@angular/forms";
 import {DateUtilsService} from "../../../utils/date-utils.service";
-import {ICreateLogisticModel} from "../interfaces/logistic.interface";
+import {ICreateLogisticModel, ILogisticModel} from "../interfaces/logistic.interface";
 import {AuthService} from "../../auth";
 import {IListPurchaseModel} from "../../purchases/interfaces/purchase.interface";
 import {PurchaseService} from "../../purchases/services/purchase.service";
 import {Config} from "datatables.net";
 import {PERMISSION_ROUTES} from "../../../constants/routes.constants";
+import {ILogisticTypeModel, IReadLogisticTypeModel} from "../../shared/interfaces/logistic-type.interface";
+import {LogisticTypeService} from "../../shared/services/logistic-type.service";
+import {FormUtilsService} from "../../../utils/form-utils.service";
+import {InputUtilsService} from "../../../utils/input-utils.service";
+import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'app-new-logistic',
   templateUrl: './new-logistic.component.html',
   styleUrl: './new-logistic.component.scss'
 })
-export class NewLogisticComponent {
+export class NewLogisticComponent implements OnInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.RECENT_PRUCHASES;
+
+  @ViewChild('formLogisticTypeModal') formLogisticTypeModal: any;
 
   private unsubscribe: Subscription[] = [];
 
   isLoading$: Observable<boolean>;
   isOnlyBuyer = false;
+  isLoading = false;
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
   controlNumber: number = 0;
   buyer: string = '';
@@ -32,6 +40,10 @@ export class NewLogisticComponent {
 
   controlNumberPurchase: IListPurchaseModel = {} as IListPurchaseModel;
   createLogisticModel: ICreateLogisticModel = {} as ICreateLogisticModel;
+  createLogisticItemModel: ILogisticModel = {} as ILogisticModel;
+  logisticTypeList: ILogisticTypeModel[] = [];
+  personalLogisticTypeList: ILogisticTypeModel[] = [];
+  inputLogisticTypeList: ILogisticTypeModel[] = [];
 
   datatableConfig: Config = {
     serverSide: false,
@@ -124,11 +136,20 @@ export class NewLogisticComponent {
   };
 
   constructor(
+    public activeModal: NgbActiveModal,
+    private modalService: NgbModal,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private dateUtils: DateUtilsService,
+    private logisticTypeService: LogisticTypeService,
     private purchaseService: PurchaseService,
+    private formUtils: FormUtilsService,
+    private inputUtils: InputUtilsService,
   ) {  }
+
+  ngOnInit(): void {
+    this.loadLogisticTypes();
+  }
 
   get logisticDateFormatted(): string | null {
     return this.dateUtils.formatISOToDateInput(
@@ -141,10 +162,46 @@ export class NewLogisticComponent {
   }
 
   delete(){}
-  create(){}
+
+  create() {
+    this.createLogisticItemModel = {
+      logisticsType: '',
+      unit: 0,
+      cost: 0,
+      total: 0
+    } as ILogisticModel;
+  }
+
+  formatDecimal(controlName: string) {
+    /*const control = this.logisticForm.controls[controlName];
+    if (control) {
+      this.formUtils.formatControlToDecimal(control); // ✅ Use utility function
+    }*/
+  }
 
   onDateChange(event: any): void {
     // date change logic
+  }
+
+  onSubmit(form: NgForm, modal: any): void {
+    if (form.valid) {
+      this.createLogisticItemModel.total = this.createLogisticItemModel.unit * this.createLogisticItemModel.cost;
+      console.log('form:', form);
+
+    }
+  }
+
+  loadLogisticTypes(): void {
+    this.logisticTypeService.getAllLogisticsTypes().subscribe({
+      next: (types) => {
+        this.logisticTypeList = types;
+      },
+      error: (error) => {
+        console.error('Error fetching logistic types:', error);
+      }
+    });
+
+    this
   }
 
   searchPurchase(): void {
@@ -176,6 +233,10 @@ export class NewLogisticComponent {
         },
       });
     this.unsubscribe.push(purchaseSub);
+  }
+
+  validateNumber(event: KeyboardEvent) {
+    this.inputUtils.validateNumber(event);
   }
 
 }

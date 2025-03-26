@@ -5,6 +5,7 @@ import {NewLogisticComponent} from "./new-logistic/new-logistic.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {CrudModule} from "../crud/crud.module";
 import {SharedModule} from "../shared/shared.module";
+import {NgbActiveModal, NgbModule} from "@ng-bootstrap/ng-bootstrap";
 
 
 
@@ -16,7 +17,9 @@ import {SharedModule} from "../shared/shared.module";
     FormsModule,
     ReactiveFormsModule,
     CrudModule,
-    SharedModule
-  ]
+    SharedModule,
+    NgbModule
+  ],
+  providers: [NgbActiveModal]
 })
 export class LogisticModule { }
