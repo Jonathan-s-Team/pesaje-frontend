@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {LogisticRoutingModule} from "./logistic-routing.module";
 import {NewLogisticComponent} from "./new-logistic/new-logistic.component";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 
 
@@ -9,7 +10,9 @@ import {NewLogisticComponent} from "./new-logistic/new-logistic.component";
   declarations: [NewLogisticComponent],
   imports: [
     CommonModule,
-    LogisticRoutingModule
+    LogisticRoutingModule,
+    FormsModule,
+    ReactiveFormsModule
   ]
 })
 export class LogisticModule { }

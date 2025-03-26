@@ -1,1 +1,92 @@
-<p>new-logistic works!</p>
+<div *ngIf="isLoading$ | async" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div *ngIf="!(isLoading$ | async)">
+  <!-- Logistic Form -->
+  <form #logisticForm="ngForm" (ngSubmit)="confirmSave($event, logisticForm)" novalidate>
+    <!-- First Section: Search Info -->
+    <div class="card card-xl-stretch mb-xl-8">
+      <!-- begin::Header -->
+      <div class="card-header border-0 pt-5">
+        <h4 class="card-title align-items-start flex-column">
+          <span class="card-label fw-bolder fs-3 mb-1">Buscar por número de control</span>
+        </h4>
+      </div>
+      <!-- end::Header -->
+
+      <!-- begin::Body -->
+      <div class="card-body py-3">
+        <!-- begin::Row -->
+        <div class="row g-5 g-xl-8">
+          <!-- Control number -->
+          <div class="col-md-4">
+            <label for="controlNumber" class="fw-semibold fs-6 mb-2">Número de control</label>
+            <input type="number" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"/>
+          </div>
+
+          <!-- Logistic Date -->
+          <div class="col-md-4">
+            <label for="logisticDate" class="required fw-semibold fs-6 mb-2">Fecha de logística</label>
+            <input type="date" class="form-control form-control-sm" id="logisticDate" name="logisticDate"
+                   [ngModel]="logisticDateFormatted" (ngModelChange)="onDateChange($event)" required #logisticDate="ngModel">
+            <div
+              *ngIf="(logisticForm.submitted || logisticDate.dirty || logisticDate.touched) && logisticDate.errors?.['required']"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>La fecha de compra es obligatoria.</div>
+            </div>
+            <!-- Si necesitas validar el formato ISO8601, deberás implementar un validador personalizado -->
+          </div>
+
+          <!-- Purchase Date -->
+          <div class="col-md-4">
+            <label for="purchaseDate" class="required fw-semibold fs-6 mb-2">Fecha de la compra</label>
+            <input type="date" class="form-control form-control-sm" id="purchaseDate" name="purchaseDate">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Second Section: Responsible -->
+    <div class="card card-xl-stretch mb-xl-8 mt-2">
+      <!-- begin::Body -->
+      <div class="card-body py-3">
+        <div class="row g-5 g-xl-8">
+          <!-- Farm Place (Disabled Input) -->
+          <div class="col-md-6">
+            <label for="farmPlace" class="fw-semibold fs-6 mb-2">Comprador Responsable</label>
+            <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm" disabled />
+          </div>
+
+          <!-- Farm Place (Disabled Input) -->
+          <div class="col-md-6">
+            <label for="farmPlace" class="fw-semibold fs-6 mb-2">Broker</label>
+            <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm" disabled />
+          </div>
+
+          <!-- Farm Place (Disabled Input) -->
+          <div class="col-md-6">
+            <label for="farmPlace" class="fw-semibold fs-6 mb-2">Propietario de la Piscina</label>
+            <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm" disabled />
+          </div>
+
+          <!-- Farm Place (Disabled Input) -->
+          <div class="col-md-6">
+            <label for="farmPlace" class="fw-semibold fs-6 mb-2">Nombre de la Piscina</label>
+            <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm" disabled />
+          </div>
+
+          <!-- Farm Place (Disabled Input) -->
+          <div class="col-md-6">
+            <label for="farmPlace" class="fw-semibold fs-6 mb-2">Ubicación de la Piscina</label>
+            <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm" disabled />
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+
