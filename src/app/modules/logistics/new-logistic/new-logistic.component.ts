@@ -41,6 +41,7 @@ export class NewLogisticComponent implements OnInit {
   controlNumberPurchase: IListPurchaseModel = {} as IListPurchaseModel;
   createLogisticModel: ICreateLogisticModel = {} as ICreateLogisticModel;
   createLogisticItemModel: ILogisticModel = {} as ILogisticModel;
+  logisticItemList: ILogisticModel[] = [];
   logisticTypeList: ILogisticTypeModel[] = [];
   personalLogisticTypeList: ILogisticTypeModel[] = [];
   inputLogisticTypeList: ILogisticTypeModel[] = [];
@@ -187,6 +188,15 @@ export class NewLogisticComponent implements OnInit {
     if (form.valid) {
       this.createLogisticItemModel.total = this.createLogisticItemModel.unit * this.createLogisticItemModel.cost;
       console.log('form:', form);
+
+      this.logisticItemList.push(this.createLogisticItemModel);
+
+      this.datatableConfig = {
+        ...this.datatableConfig,
+        data: [...this.logisticItemList],
+      };
+
+      console.log('datatableConfig:', this.datatableConfig.data);
 
     }
   }
