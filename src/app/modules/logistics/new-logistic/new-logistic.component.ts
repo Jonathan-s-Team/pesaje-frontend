@@ -195,13 +195,13 @@ export class NewLogisticComponent implements OnInit {
     this.logisticTypeService.getAllLogisticsTypes().subscribe({
       next: (types) => {
         this.logisticTypeList = types;
+        this.personalLogisticTypeList = types.filter((logistic) => logistic.type == 'PERSONNEL');
+        this.inputLogisticTypeList = types.filter((logistic) => logistic.type == 'INPUTS');
       },
       error: (error) => {
         console.error('Error fetching logistic types:', error);
       }
     });
-
-    this
   }
 
   searchPurchase(): void {

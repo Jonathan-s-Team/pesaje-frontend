@@ -160,7 +160,7 @@
             <select id="logisticType" name="logisticType" class="form-select form-select-sm" [(ngModel)]="createLogisticItemModel.logisticsType"
                     #logisticType="ngModel" required>
               <option [ngValue]="null" disabled selected>Seleccione una opción</option>
-              <option *ngFor="let logisticType of logisticTypeList" [value]="logisticType.id">
+              <option *ngFor="let logisticType of personalLogisticTypeList" [value]="logisticType.id">
                 {{ logisticType.name }}
               </option>
             </select>
