@@ -27,6 +27,13 @@ const Routing: Routes = [
       ),
   },
   {
+    path: 'logistics',
+    loadChildren: () =>
+      import('../modules/logistics/logistic.module').then(
+        (m) => m.LogisticModule
+      ),
+  },
+  {
     path: 'settings',
     loadChildren: () =>
       import('../modules/settings/settings.module').then(
