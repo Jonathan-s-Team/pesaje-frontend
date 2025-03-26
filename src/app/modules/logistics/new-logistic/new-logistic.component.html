@@ -25,7 +25,7 @@
           <div class="col-md-4">
             <label for="controlNumber" class="fw-semibold fs-6 mb-2">Número de control</label>
             <input type="number" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
-                   (keydown.enter)="searchPurchase()" [(ngModel)]="controlNumber" />
+                   (keydown.enter)="$event.preventDefault(); searchPurchase();" [(ngModel)]="controlNumber" />
           </div>
 
           <!-- Logistic Date -->
@@ -138,6 +138,14 @@
           </app-crud>
         </div>
       </div>
+
+      <div class="card-footer d-flex justify-content-end py-6 px-9">
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary"
+                [disabled]="isLoading$ | async">
+          Guardar
+        </button>
+      </div>
     </div>
   </form>
 </div>
@@ -175,7 +183,6 @@
           <div class="mb-3">
             <label for="unit" class="required fw-semibold fs-6 mb-2">Unidades</label>
             <div class="input-group">
-              <span class="input-group-text">$</span>
               <input type="number" class="form-control" id="unit" name="unit" [(ngModel)]="createLogisticItemModel.unit"
                      (blur)="formatDecimal('unit')" (keypress)="validateNumber($event)" required #unit="ngModel">
               <div *ngIf="(myForm.submitted || unit.dirty || unit.touched) && unit.errors?.['required']"
@@ -223,7 +230,7 @@
   <form #myInputForm="ngForm" (ngSubmit)="onSubmitInput(myInputForm, inputLogisticTypeModal)">
 
     <div class="modal-header">
-      <h4 class="modal-title" id="modal-basic-title">Detalles del Producto o Insumo</h4>
+      <h4 class="modal-title" id="modal-basic-title2">Detalles del Producto o Insumo</h4>
       <button type="button" class="btn-close" aria-label="Cerrar" (click)="inputLogisticTypeModal.dismiss('Cross click')"></button>
     </div>
 
@@ -252,8 +259,7 @@
           <div class="mb-3">
             <label for="unit" class="required fw-semibold fs-6 mb-2">Unidades</label>
             <div class="input-group">
-              <span class="input-group-text">$</span>
-              <input type="number" class="form-control" id="unit" name="unit" [(ngModel)]="createLogisticItemModel.unit"
+              <input type="number" class="form-control" id="unit2" name="unit" [(ngModel)]="createLogisticItemModel.unit"
                      (blur)="formatDecimal('unit')" (keypress)="validateNumber($event)" required #unit="ngModel">
               <div *ngIf="(myInputForm.submitted || unit.dirty || unit.touched) && unit.errors?.['required']"
                    class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -267,7 +273,7 @@
             <label for="cost" class="required fw-semibold fs-6 mb-2">Costo</label>
             <div class="input-group">
               <span class="input-group-text">$</span>
-              <input type="number" class="form-control" id="cost" name="cost" [(ngModel)]="createLogisticItemModel.cost"
+              <input type="number" class="form-control" id="cost2" name="cost" [(ngModel)]="createLogisticItemModel.cost"
                      (blur)="formatDecimal('cost')" (keypress)="validateNumber($event)" required #cost="ngModel">
               <div *ngIf="(myInputForm.submitted || cost.dirty || cost.touched) && cost.errors?.['required']"
                    class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">

@@ -13,6 +13,8 @@ import {LogisticTypeService} from "../../shared/services/logistic-type.service";
 import {FormUtilsService} from "../../../utils/form-utils.service";
 import {InputUtilsService} from "../../../utils/input-utils.service";
 import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {AlertService} from "../../../utils/alert.service";
+import {LogisticService} from "../services/logistic.service";
 
 @Component({
   selector: 'app-new-logistic',
@@ -43,6 +45,7 @@ export class NewLogisticComponent implements OnInit {
   shrimpFarm: string = '';
   farmPlace: string = '';
   purchaseDate: string = '';
+  purchase: string = '';
 
   controlNumberPurchase: IListPurchaseModel = {} as IListPurchaseModel;
   createLogisticModel: ICreateLogisticModel = {} as ICreateLogisticModel;
@@ -141,6 +144,7 @@ export class NewLogisticComponent implements OnInit {
 
   constructor(
     public activeModal: NgbActiveModal,
+    private alertService: AlertService,
     private modalService: NgbModal,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
@@ -149,7 +153,8 @@ export class NewLogisticComponent implements OnInit {
     private purchaseService: PurchaseService,
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private logisticService: LogisticService
   ) {
     // Inicializa las listas y configuraciones
     this.reloadEvent = new EventEmitter<boolean>();
@@ -178,6 +183,13 @@ export class NewLogisticComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadLogisticTypes();
+
+    this.createLogisticModel = {
+      purchase: '',
+      logisticsDate: this.dateUtils.convertLocalDateToUTC(new Date().toISOString().split('T')[0]),
+      grandTotal: 0,
+      items: []
+    };
   }
 
   get logisticDateFormatted(): string | null {
@@ -187,7 +199,42 @@ export class NewLogisticComponent implements OnInit {
   }
 
   confirmSave(event: Event, form: NgForm) {
-    // save logic
+    // Prevenir el comportamiento por defecto del formulario
+    event.preventDefault();
+
+    // Preparar los items combinando ambas listas
+    const allItems = [...this.logisticItemList, ...this.inputLogisticItemList];
+
+    // Calcular el grandTotal sumando el total de todos los items
+    const grandTotal = allItems.reduce((sum, item) => sum + item.total, 0);
+
+    // Construir el objeto final
+    this.createLogisticModel = {
+      purchase: this.purchase,
+      logisticsDate: this.createLogisticModel.logisticsDate,
+      grandTotal: grandTotal,
+      items: allItems
+    };
+
+    console.log('Objeto final a guardar:', this.createLogisticModel);
+
+    this.alertService.confirm().then((result) => {
+      if (result.isConfirmed) {
+        this.submitForm();
+      }
+    });
+  }
+
+  submitForm() {
+    this.logisticService.createLogistic(this.createLogisticModel).subscribe({
+      next: (response) => {
+        this.alertService.showSuccessAlert({});
+      },
+      error: (error) => {
+        console.error('Error creating purchase:', error);
+        this.alertService.showErrorAlert({ error });
+      },
+    });
   }
 
   delete(){}
@@ -218,7 +265,7 @@ export class NewLogisticComponent implements OnInit {
   }
 
   onDateChange(event: any): void {
-    // date change logic
+    this.createLogisticModel.logisticsDate = this.dateUtils.convertLocalDateToUTC(event);
   }
 
   onSubmitInput(form: NgForm, modal: any): void {
@@ -320,6 +367,7 @@ export class NewLogisticComponent implements OnInit {
           this.company = this.controlNumberPurchase.company;
           this.shrimpFarm = this.controlNumberPurchase.shrimpFarm;
           this.farmPlace = this.controlNumberPurchase.shrimpFarm;
+          this.purchase = this.controlNumberPurchase.id;
           this.purchaseDate = this.dateUtils.formatISOToDateInput(this.controlNumberPurchase.purchaseDate);
           this.reloadEvent.emit(true);
           this.cdr.detectChanges();
