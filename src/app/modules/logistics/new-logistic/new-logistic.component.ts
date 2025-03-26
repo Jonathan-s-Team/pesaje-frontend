@@ -23,6 +23,7 @@ export class NewLogisticComponent implements OnInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.RECENT_PRUCHASES;
 
   @ViewChild('formLogisticTypeModal') formLogisticTypeModal: any;
+  @ViewChild('formInputLogisticTypeModal') formInputLogisticTypeModal: any;
 
   private logisticItemListSubject = new BehaviorSubject<ILogisticModel[]>([]);
   private inputLogisticItemListSubject = new BehaviorSubject<ILogisticModel[]>([]);
@@ -103,30 +104,28 @@ export class NewLogisticComponent implements OnInit {
     columns: [
       {
         title: 'Productos o Insumos',
-        data: 'purchaseDate',
+        data: 'logisticsType',
         render: function (data) {
-          if (!data) return '-';
-          const date = new Date(data);
-          return date.toLocaleDateString('es-ES');
+          return data ? data : '-';
         },
       },
       {
         title: 'Unidades',
-        data: 'subtotal',
+        data: 'unit',
         render: function (data) {
           return data ? data : '-';
         },
       },
       {
         title: 'Costo',
-        data: 'subtotal2',
+        data: 'cost',
         render: function (data) {
           return data ? data : '-';
         },
       },
       {
         title: 'Total',
-        data: 'grandTotal',
+        data: 'total',
         render: function (data) {
           return data ? data : '-';
         },
@@ -193,11 +192,23 @@ export class NewLogisticComponent implements OnInit {
 
   delete(){}
 
-  createPersonalItem() {
+  openPersonalModal() {
     this.createLogisticItemModel = {} as ILogisticModel;
+    this.modalService.open(this.formLogisticTypeModal, {
+      size: 'md',
+      backdrop: 'static',
+      keyboard: false
+    });
   }
 
-  createInputItem() {}
+  openInputModal() {
+    this.createLogisticItemModel = {} as ILogisticModel;
+    this.modalService.open(this.formInputLogisticTypeModal, {
+      size: 'md',
+      backdrop: 'static',
+      keyboard: false
+    });
+  }
 
   formatDecimal(controlName: string) {
     /*const control = this.logisticForm.controls[controlName];
@@ -211,7 +222,7 @@ export class NewLogisticComponent implements OnInit {
   }
 
   onSubmitInput(form: NgForm, modal: any): void {
-    if (form.invalid) {
+    if (form.valid) {
       // Calcular el total
       this.createLogisticItemModel.total = this.createLogisticItemModel.unit * this.createLogisticItemModel.cost;
 

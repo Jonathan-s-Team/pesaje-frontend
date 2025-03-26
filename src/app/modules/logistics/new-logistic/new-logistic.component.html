@@ -99,11 +99,11 @@
       <!-- begin::Header -->
       <div class="card-header border-0 pt-5">
         <div class="d-flex justify-content-end w-100">
-        <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create"
-                (click)="createPersonalItem()">
-          Agregar Personal
-        </button>
-      </div>
+          <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary"
+                  (click)="openPersonalModal()">
+            Agregar Personal
+          </button>
+        </div>
       </div>
       <!-- end::Header -->
 
@@ -122,8 +122,8 @@
       <!-- begin::Header -->
       <div class="card-header border-0 pt-5">
         <div class="d-flex justify-content-end w-100">
-          <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create"
-                  (click)="createInputItem()">
+          <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary"
+                  (click)="openInputModal()">
             Agregar Productos
           </button>
         </div>
@@ -133,7 +133,8 @@
       <div class="card-body py-3">
         <div class="row g-5 g-xl-8">
           <app-crud [datatableConfig]="datatableConfig2" [permissionRoute]="PERMISSION_ROUTE"
-                    (deleteEvent)="delete()" [reload]="reloadEvent">
+                    (deleteEvent)="delete()" [reload]="reloadEvent"
+                    [modal]="formInputLogisticTypeModal">
           </app-crud>
         </div>
       </div>
@@ -219,7 +220,7 @@
 </ng-template>
 
 <ng-template #formInputLogisticTypeModal let-inputLogisticTypeModal>
-  <form #myInputForm="ngForm" (ngSubmit)="onSubmit(myInputForm, inputLogisticTypeModal)">
+  <form #myInputForm="ngForm" (ngSubmit)="onSubmitInput(myInputForm, inputLogisticTypeModal)">
 
     <div class="modal-header">
       <h4 class="modal-title" id="modal-basic-title">Detalles del Producto o Insumo</h4>
