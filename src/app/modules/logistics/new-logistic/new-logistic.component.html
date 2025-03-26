@@ -24,7 +24,8 @@
           <!-- Control number -->
           <div class="col-md-4">
             <label for="controlNumber" class="fw-semibold fs-6 mb-2">Número de control</label>
-            <input type="number" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"/>
+            <input type="number" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
+                   (keydown.enter)="searchPurchase()" [(ngModel)]="controlNumber" />
           </div>
 
           <!-- Logistic Date -->
@@ -43,7 +44,8 @@
           <!-- Purchase Date -->
           <div class="col-md-4">
             <label for="purchaseDate" class="required fw-semibold fs-6 mb-2">Fecha de la compra</label>
-            <input type="date" class="form-control form-control-sm" id="purchaseDate" name="purchaseDate">
+            <input type="date" class="form-control form-control-sm" id="purchaseDate" name="purchaseDate"
+                   [(ngModel)]="purchaseDate" disabled>
           </div>
         </div>
       </div>
@@ -56,32 +58,37 @@
         <div class="row g-5 g-xl-8">
           <!-- Farm Place (Disabled Input) -->
           <div class="col-md-6">
-            <label for="farmPlace" class="fw-semibold fs-6 mb-2">Comprador Responsable</label>
-            <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm" disabled />
+            <label for="buyer" class="fw-semibold fs-6 mb-2">Comprador Responsable</label>
+            <input type="text" id="buyer" name="buyer" class="form-control form-control-sm"
+                   [(ngModel)]="buyer" disabled />
           </div>
 
           <!-- Farm Place (Disabled Input) -->
           <div class="col-md-6">
-            <label for="farmPlace" class="fw-semibold fs-6 mb-2">Broker</label>
-            <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm" disabled />
+            <label for="broker" class="fw-semibold fs-6 mb-2">Broker</label>
+            <input type="text" id="broker" name="broker" class="form-control form-control-sm"
+                   [(ngModel)]="broker" disabled />
           </div>
 
           <!-- Farm Place (Disabled Input) -->
           <div class="col-md-6">
-            <label for="farmPlace" class="fw-semibold fs-6 mb-2">Propietario de la Piscina</label>
-            <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm" disabled />
+            <label for="company" class="fw-semibold fs-6 mb-2">Propietario de la Piscina</label>
+            <input type="text" id="company" name="company" class="form-control form-control-sm"
+                   [(ngModel)]="company" disabled />
           </div>
 
           <!-- Farm Place (Disabled Input) -->
           <div class="col-md-6">
-            <label for="farmPlace" class="fw-semibold fs-6 mb-2">Nombre de la Piscina</label>
-            <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm" disabled />
+            <label for="shrimpFarm" class="fw-semibold fs-6 mb-2">Nombre de la Piscina</label>
+            <input type="text" id="shrimpFarm" name="shrimpFarm" class="form-control form-control-sm"
+                   [(ngModel)]="shrimpFarm"  disabled />
           </div>
 
           <!-- Farm Place (Disabled Input) -->
           <div class="col-md-6">
             <label for="farmPlace" class="fw-semibold fs-6 mb-2">Ubicación de la Piscina</label>
-            <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm" disabled />
+            <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm"
+                   [(ngModel)]="farmPlace" disabled />
           </div>
         </div>
       </div>
