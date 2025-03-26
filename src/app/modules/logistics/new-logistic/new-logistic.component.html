@@ -93,6 +93,50 @@
         </div>
       </div>
     </div>
+
+    <!-- Third Section: Details -->
+    <div class="card card-xl-stretch mb-xl-8 mt-2">
+      <!-- begin::Header -->
+      <div class="card-header border-0 pt-5">
+        <div class="d-flex justify-content-end w-100">
+        <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create"
+                (click)="create()">
+          Agregar Personal
+        </button>
+      </div>
+      </div>
+      <!-- end::Header -->
+
+      <div class="card-body py-3">
+        <div class="row g-5 g-xl-8">
+          <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="PERMISSION_ROUTE"
+                    (deleteEvent)="delete()" [reload]="reloadEvent">
+          </app-crud>
+        </div>
+      </div>
+    </div>
+
+    <!-- Third Section: Details -->
+    <div class="card card-xl-stretch mb-xl-8 mt-2">
+      <!-- begin::Header -->
+      <div class="card-header border-0 pt-5">
+        <div class="d-flex justify-content-end w-100">
+          <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create"
+                  (click)="create()">
+            Agregar Productos
+          </button>
+        </div>
+      </div>
+      <!-- end::Header -->
+
+      <div class="card-body py-3">
+        <div class="row g-5 g-xl-8">
+          <app-crud [datatableConfig]="datatableConfig2" [permissionRoute]="PERMISSION_ROUTE"
+                    (deleteEvent)="delete()" [reload]="reloadEvent">
+          </app-crud>
+        </div>
+      </div>
+    </div>
   </form>
 </div>
 

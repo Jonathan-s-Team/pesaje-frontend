@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import {LogisticRoutingModule} from "./logistic-routing.module";
 import {NewLogisticComponent} from "./new-logistic/new-logistic.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {CrudModule} from "../crud/crud.module";
+import {SharedModule} from "../shared/shared.module";
 
 
 
@@ -12,7 +14,9 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
     CommonModule,
     LogisticRoutingModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CrudModule,
+    SharedModule
   ]
 })
 export class LogisticModule { }
