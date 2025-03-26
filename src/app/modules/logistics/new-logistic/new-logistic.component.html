@@ -218,4 +218,81 @@
 
 </ng-template>
 
+<ng-template #formInputLogisticTypeModal let-inputLogisticTypeModal>
+  <form #myInputForm="ngForm" (ngSubmit)="onSubmit(myInputForm, inputLogisticTypeModal)">
+
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Detalles del Producto o Insumo</h4>
+      <button type="button" class="btn-close" aria-label="Cerrar" (click)="inputLogisticTypeModal.dismiss('Cross click')"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
+        <!--begin::Payment information form-->
+        <div class="collapse show">
+
+          <!-- Tipo de Pago -->
+          <div class="mb-3">
+            <label for="inputLogisticType" class="required fw-semibold fs-6 mb-2">Tipo de Producto o Insumo</label>
+            <select id="inputLogisticType" name="inputLogisticType" class="form-select form-select-sm" [(ngModel)]="createLogisticItemModel.logisticsType"
+                    #inputLogisticType="ngModel" required>
+              <option [ngValue]="null" disabled selected>Seleccione una opción</option>
+              <option *ngFor="let inputLogisticType of inputLogisticTypeList" [value]="inputLogisticType.id">
+                {{ inputLogisticType.name }}
+              </option>
+            </select>
+            <div *ngIf="(myInputForm.submitted || inputLogisticType.dirty || inputLogisticType.touched) && inputLogisticType.errors?.['required']"
+                 class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>El tipo de producto o insumo es obligatorio.</div>
+            </div>
+          </div>
+
+          <!-- Unidad -->
+          <div class="mb-3">
+            <label for="unit" class="required fw-semibold fs-6 mb-2">Unidades</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control" id="unit" name="unit" [(ngModel)]="createLogisticItemModel.unit"
+                     (blur)="formatDecimal('unit')" (keypress)="validateNumber($event)" required #unit="ngModel">
+              <div *ngIf="(myInputForm.submitted || unit.dirty || unit.touched) && unit.errors?.['required']"
+                   class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div>Las unidades son obligatorias.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Costo -->
+          <div class="mb-3">
+            <label for="cost" class="required fw-semibold fs-6 mb-2">Costo</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control" id="cost" name="cost" [(ngModel)]="createLogisticItemModel.cost"
+                     (blur)="formatDecimal('cost')" (keypress)="validateNumber($event)" required #cost="ngModel">
+              <div *ngIf="(myInputForm.submitted || cost.dirty || cost.touched) && cost.errors?.['required']"
+                   class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div>El costo es obligatorio.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!--end::Payment information form-->
+      </div>
+    </div>
+
+    <div class="modal-footer flex-center">
+      <button type="button" class="btn btn-light me-3" (click)="activeModal.dismiss('cancel')">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Guardar</span>
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        <span *ngIf="isLoading" class="visually-hidden">Guardando...</span>
+      </button>
+    </div>
+
+  </form>
+
+</ng-template>
+
 

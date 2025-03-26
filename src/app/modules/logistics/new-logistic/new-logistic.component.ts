@@ -25,9 +25,11 @@ export class NewLogisticComponent implements OnInit {
   @ViewChild('formLogisticTypeModal') formLogisticTypeModal: any;
 
   private logisticItemListSubject = new BehaviorSubject<ILogisticModel[]>([]);
+  private inputLogisticItemListSubject = new BehaviorSubject<ILogisticModel[]>([]);
   private unsubscribe: Subscription[] = [];
 
   logisticItemList$ = this.logisticItemListSubject.asObservable();
+  inputLogisticItemList$ = this.inputLogisticItemListSubject.asObservable();
 
   isLoading$: Observable<boolean>;
   isOnlyBuyer = false;
@@ -45,6 +47,7 @@ export class NewLogisticComponent implements OnInit {
   createLogisticModel: ICreateLogisticModel = {} as ICreateLogisticModel;
   createLogisticItemModel: ILogisticModel = {} as ILogisticModel;
   logisticItemList: ILogisticModel[] = [];
+  inputLogisticItemList: ILogisticModel[] = [];
   logisticTypeList: ILogisticTypeModel[] = [];
   personalLogisticTypeList: ILogisticTypeModel[] = [];
   inputLogisticTypeList: ILogisticTypeModel[] = [];
@@ -162,6 +165,16 @@ export class NewLogisticComponent implements OnInit {
       // Forzar la detección de cambios
       this.cdr.markForCheck();
     });
+
+    this.inputLogisticItemList$.subscribe(items => {
+      this.inputLogisticItemList = items;
+      this.datatableConfig2 = {
+        ...this.datatableConfig2,
+        data: items
+      };
+      // Forzar la detección de cambios
+      this.cdr.markForCheck();
+    });
   }
 
   ngOnInit(): void {
@@ -195,6 +208,40 @@ export class NewLogisticComponent implements OnInit {
 
   onDateChange(event: any): void {
     // date change logic
+  }
+
+  onSubmitInput(form: NgForm, modal: any): void {
+    if (form.invalid) {
+      // Calcular el total
+      this.createLogisticItemModel.total = this.createLogisticItemModel.unit * this.createLogisticItemModel.cost;
+
+      // Crear una copia del objeto con propiedades adicionales si es necesario
+      const newItem = {
+        id: Date.now().toString(), // Identificador único
+        ...this.createLogisticItemModel
+      };
+
+      // Actualizar el subject con los nuevos datos
+      this.ngZone.run(() => {
+        const currentItems = this.inputLogisticItemListSubject.getValue();
+        this.inputLogisticItemListSubject.next([...currentItems, newItem]);
+
+        // Cerrar el modal
+        modal.close('Success');
+
+        // Emitir evento de recarga después de actualizar los datos
+        this.reloadEvent.emit(true);
+
+        // Resetear el formulario y el modelo
+        form.resetForm();
+        this.createLogisticItemModel = {} as ILogisticModel;
+
+        // Forzar la detección de cambios
+        this.cdr.detectChanges();
+      });
+
+
+    }
   }
 
   onSubmit(form: NgForm, modal: any): void {
