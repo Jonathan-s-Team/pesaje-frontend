@@ -1,5 +1,5 @@
-import {ChangeDetectorRef, Component, EventEmitter, OnInit, ViewChild} from '@angular/core';
-import {Observable, Subscription} from "rxjs";
+import {ChangeDetectorRef, Component, EventEmitter, NgZone, OnInit, ViewChild} from '@angular/core';
+import {BehaviorSubject, Observable, Subscription} from "rxjs";
 import {NgForm} from "@angular/forms";
 import {DateUtilsService} from "../../../utils/date-utils.service";
 import {ICreateLogisticModel, ILogisticModel} from "../interfaces/logistic.interface";
@@ -24,7 +24,10 @@ export class NewLogisticComponent implements OnInit {
 
   @ViewChild('formLogisticTypeModal') formLogisticTypeModal: any;
 
+  private logisticItemListSubject = new BehaviorSubject<ILogisticModel[]>([]);
   private unsubscribe: Subscription[] = [];
+
+  logisticItemList$ = this.logisticItemListSubject.asObservable();
 
   isLoading$: Observable<boolean>;
   isOnlyBuyer = false;
@@ -54,30 +57,28 @@ export class NewLogisticComponent implements OnInit {
     columns: [
       {
         title: 'Personal',
-        data: 'purchaseDate',
+        data: 'logisticsType',
         render: function (data) {
-          if (!data) return '-';
-          const date = new Date(data);
-          return date.toLocaleDateString('es-ES');
+          return data ? data : '-';
         },
       },
       {
         title: 'Unidades',
-        data: 'subtotal',
+        data: 'unit',
         render: function (data) {
           return data ? data : '-';
         },
       },
       {
         title: 'Costo',
-        data: 'subtotal2',
+        data: 'cost',
         render: function (data) {
           return data ? data : '-';
         },
       },
       {
         title: 'Total',
-        data: 'grandTotal',
+        data: 'total',
         render: function (data) {
           return data ? data : '-';
         },
@@ -146,7 +147,22 @@ export class NewLogisticComponent implements OnInit {
     private purchaseService: PurchaseService,
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
-  ) {  }
+    private ngZone: NgZone
+  ) {
+    // Inicializa las listas y configuraciones
+    this.reloadEvent = new EventEmitter<boolean>();
+
+    // Suscríbete a cambios en la lista para actualizar la configuración de la tabla
+    this.logisticItemList$.subscribe(items => {
+      this.logisticItemList = items;
+      this.datatableConfig = {
+        ...this.datatableConfig,
+        data: items
+      };
+      // Forzar la detección de cambios
+      this.cdr.markForCheck();
+    });
+  }
 
   ngOnInit(): void {
     this.loadLogisticTypes();
@@ -164,14 +180,11 @@ export class NewLogisticComponent implements OnInit {
 
   delete(){}
 
-  create() {
-    this.createLogisticItemModel = {
-      logisticsType: '',
-      unit: 0,
-      cost: 0,
-      total: 0
-    } as ILogisticModel;
+  createPersonalItem() {
+    this.createLogisticItemModel = {} as ILogisticModel;
   }
+
+  createInputItem() {}
 
   formatDecimal(controlName: string) {
     /*const control = this.logisticForm.controls[controlName];
@@ -186,18 +199,33 @@ export class NewLogisticComponent implements OnInit {
 
   onSubmit(form: NgForm, modal: any): void {
     if (form.valid) {
+      // Calcular el total
       this.createLogisticItemModel.total = this.createLogisticItemModel.unit * this.createLogisticItemModel.cost;
-      console.log('form:', form);
 
-      this.logisticItemList.push(this.createLogisticItemModel);
-
-      this.datatableConfig = {
-        ...this.datatableConfig,
-        data: [...this.logisticItemList],
+      // Crear una copia del objeto con propiedades adicionales si es necesario
+      const newItem = {
+        id: Date.now().toString(), // Identificador único
+        ...this.createLogisticItemModel
       };
 
-      console.log('datatableConfig:', this.datatableConfig.data);
+      // Actualizar el subject con los nuevos datos
+      this.ngZone.run(() => {
+        const currentItems = this.logisticItemListSubject.getValue();
+        this.logisticItemListSubject.next([...currentItems, newItem]);
 
+        // Cerrar el modal
+        modal.close('Success');
+
+        // Emitir evento de recarga después de actualizar los datos
+        this.reloadEvent.emit(true);
+
+        // Resetear el formulario y el modelo
+        form.resetForm();
+        this.createLogisticItemModel = {} as ILogisticModel;
+
+        // Forzar la detección de cambios
+        this.cdr.detectChanges();
+      });
     }
   }
 
