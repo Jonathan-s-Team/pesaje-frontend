@@ -94,8 +94,42 @@
       <div class="card-body py-3">
 
         <div class="row g-5 g-xl-8">
+          <!-- Company -->
+          <div class="col-md-6">
+            <label for="company" class="required fw-semibold fs-6 mb-2">Compañía</label>
+            <select id="company" name="company" class="form-select form-select-sm"
+              [(ngModel)]="createPurchaseModel.company" #company="ngModel" required (change)="onCompanyChange($event)">
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option *ngFor="let company of companiesList" [value]="company.id">
+                {{ company.name }}
+              </option>
+            </select>
+            <div *ngIf="purchaseForm.submitted && company.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>Debe seleccionar una compañía.</div>
+            </div>
+          </div>
+
+          <!-- Period -->
+          <div class="col-md-6">
+            <label for="period" class="required fw-semibold fs-6 mb-2">Período</label>
+            <select id="period" name="period" class="form-select form-select-sm"
+              [(ngModel)]="createPurchaseModel.period" #period="ngModel" required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option *ngFor="let period of existingPeriods" [value]="period.id">
+                {{ period.name }}
+              </option>
+            </select>
+            <div *ngIf="purchaseForm.submitted && period.invalid"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>Debe seleccionar un período.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-5 g-xl-8 mt-1">
           <!-- Buyer -->
-          <div *ngIf="!isOnlyBuyer" class="col-md-6">
+          <div *ngIf="!isOnlyBuyer" class="col-md-4">
             <label for="buyer" class="required fw-semibold fs-6 mb-2">Comprador</label>
             <select id="buyer" name="buyer" class="form-select form-select-sm" [(ngModel)]="createPurchaseModel.buyer"
               #buyer="ngModel" required (change)="onBuyerChange($event)">
@@ -110,26 +144,8 @@
             </div>
           </div>
 
-          <!-- Company -->
-          <div class="col-md-6">
-            <label for="company" class="required fw-semibold fs-6 mb-2">Compañía</label>
-            <select id="company" name="company" class="form-select form-select-sm"
-              [(ngModel)]="createPurchaseModel.company" #company="ngModel" required>
-              <option value="" disabled selected>Seleccione una opción</option>
-              <option *ngFor="let company of companiesList" [value]="company.id">
-                {{ company.name }}
-              </option>
-            </select>
-            <div *ngIf="purchaseForm.submitted && company.invalid"
-              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>Debe seleccionar una compañía.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="row g-5 g-xl-8 mt-1">
           <!-- Broker -->
-          <div class="col-md-6">
+          <div class="col-md-4">
             <label for="broker" class="required fw-semibold fs-6 mb-2">Bróker</label>
             <select id="broker" name="broker" class="form-select form-select-sm"
               [(ngModel)]="createPurchaseModel.broker" #broker="ngModel" required>
@@ -145,7 +161,7 @@
           </div>
 
           <!-- Client Dropdown & "Nuevo Cliente" Button -->
-          <div class="col-md-6 d-flex align-items-center">
+          <div class="col-md-4 d-flex align-items-center">
             <div class="flex-grow-1">
               <label for="client" class="required fw-semibold fs-6 mb-2">Cliente</label>
               <div class="d-flex align-items-center">

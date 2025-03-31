@@ -1,10 +1,8 @@
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
   OnDestroy,
   OnInit,
-  TemplateRef,
   ViewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -26,7 +24,6 @@ import { ShrimpFarmService } from '../../shared/services/shrimp-farm.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import {
-  IBasePurchaseModel,
   ICreatePurchaseModel,
   IListPurchaseModel,
 } from '../interfaces/purchase.interface';
@@ -36,6 +33,8 @@ import { PurchasePaymentListingComponent } from '../purchase-payment-listing/pur
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { IReadUserModel } from '../../settings/interfaces/user.interface';
 import { UserService } from '../../settings/services/user.service';
+import { IReadPeriodModel } from '../../shared/interfaces/period.interface';
+import { PeriodService } from '../../shared/services/period.service';
 
 type Tabs = 'Details' | 'Payment Info';
 
@@ -59,6 +58,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   clientsList: IReadClientModel[];
   shrimpFarmsList: IReadShrimpFarmModel[];
   companiesList: IReadCompanyModel[];
+  existingPeriods: IReadPeriodModel[] = [];
 
   roles: IRoleModel[];
   isOnlyBuyer = false;
@@ -78,6 +78,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private authService: AuthService,
     private companyService: CompanyService,
+    private periodService: PeriodService,
     private brokerService: BrokerService,
     private clientService: ClientService,
     private shrimpFarmService: ShrimpFarmService,
@@ -114,6 +115,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
             this.loadBrokers(this.createPurchaseModel.buyer);
             this.loadClients(this.createPurchaseModel.buyer);
             this.loadShrimpFarms(this.createPurchaseModel.client);
+            this.loadPeriods(this.createPurchaseModel.company);
 
             // Format shrimp size calculations
             this.shrimpFarmSize = this.inputUtils.formatToDecimal(
@@ -149,6 +151,33 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     this.loadCompanies();
   }
 
+  loadCompanies(): void {
+    const companieSub = this.companyService
+      .getCompanies()
+      .pipe(distinctUntilChanged())
+      .subscribe({
+        next: (companies) => (this.companiesList = companies),
+        error: (err) => console.error('Error al cargar compañías', err),
+      });
+
+    this.unsubscribe.push(companieSub);
+  }
+
+  loadPeriods(companyId: string): void {
+    const periodSub = this.periodService
+      .getPeriodsByCompany(companyId)
+      .subscribe({
+        next: (periods) => {
+          this.existingPeriods = periods;
+        },
+        error: (err) => {
+          console.error('Error al cargar periodos:', err);
+        },
+      });
+
+    this.unsubscribe.push(periodSub);
+  }
+
   loadBuyers(): void {
     const userSub = this.userService.getAllUsers(true, 'Comprador').subscribe({
       next: (users: IReadUserModel[]) => {
@@ -161,18 +190,6 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     });
 
     this.unsubscribe.push(userSub);
-  }
-
-  loadCompanies(): void {
-    const companieSub = this.companyService
-      .getCompanies()
-      .pipe(distinctUntilChanged())
-      .subscribe({
-        next: (companies) => (this.companiesList = companies),
-        error: (err) => console.error('Error al cargar compañías', err),
-      });
-
-    this.unsubscribe.push(companieSub);
   }
 
   loadBrokers(buyerId: string): void {
@@ -212,8 +229,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     }
 
     const shrimpFarmSub = this.shrimpFarmService
-      //.getFarmsByClientAndBuyer(clientId, userId)
-      .getFarmsByClientAndBuyer(clientId)
+      .getFarmsByClientAndBuyer(clientId, userId)
       .subscribe({
         next: (farms: IReadShrimpFarmModel[]) => {
           this.shrimpFarmsList = farms;
@@ -234,6 +250,16 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       });
 
     this.unsubscribe.push(shrimpFarmSub);
+  }
+
+  onCompanyChange(event: Event) {
+    this.createPurchaseModel.period = '';
+
+    const companyId = (event.target as HTMLSelectElement).value;
+    if (companyId) {
+      // Fetch periods for the selected company
+      this.loadPeriods(companyId);
+    }
   }
 
   onBuyerChange(event: Event): void {
@@ -273,8 +299,6 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   submitForm(): void {
-    console.log('Submitting purchase data:', this.createPurchaseModel);
-
     if (this.purchaseId) {
       // ✅ Update Purchase if ID exists
       this.purchaseService
@@ -381,7 +405,9 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
   async openModal(): Promise<any> {
     if (this.modalRef) {
-      console.warn('⚠️ Modal is already open. Ignoring duplicate open request.');
+      console.warn(
+        '⚠️ Modal is already open. Ignoring duplicate open request.'
+      );
       return;
     }
 
@@ -397,17 +423,18 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
         centered: true,
         backdrop: 'static',
         keyboard: false, // Evitar cierre con tecla Escape
-        windowClass: 'payment-listing-modal' // Clase personalizada para estilos
+        windowClass: 'payment-listing-modal', // Clase personalizada para estilos
       });
 
       // Pasar el purchaseId como input al componente
-      const componentInstance = modalRef.componentInstance as PurchasePaymentListingComponent;
+      const componentInstance =
+        modalRef.componentInstance as PurchasePaymentListingComponent;
       componentInstance.purchaseId = this.purchaseId;
 
       this.modalRef = modalRef;
 
       // Cuando el modal se cierre, limpiar la referencia
-      const result = await modalRef.result.catch(error => {
+      const result = await modalRef.result.catch((error) => {
         console.warn('Modal dismissed:', error);
         return null;
       });
@@ -420,7 +447,6 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       return Promise.reject(error);
     }
   }
-
 
   /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */
   ngOnDestroy(): void {
