@@ -16,11 +16,14 @@ import { PurchasesRoutingModule } from './purchases-routing.module';
 import { NewPurchaseComponent } from './new-purchase/new-purchase.component';
 import { MaterialModule } from 'src/app/material.module';
 import { PurchasePaymentListingComponent } from './purchase-payment-listing/purchase-payment-listing.component';
-import {RecentPurchasesComponent} from "./recent-purchases/recent-purchases.component";
-import {PaymentFormComponent} from "./payment-form/payment-form.component";
+import { RecentPurchasesComponent } from './recent-purchases/recent-purchases.component';
 
 @NgModule({
-  declarations: [NewPurchaseComponent, PurchasePaymentListingComponent,RecentPurchasesComponent, PaymentFormComponent],
+  declarations: [
+    NewPurchaseComponent,
+    PurchasePaymentListingComponent,
+    RecentPurchasesComponent,
+  ],
   imports: [
     CommonModule,
     SharedModule,

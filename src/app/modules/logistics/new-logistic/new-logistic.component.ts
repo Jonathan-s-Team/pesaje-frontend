@@ -1,25 +1,38 @@
-import {ChangeDetectorRef, Component, EventEmitter, NgZone, OnInit, ViewChild} from '@angular/core';
-import {BehaviorSubject, Observable, Subscription} from "rxjs";
-import {NgForm} from "@angular/forms";
-import {DateUtilsService} from "../../../utils/date-utils.service";
-import {ICreateLogisticModel, ILogisticModel} from "../interfaces/logistic.interface";
-import {AuthService} from "../../auth";
-import {IListPurchaseModel} from "../../purchases/interfaces/purchase.interface";
-import {PurchaseService} from "../../purchases/services/purchase.service";
-import {Config} from "datatables.net";
-import {PERMISSION_ROUTES} from "../../../constants/routes.constants";
-import {ILogisticTypeModel, IReadLogisticTypeModel} from "../../shared/interfaces/logistic-type.interface";
-import {LogisticTypeService} from "../../shared/services/logistic-type.service";
-import {FormUtilsService} from "../../../utils/form-utils.service";
-import {InputUtilsService} from "../../../utils/input-utils.service";
-import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {AlertService} from "../../../utils/alert.service";
-import {LogisticService} from "../services/logistic.service";
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  NgZone,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { NgForm } from '@angular/forms';
+import { DateUtilsService } from '../../../utils/date-utils.service';
+import {
+  ICreateLogisticModel,
+  ILogisticModel,
+} from '../interfaces/logistic.interface';
+import { AuthService } from '../../auth';
+import { IListPurchaseModel } from '../../purchases/interfaces/purchase.interface';
+import { PurchaseService } from '../../purchases/services/purchase.service';
+import { Config } from 'datatables.net';
+import { PERMISSION_ROUTES } from '../../../constants/routes.constants';
+import {
+  ILogisticTypeModel,
+  IReadLogisticTypeModel,
+} from '../../shared/interfaces/logistic-type.interface';
+import { LogisticTypeService } from '../../shared/services/logistic-type.service';
+import { FormUtilsService } from '../../../utils/form-utils.service';
+import { InputUtilsService } from '../../../utils/input-utils.service';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AlertService } from '../../../utils/alert.service';
+import { LogisticService } from '../services/logistic.service';
 
 @Component({
   selector: 'app-new-logistic',
   templateUrl: './new-logistic.component.html',
-  styleUrl: './new-logistic.component.scss'
+  styleUrl: './new-logistic.component.scss',
 })
 export class NewLogisticComponent implements OnInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.RECENT_PRUCHASES;
@@ -28,7 +41,9 @@ export class NewLogisticComponent implements OnInit {
   @ViewChild('formInputLogisticTypeModal') formInputLogisticTypeModal: any;
 
   private logisticItemListSubject = new BehaviorSubject<ILogisticModel[]>([]);
-  private inputLogisticItemListSubject = new BehaviorSubject<ILogisticModel[]>([]);
+  private inputLogisticItemListSubject = new BehaviorSubject<ILogisticModel[]>(
+    []
+  );
   private unsubscribe: Subscription[] = [];
 
   logisticItemList$ = this.logisticItemListSubject.asObservable();
@@ -160,21 +175,21 @@ export class NewLogisticComponent implements OnInit {
     this.reloadEvent = new EventEmitter<boolean>();
 
     // Suscríbete a cambios en la lista para actualizar la configuración de la tabla
-    this.logisticItemList$.subscribe(items => {
+    this.logisticItemList$.subscribe((items) => {
       this.logisticItemList = items;
       this.datatableConfig = {
         ...this.datatableConfig,
-        data: items
+        data: items,
       };
       // Forzar la detección de cambios
       this.cdr.markForCheck();
     });
 
-    this.inputLogisticItemList$.subscribe(items => {
+    this.inputLogisticItemList$.subscribe((items) => {
       this.inputLogisticItemList = items;
       this.datatableConfig2 = {
         ...this.datatableConfig2,
-        data: items
+        data: items,
       };
       // Forzar la detección de cambios
       this.cdr.markForCheck();
@@ -186,9 +201,11 @@ export class NewLogisticComponent implements OnInit {
 
     this.createLogisticModel = {
       purchase: '',
-      logisticsDate: this.dateUtils.convertLocalDateToUTC(new Date().toISOString().split('T')[0]),
+      logisticsDate: this.dateUtils.convertLocalDateToUTC(
+        new Date().toISOString().split('T')[0]
+      ),
       grandTotal: 0,
-      items: []
+      items: [],
     };
   }
 
@@ -213,7 +230,7 @@ export class NewLogisticComponent implements OnInit {
       purchase: this.purchase,
       logisticsDate: this.createLogisticModel.logisticsDate,
       grandTotal: grandTotal,
-      items: allItems
+      items: allItems,
     };
 
     console.log('Objeto final a guardar:', this.createLogisticModel);
@@ -237,14 +254,14 @@ export class NewLogisticComponent implements OnInit {
     });
   }
 
-  delete(){}
+  delete() {}
 
   openPersonalModal() {
     this.createLogisticItemModel = {} as ILogisticModel;
     this.modalService.open(this.formLogisticTypeModal, {
       size: 'md',
       backdrop: 'static',
-      keyboard: false
+      keyboard: false,
     });
   }
 
@@ -253,7 +270,7 @@ export class NewLogisticComponent implements OnInit {
     this.modalService.open(this.formInputLogisticTypeModal, {
       size: 'md',
       backdrop: 'static',
-      keyboard: false
+      keyboard: false,
     });
   }
 
@@ -265,18 +282,20 @@ export class NewLogisticComponent implements OnInit {
   }
 
   onDateChange(event: any): void {
-    this.createLogisticModel.logisticsDate = this.dateUtils.convertLocalDateToUTC(event);
+    this.createLogisticModel.logisticsDate =
+      this.dateUtils.convertLocalDateToUTC(event);
   }
 
   onSubmitInput(form: NgForm, modal: any): void {
     if (form.valid) {
       // Calcular el total
-      this.createLogisticItemModel.total = this.createLogisticItemModel.unit * this.createLogisticItemModel.cost;
+      this.createLogisticItemModel.total =
+        this.createLogisticItemModel.unit * this.createLogisticItemModel.cost;
 
       // Crear una copia del objeto con propiedades adicionales si es necesario
       const newItem = {
         id: Date.now().toString(), // Identificador único
-        ...this.createLogisticItemModel
+        ...this.createLogisticItemModel,
       };
 
       // Actualizar el subject con los nuevos datos
@@ -297,20 +316,19 @@ export class NewLogisticComponent implements OnInit {
         // Forzar la detección de cambios
         this.cdr.detectChanges();
       });
-
-
     }
   }
 
   onSubmit(form: NgForm, modal: any): void {
     if (form.valid) {
       // Calcular el total
-      this.createLogisticItemModel.total = this.createLogisticItemModel.unit * this.createLogisticItemModel.cost;
+      this.createLogisticItemModel.total =
+        this.createLogisticItemModel.unit * this.createLogisticItemModel.cost;
 
       // Crear una copia del objeto con propiedades adicionales si es necesario
       const newItem = {
         id: Date.now().toString(), // Identificador único
-        ...this.createLogisticItemModel
+        ...this.createLogisticItemModel,
       };
 
       // Actualizar el subject con los nuevos datos
@@ -338,12 +356,16 @@ export class NewLogisticComponent implements OnInit {
     this.logisticTypeService.getAllLogisticsTypes().subscribe({
       next: (types) => {
         this.logisticTypeList = types;
-        this.personalLogisticTypeList = types.filter((logistic) => logistic.type == 'PERSONNEL');
-        this.inputLogisticTypeList = types.filter((logistic) => logistic.type == 'INPUTS');
+        this.personalLogisticTypeList = types.filter(
+          (logistic) => logistic.type == 'PERSONNEL'
+        );
+        this.inputLogisticTypeList = types.filter(
+          (logistic) => logistic.type == 'INPUTS'
+        );
       },
       error: (error) => {
         console.error('Error fetching logistic types:', error);
-      }
+      },
     });
   }
 
@@ -356,7 +378,7 @@ export class NewLogisticComponent implements OnInit {
       : null;
 
     const purchaseSub = this.purchaseService
-      .getPurchaseByParams(false, userId, null, this.controlNumber)
+      .getPurchaseByParams(false, userId, null, null, this.controlNumber)
       .subscribe({
         next: (purchases: IListPurchaseModel[]) => {
           console.log(purchases);
@@ -368,7 +390,9 @@ export class NewLogisticComponent implements OnInit {
           this.shrimpFarm = this.controlNumberPurchase.shrimpFarm;
           this.farmPlace = this.controlNumberPurchase.shrimpFarm;
           this.purchase = this.controlNumberPurchase.id;
-          this.purchaseDate = this.dateUtils.formatISOToDateInput(this.controlNumberPurchase.purchaseDate);
+          this.purchaseDate = this.dateUtils.formatISOToDateInput(
+            this.controlNumberPurchase.purchaseDate
+          );
           this.reloadEvent.emit(true);
           this.cdr.detectChanges();
         },
@@ -382,5 +406,4 @@ export class NewLogisticComponent implements OnInit {
   validateNumber(event: KeyboardEvent) {
     this.inputUtils.validateNumber(event);
   }
-
 }

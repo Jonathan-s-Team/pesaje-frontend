@@ -1,9 +1,9 @@
-export interface IPurchasePaymentMethodModel {
+export interface IPaymentMethodModel {
   name: string;
   id: string;
 }
 
-export interface IReadPurchasePaymentMethodModel {
+export interface IReadPaymentMethodModel {
   ok: boolean;
-  data: IPurchasePaymentMethodModel[];
+  data: IPaymentMethodModel[];
 }

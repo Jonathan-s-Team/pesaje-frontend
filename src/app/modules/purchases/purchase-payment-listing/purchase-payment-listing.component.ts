@@ -1,65 +1,51 @@
+import { PaymentMethodService } from './../../shared/services/payment-method.service';
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
   OnDestroy,
   OnInit,
-  TemplateRef,
   ViewChild,
 } from '@angular/core';
 import { PERMISSION_ROUTES } from '../../../constants/routes.constants';
 import { Config } from 'datatables.net';
 import { NgForm } from '@angular/forms';
-import { SweetAlertOptions } from 'sweetalert2';
 import { PurchasePaymentService } from '../../shared/services/purchase-payment.service';
 import {
   ICreateUpdatePurchasePaymentModel,
   IPurchasePaymentModel,
 } from '../../shared/interfaces/purchase-payment.interface';
-import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { FormUtilsService } from '../../../utils/form-utils.service';
 import { InputUtilsService } from '../../../utils/input-utils.service';
-import { PurchasePaymentMethodService } from '../../shared/services/payment-method.service';
-import {
-  IPurchasePaymentMethodModel,
-  IReadPurchasePaymentMethodModel,
-} from '../../shared/interfaces/payment-method.interface';
-import { Subscription } from 'rxjs';
-import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { distinctUntilChanged, Subscription } from 'rxjs';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from 'src/app/utils/alert.service';
-import { PaymentFormComponent } from '../payment-form/payment-form.component';
+import { IPaymentMethodModel } from '../../shared/interfaces/payment-method.interface';
+import { DateUtilsService } from 'src/app/utils/date-utils.service';
 
 @Component({
   selector: 'app-purchase-payment-listing',
   templateUrl: './purchase-payment-listing.component.html',
   styleUrls: ['./purchase-payment-listing.component.scss'],
 })
-export class PurchasePaymentListingComponent implements OnInit, AfterViewInit, OnDestroy {
+export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
 
   @Input() purchaseId!: string;
 
   private unsubscribe: Subscription[] = [];
-  private formModalRef: NgbModalRef | null = null;
 
   isLoading = false;
-  reloadData = false;
 
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  createPurchasePaymentModel: ICreateUpdatePurchasePaymentModel = {} as ICreateUpdatePurchasePaymentModel;
-  purchasePaymentMethodList: IPurchasePaymentMethodModel[] = [];
   purchasePayments: IPurchasePaymentModel[] = [];
+  purchasePaymentModel: IPurchasePaymentModel = {} as IPurchasePaymentModel;
 
-  @ViewChild('noticeSwal') noticeSwal!: SwalComponent;
-  @ViewChild('paymentForm') paymentForm!: NgForm;
+  paymentMethods: IPaymentMethodModel[] = [];
 
-  // Variable para almacenar los datos que se pasarán al nuevo modal
-  private currentPurchaseId = '';
-
-  swalOptions: SweetAlertOptions = {};
+  @ViewChild('myForm') paymentForm!: NgForm;
 
   datatableConfig: Config = {
     serverSide: false,
@@ -69,7 +55,7 @@ export class PurchasePaymentListingComponent implements OnInit, AfterViewInit, O
     columns: [
       {
         title: 'Tipo de Pago',
-        data: 'paymentMethod',
+        data: 'paymentMethod.name',
         render: function (data) {
           return data ? data : '-';
         },
@@ -78,7 +64,14 @@ export class PurchasePaymentListingComponent implements OnInit, AfterViewInit, O
         title: 'Monto',
         data: 'amount',
         render: function (data) {
-          return data ? data : '-';
+          if (!data && data !== 0) return '-';
+
+          const formatted = new Intl.NumberFormat('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(data);
+
+          return `$${formatted}`;
         },
       },
       {
@@ -101,168 +94,189 @@ export class PurchasePaymentListingComponent implements OnInit, AfterViewInit, O
 
   constructor(
     private purchasePaymentService: PurchasePaymentService,
-    private purchasePaymentMethodService: PurchasePaymentMethodService,
-    private cdr: ChangeDetectorRef,
+    private paymentMethodService: PaymentMethodService,
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
-    private changeDetectorRef: ChangeDetectorRef,
-    private modalService: NgbModal,
     public activeModal: NgbActiveModal,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private dateUtils: DateUtilsService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    console.log('PurchasePaymentListingComponent initialized with purchaseId:', this.purchaseId);
-    this.initialize();
-
-    // Si se indica que se deben recargar los datos, hacerlo
-    if (this.reloadData) {
-      this.loadPurchasePaymentsById(this.purchaseId);
-    }
+    this.loadPaymentsMethods();
+    this.loadPurchasePaymentsById(this.purchaseId);
   }
 
-  ngAfterViewInit(): void {
-    // Cargar datos necesarios
-    this.loadPurchasePaymentsMethods();
-
-    // Solo cargar pagos si hay un purchaseId válido
-    if (this.purchaseId) {
-      this.loadPurchasePaymentsById(this.purchaseId);
-    } else {
-      console.error('No purchaseId provided to PurchasePaymentListingComponent');
-    }
-  }
-
-  loadPurchasePaymentsMethods(): void {
-    const purchasePaymentMethodsSub = this.purchasePaymentMethodService
-      .getAllPaymentsMethods()
+  loadPurchasePaymentsById(purchaseId: string): void {
+    const sub = this.purchasePaymentService
+      .getPurchasePaymentsById(purchaseId)
       .subscribe({
-        next: (purchasePaymentMethods: IPurchasePaymentMethodModel[]) => {
-          this.purchasePaymentMethodList = purchasePaymentMethods;
-          this.changeDetectorRef.detectChanges();
+        next: (payments) => {
+          this.purchasePayments = payments;
+
+          this.datatableConfig = {
+            ...this.datatableConfig,
+            data: [...this.purchasePayments],
+          };
+
+          this.cdr.detectChanges();
+          this.reloadEvent.emit(true);
+        },
+        error: (error) => {
+          console.error('❌ Error loading purchase payments:', error);
+          this.alertService.showErrorAlert({
+            title: 'Error al cargar los pagos',
+            error,
+          });
+        },
+      });
+
+    this.unsubscribe.push(sub);
+  }
+
+  loadPaymentsMethods(): void {
+    const paymentMethodSub = this.paymentMethodService
+      .getAllPaymentsMethods()
+      .pipe(distinctUntilChanged())
+      .subscribe({
+        next: (methods) => {
+          this.paymentMethods = methods;
         },
         error: (error) => {
           console.error('Error fetching payment methods:', error);
         },
       });
 
-    this.unsubscribe.push(purchasePaymentMethodsSub);
+    this.unsubscribe.push(paymentMethodSub);
   }
 
-  loadPurchasePaymentsById(purchaseId: string): void {
-    const purchasePaymentMethodsObservable =
-      this.purchasePaymentService.getPurchasePaymentsById(purchaseId);
+  onSubmit(event: Event, myForm: NgForm): void {
+    if (myForm && myForm.invalid) {
+      return;
+    }
 
-    const purchasePaymentMethodsSub =
-      purchasePaymentMethodsObservable.subscribe({
-        next: (data) => {
-          this.purchasePayments = data;
-          this.datatableConfig = {
-            ...this.datatableConfig,
-            data: [...this.purchasePayments],
-          };
-          this.changeDetectorRef.detectChanges();
-        },
-        error: (error) => {
-          console.error('Error loading purchase payments:', error);
-          this.showAlert({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudo cargar la información de pagos.',
-          });
-        },
-      });
+    this.isLoading = true;
 
-    this.unsubscribe.push(purchasePaymentMethodsSub);
+    const completeFn = () => {
+      this.isLoading = false;
+    };
+
+    const paymentPayload: ICreateUpdatePurchasePaymentModel = {
+      purchase: this.purchasePaymentModel.purchase,
+      paymentMethod: this.purchasePaymentModel.paymentMethod.id,
+      amount: this.purchasePaymentModel.amount,
+      paymentDate: this.dateUtils.convertLocalDateToUTC(
+        this.purchasePaymentModel.paymentDate
+      ),
+    };
+
+    const updateFn = () => {
+      const updateSub = this.purchasePaymentService
+        .updatePurchasePayment(this.purchasePaymentModel.id, paymentPayload)
+        .subscribe({
+          next: (updatedInfo) => {
+            if (!updatedInfo.id) {
+              console.error('Updated payment has no ID');
+              return;
+            }
+
+            const index = this.purchasePayments.findIndex(
+              (item) => item.id === updatedInfo.id
+            );
+
+            if (index > -1) {
+              const fullUpdatedPayment: IPurchasePaymentModel = {
+                id: updatedInfo.id,
+                purchase: updatedInfo.purchase,
+                amount: updatedInfo.amount,
+                paymentDate: updatedInfo.paymentDate,
+                paymentMethod: this.paymentMethods.find(
+                  (x) => x.id === updatedInfo.paymentMethod
+                )!,
+              };
+
+              this.purchasePayments[index] = fullUpdatedPayment;
+            }
+
+            this.alertService.showSuccessAlert({});
+
+            this.datatableConfig = {
+              ...this.datatableConfig,
+              data: [...this.purchasePayments],
+            };
+
+            this.cdr.detectChanges();
+            this.reloadEvent.emit(true);
+          },
+          error: (error) => {
+            this.alertService.showErrorAlert({});
+            this.isLoading = false;
+          },
+          complete: completeFn,
+        });
+
+      this.unsubscribe.push(updateSub);
+    };
+
+    const createFn = () => {
+      const createSub = this.purchasePaymentService
+        .createPurchasePayment(paymentPayload)
+        .subscribe({
+          next: () => {
+            this.alertService.showSuccessAlert({});
+            this.loadPurchasePaymentsById(this.purchaseId);
+
+            this.paymentForm.resetForm(); // ✅ Clear the form
+            this.create(); // ✅ Reset the model (optional)
+          },
+          error: (error) => {
+            this.alertService.showErrorAlert({});
+            this.isLoading = false;
+          },
+          complete: completeFn,
+        });
+
+      this.unsubscribe.push(createSub);
+    };
+
+    if (this.purchasePaymentModel.id) {
+      updateFn();
+    } else {
+      createFn();
+    }
   }
 
   create() {
-    this.createPurchasePaymentModel = {} as ICreateUpdatePurchasePaymentModel;
-
-    // Abrir directamente el modal del formulario sin cerrar el actual
-    const paymentFormRef = this.modalService.open(PaymentFormComponent, {
-      centered: true,
-      backdrop: 'static',
-      windowClass: 'payment-form-modal'
-    });
-
-    // Configurar el componente
-    const paymentFormInstance = paymentFormRef.componentInstance;
-    paymentFormInstance.purchaseId = this.purchaseId;
-
-    // Cuando el formulario se cierre
-    paymentFormRef.result.then(
-      (result) => {
-        // Si se guardó el pago, recargar los datos
-        if (result === 'saved') {
-          this.loadPurchasePaymentsById(this.purchaseId);
-        }
-      },
-      (reason) => {
-        console.log('Form dismissed:', reason);
-      }
-    );
-  }
-
-  // Método para reabrir el modal principal
-  private reopenPaymentListingModal(shouldReload: boolean) {
-    const listingModalRef = this.modalService.open(PurchasePaymentListingComponent, {
-      size: 'lg',
-      centered: true,
-      backdrop: 'static'
-    });
-
-    // Configurar el componente con los mismos datos
-    const listingInstance = listingModalRef.componentInstance;
-    listingInstance.purchaseId = this.currentPurchaseId;
-
-    // Si se guardó el pago, indicar que se deben recargar los datos
-    if (shouldReload) {
-      listingInstance.reloadData = true;
-    }
+    this.purchasePaymentModel = {} as IPurchasePaymentModel;
+    this.purchasePaymentModel.purchase = this.purchaseId;
+    this.purchasePaymentModel.paymentMethod = {} as IPaymentMethodModel;
   }
 
   delete(id: string): void {
-    // Implementar lógica de eliminación si se requiere
-    console.log('Delete payment with ID:', id);
-    this.alertService.confirm().then((result) => {
-      if (result.isConfirmed) {
-        // Llamar al servicio para eliminar
-      }
-    });
+    const deleteSub = this.purchasePaymentService
+      .deletePurchasePayment(id)
+      .subscribe({
+        next: () => {
+          this.purchasePayments = this.purchasePayments.filter(
+            (item) => item.id !== id
+          );
+          this.reloadEvent.emit(true);
+        },
+        error: () => {
+          this.alertService.showErrorAlert({});
+        },
+      });
+    this.unsubscribe.push(deleteSub);
   }
 
   edit(id: string): void {
-    // Implementar lógica de edición si se requiere
-    console.log('Edit payment with ID:', id);
-  }
+    const foundItem = this.purchasePayments.find((item) => item.id === id);
+    this.purchasePaymentModel = foundItem ?? ({} as IPurchasePaymentModel);
 
-  showAlert(swalOptions: SweetAlertOptions) {
-    let style = swalOptions.icon?.toString() || 'success';
-    if (swalOptions.icon === 'error') {
-      style = 'danger';
-    }
-    this.swalOptions = Object.assign(
-      {
-        buttonsStyling: false,
-        confirmButtonText: 'Ok, got it!',
-        customClass: {
-          confirmButton: 'btn btn-' + style,
-        },
-      },
-      swalOptions
+    this.purchasePaymentModel.paymentDate = this.dateUtils.formatISOToDateInput(
+      this.purchasePaymentModel.paymentDate
     );
-    this.cdr.detectChanges();
-    if (this.noticeSwal) {
-      this.noticeSwal.fire();
-    } else {
-      console.warn('noticeSwal component is not available');
-    }
-  }
-
-  initialize() {
-    this.reloadEvent = new EventEmitter<boolean>();
-    this.createPurchasePaymentModel = {} as ICreateUpdatePurchasePaymentModel;
   }
 
   formatDecimal(controlName: string) {
@@ -278,11 +292,7 @@ export class PurchasePaymentListingComponent implements OnInit, AfterViewInit, O
 
   ngOnDestroy(): void {
     // Limpiar todas las suscripciones
-    this.unsubscribe.forEach(sub => sub.unsubscribe());
-
-    // Cerrar cualquier modal abierto
-    if (this.formModalRef) {
-      this.formModalRef.close();
-    }
+    this.unsubscribe.forEach((sub) => sub.unsubscribe());
+    this.reloadEvent.unsubscribe();
   }
 }
