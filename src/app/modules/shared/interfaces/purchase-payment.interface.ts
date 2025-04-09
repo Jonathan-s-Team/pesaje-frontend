@@ -1,17 +1,20 @@
+import { IPaymentMethodModel } from './payment-method.interface';
+
 export interface IPurchasePaymentModel {
   purchase: string;
-  paymentMethod: string;
+  paymentMethod: IPaymentMethodModel;
   amount: number;
-  paymentDate: Date;
+  paymentDate: string;
   deletedAt?: Date;
   id: string;
 }
 
 export interface ICreateUpdatePurchasePaymentModel {
+  id?: string;
   purchase: string;
   paymentMethod: string;
   amount: number;
-  paymentDate: Date;
+  paymentDate: string;
 }
 
 export interface IReadPurchasePaymentModel {

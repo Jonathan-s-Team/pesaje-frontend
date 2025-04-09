@@ -371,16 +371,15 @@
       </div>
 
       <div class="card-footer d-flex justify-content-end py-6 px-9">
-        <!-- Payments List Button -->
-        <button *ngIf="createPurchaseModel.status" type="button" (click)="openModal()" class="btn btn-secondary"
-          [disabled]="isLoading$ | async">
-          Pagos
+        <!-- Submit Button -->
+        <button *ngIf="canSavePurchase()" type="submit" class="btn btn-primary me-3" [disabled]="isLoading$ | async">
+          Guardar
         </button>
 
-        <!-- Submit Button -->
-        <button *ngIf="!createPurchaseModel.status" type="submit" class="btn btn-primary"
+        <!-- Payments List Button -->
+        <button *ngIf="canAddPayments()" type="button" (click)="openPaymentsModal()" class="btn btn-secondary"
           [disabled]="isLoading$ | async">
-          Guardar
+          Pagos
         </button>
       </div>
     </div>

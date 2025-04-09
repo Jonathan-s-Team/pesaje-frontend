@@ -26,6 +26,7 @@ import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import {
   ICreatePurchaseModel,
   IListPurchaseModel,
+  PurchaseStatusEnum,
 } from '../interfaces/purchase.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { AlertService } from 'src/app/utils/alert.service';
@@ -346,6 +347,26 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     });
   }
 
+  canSavePurchase(): boolean {
+    if (!this.purchaseId) return true;
+
+    if (this.isOnlyBuyer) {
+      return this.createPurchaseModel.status !== PurchaseStatusEnum.COMPLETED;
+    }
+
+    return true;
+  }
+
+  canAddPayments(): boolean {
+    if (this.purchaseId) return true;
+
+    if (this.isOnlyBuyer) {
+      return this.createPurchaseModel.status !== PurchaseStatusEnum.COMPLETED;
+    }
+
+    return false;
+  }
+
   addNewClient() {
     if (this.isOnlyBuyer) this.router.navigate(['clients']);
     else this.router.navigate(['settings', 'clients']);
@@ -403,48 +424,39 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     this.inputUtils.validateNumber(event); // ✅ Use utility function
   }
 
-  async openModal(): Promise<any> {
+  async openPaymentsModal(): Promise<any> {
     if (this.modalRef) {
-      console.warn(
-        '⚠️ Modal is already open. Ignoring duplicate open request.'
-      );
+      // console.warn(
+      //   '⚠️ Modal is already open. Ignoring duplicate open request.'
+      // );
       return;
     }
 
     if (!this.purchaseId) {
-      console.error('❌ purchaseId is missing. Modal cannot be opened.');
+      // console.error('❌ purchaseId is missing. Modal cannot be opened.');
       return;
     }
 
     try {
-      // Configurar el modal con opciones específicas para evitar problemas
-      const modalRef = this.modalService.open(PurchasePaymentListingComponent, {
+      this.modalRef = this.modalService.open(PurchasePaymentListingComponent, {
         size: 'lg',
         centered: true,
         backdrop: 'static',
-        keyboard: false, // Evitar cierre con tecla Escape
-        windowClass: 'payment-listing-modal', // Clase personalizada para estilos
+        keyboard: false,
+        windowClass: 'payment-listing-modal',
       });
 
-      // Pasar el purchaseId como input al componente
-      const componentInstance =
-        modalRef.componentInstance as PurchasePaymentListingComponent;
-      componentInstance.purchaseId = this.purchaseId;
+      // ✅ Set input safely
+      this.modalRef.componentInstance.purchaseId = this.purchaseId;
 
-      this.modalRef = modalRef;
-
-      // Cuando el modal se cierre, limpiar la referencia
-      const result = await modalRef.result.catch((error) => {
-        console.warn('Modal dismissed:', error);
-        return null;
-      });
-
-      this.modalRef = null; // Limpiar la referencia al cerrar
+      const result = await this.modalRef.result;
       return result;
     } catch (error) {
-      console.error('❌ Modal error:', error);
+      // console.warn('⚠️ Modal dismissed or error occurred:', error);
+      return null;
+    } finally {
+      // ✅ Always clear the modal ref
       this.modalRef = null;
-      return Promise.reject(error);
     }
   }
 

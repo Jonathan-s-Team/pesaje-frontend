@@ -89,7 +89,5 @@ export interface IUpdatePurchaseModel {
 export enum PurchaseStatusEnum {
   DRAFT = 'DRAFT',
   IN_PROGRESS = 'IN_PROGRESS',
-  READY_FOR_CONFIRMATION = 'READY_FOR_CONFIRMATION',
   COMPLETED = 'COMPLETED',
-  CANCELED = 'CANCELED',
 }

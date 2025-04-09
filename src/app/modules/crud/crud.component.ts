@@ -36,6 +36,8 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() permissionRoute: string = '/';
 
+  @Input() existsOutModalRef: boolean = false;
+
   // Reload emitter inside datatable
   @Input() reload: EventEmitter<boolean>;
 
@@ -100,7 +102,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.reload) {
       this.reload.subscribe((data) => {
-        this.modalService.dismissAll();
+        if (!this.existsOutModalRef) this.modalService.dismissAll();
 
         this.datatableElement.dtInstance?.then((dtInstance: Api) => {
           if (this.datatableConfig.serverSide) {

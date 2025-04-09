@@ -8,12 +8,19 @@ import { Config } from 'datatables.net';
 import { PERMISSION_ROUTES } from '../../../constants/routes.constants';
 import { AuthService } from '../../auth';
 import { PurchaseService } from '../services/purchase.service';
-import { Subscription } from 'rxjs';
+import { distinctUntilChanged, Subscription } from 'rxjs';
 import {
   IDetailedPurchaseModel,
   IListPurchaseModel,
+  PurchaseStatusEnum,
 } from '../interfaces/purchase.interface';
 import { Router } from '@angular/router';
+import { PeriodService } from '../../shared/services/period.service';
+import { CompanyService } from '../../shared/services/company.service';
+import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
+import { IReadPeriodModel } from '../../shared/interfaces/period.interface';
+import { IReadClientModel } from '../../shared/interfaces/client.interface';
+import { ClientService } from '../../shared/services/client.service';
 
 @Component({
   selector: 'app-recent-purchases',
@@ -30,12 +37,43 @@ export class RecentPurchasesComponent implements OnInit {
   isOnlyBuyer = false;
   recentPurchases: IListPurchaseModel[] = [];
 
+  companies: IReadCompanyModel[] = [];
+  existingPeriods: IReadPeriodModel[] = [];
+  clients: IReadClientModel[] = [];
+  selectedPeriod = '';
+  selectedCompany = '';
+  selectedClient = '';
+  controlNumber = '';
+
   datatableConfig: Config = {
     serverSide: false,
     paging: true,
     pageLength: 10,
     data: [],
     columns: [
+      {
+        title: 'Numero de Control',
+        data: 'controlNumber',
+        render: function (data) {
+          return data ? data : '-';
+        },
+      },
+      {
+        title: 'Estado',
+        data: 'status',
+        render: function (data: PurchaseStatusEnum) {
+          switch (data) {
+            case PurchaseStatusEnum.DRAFT:
+              return `<span class="badge bg-secondary">Sin pagos</span>`;
+            case PurchaseStatusEnum.IN_PROGRESS:
+              return `<span class="badge bg-warning text-dark">En progreso</span>`;
+            case PurchaseStatusEnum.COMPLETED:
+              return `<span class="badge bg-success">Completado</span>`;
+            default:
+              return `<span class="badge bg-light text-dark">Desconocido</span>`;
+          }
+        },
+      },
       {
         title: 'Fecha de Compra',
         data: 'purchaseDate',
@@ -49,49 +87,56 @@ export class RecentPurchasesComponent implements OnInit {
         title: 'Subtotal',
         data: 'subtotal',
         render: function (data) {
-          return data ? data : '-';
+          if (!data && data !== 0) return '-';
+
+          const formatted = new Intl.NumberFormat('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(data);
+
+          return `$${formatted}`;
         },
       },
       {
         title: 'Subtotal 2',
         data: 'subtotal2',
         render: function (data) {
-          return data ? data : '-';
+          if (!data && data !== 0) return '-';
+
+          const formatted = new Intl.NumberFormat('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(data);
+
+          return `$${formatted}`;
         },
       },
       {
         title: 'Total',
         data: 'grandTotal',
         render: function (data) {
-          return data ? data : '-';
+          if (!data && data !== 0) return '-';
+
+          const formatted = new Intl.NumberFormat('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(data);
+
+          return `$${formatted}`;
         },
       },
       {
         title: 'Total Acordado',
         data: 'totalAgreedToPay',
         render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Factura',
-        data: 'invoice',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Estado',
-        data: 'status',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Numero de Control',
-        data: 'controlNumber',
-        render: function (data) {
-          return data ? data : '-';
+          if (!data && data !== 0) return '-';
+
+          const formatted = new Intl.NumberFormat('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(data);
+
+          return `$${formatted}`;
         },
       },
     ],
@@ -106,12 +151,17 @@ export class RecentPurchasesComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private purchaseService: PurchaseService,
+    private companyService: CompanyService,
+    private periodService: PeriodService,
+    private clientService: ClientService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
+    this.loadCompanies();
+    this.loadClients();
     this.loadRecentPurchases();
   }
 
@@ -120,8 +170,18 @@ export class RecentPurchasesComponent implements OnInit {
       ? this.authService.currentUserValue?.id ?? null
       : null;
 
+    const parsedControlNumber = Number(this.controlNumber);
+
     const purchaseSub = this.purchaseService
-      .getPurchaseByParams(false, userId, null, null)
+      .getPurchaseByParams(
+        false,
+        userId,
+        this.selectedPeriod ? this.selectedPeriod : null,
+        this.selectedClient ? this.selectedClient : null,
+        !this.controlNumber || isNaN(parsedControlNumber)
+          ? null
+          : parsedControlNumber
+      )
       .subscribe({
         next: (purchases: IListPurchaseModel[]) => {
           this.recentPurchases = purchases;
@@ -141,6 +201,73 @@ export class RecentPurchasesComponent implements OnInit {
 
   edit(id: string) {
     this.router.navigate(['purchases', 'edit', id]);
+  }
+
+  loadCompanies(): void {
+    const companySub = this.companyService
+      .getCompanies()
+      .pipe(distinctUntilChanged())
+      .subscribe({
+        next: (companies) => (this.companies = companies),
+        error: (err) => console.error('Error al cargar compañías', err),
+      });
+
+    this.unsubscribe.push(companySub);
+  }
+
+  onCompanyChange() {
+    if (!this.selectedCompany) {
+      this.existingPeriods = [];
+      return;
+    }
+
+    // Fetch periods for the selected company
+    this.periodService.getPeriodsByCompany(this.selectedCompany).subscribe({
+      next: (periods) => {
+        this.existingPeriods = periods;
+      },
+      error: (err) => {
+        console.error('Error al cargar periodos:', err);
+      },
+    });
+
+    this.selectedPeriod = '';
+  }
+
+  loadClients(): void {
+    const userId: string | null = this.isOnlyBuyer
+      ? this.authService.currentUserValue?.id ?? null
+      : null;
+
+    let clientSub;
+    if (userId) {
+      clientSub = this.clientService
+        .getClientsByUser(userId)
+        .pipe(distinctUntilChanged())
+        .subscribe({
+          next: (clients) => (this.clients = clients),
+          error: (err) => console.error('Error al cargar clientes', err),
+        });
+    } else {
+      clientSub = this.clientService
+        .getAllClients(false)
+        .pipe(distinctUntilChanged())
+        .subscribe({
+          next: (clients) => (this.clients = clients),
+          error: (err) => console.error('Error al cargar clientes', err),
+        });
+    }
+
+    this.unsubscribe.push(clientSub);
+  }
+
+  clearFilters() {
+    this.selectedClient = '';
+    this.selectedCompany = '';
+    this.selectedPeriod = '';
+    this.controlNumber = '';
+
+    this.loadRecentPurchases();
   }
 
   ngOnDestroy(): void {

@@ -4,7 +4,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import {
-  ICreatePurchaseModel, IDetailedPurchaseModel, IListPurchaseModel,
+  ICreatePurchaseModel,
+  IDetailedPurchaseModel,
+  IListPurchaseModel,
   IUpdatePurchaseModel,
 } from '../interfaces/purchase.interface';
 
@@ -68,6 +70,7 @@ export class PurchaseService {
   getPurchaseByParams(
     includeDeleted: boolean,
     userId: string | null,
+    periodId: string | null,
     clientId: string | null,
     controlNumber: number | null
   ): Observable<IListPurchaseModel[]> {
@@ -76,8 +79,10 @@ export class PurchaseService {
     const params = new URLSearchParams();
     params.append('includeDeleted', includeDeleted.toString());
     if (userId) params.append('userId', userId);
+    if (periodId) params.append('periodId', periodId);
     if (clientId) params.append('clientId', clientId);
-    if (controlNumber !== null) params.append('controlNumber', controlNumber.toString());
+    if (controlNumber !== null)
+      params.append('controlNumber', controlNumber.toString());
 
     return this.http
       .get<{ ok: boolean; data: IListPurchaseModel[] }>(
