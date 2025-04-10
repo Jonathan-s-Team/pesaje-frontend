@@ -1,11 +1,16 @@
-export interface ILogisticTypeModel {
+export interface ILogisticsCategoryModel {
   name: string;
-  type: string;
+  category: LogisticsCategoryEnum;
   deleteAt: Date;
   id: string;
 }
 
-export interface IReadLogisticTypeModel {
+export interface IReadLogisticsCategoryModel {
   ok: boolean;
-  data: ILogisticTypeModel[];
+  data: ILogisticsCategoryModel[];
+}
+
+export enum LogisticsCategoryEnum {
+  PERSONNEL = 'PERSONNEL',
+  INPUTS = 'INPUTS',
 }

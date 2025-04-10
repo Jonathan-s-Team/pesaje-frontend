@@ -5,31 +5,30 @@ import {
   OnInit,
 } from '@angular/core';
 import { Config } from 'datatables.net';
-import { PERMISSION_ROUTES } from '../../../constants/routes.constants';
-import { AuthService } from '../../auth';
-import { PurchaseService } from '../services/purchase.service';
+import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
+import { AuthService } from '../../../auth';
 import { distinctUntilChanged, Subscription } from 'rxjs';
+
+import { Router } from '@angular/router';
+import { PeriodService } from '../../../shared/services/period.service';
+import { CompanyService } from '../../../shared/services/company.service';
+import { IReadCompanyModel } from '../../../shared/interfaces/company.interface';
+import { IReadPeriodModel } from '../../../shared/interfaces/period.interface';
+import { IReadClientModel } from '../../../shared/interfaces/client.interface';
+import { ClientService } from '../../../shared/services/client.service';
 import {
-  IDetailedPurchaseModel,
-  IListPurchaseModel,
   IReducedDetailedPurchaseModel,
   PurchaseStatusEnum,
-} from '../interfaces/purchase.interface';
-import { Router } from '@angular/router';
-import { PeriodService } from '../../shared/services/period.service';
-import { CompanyService } from '../../shared/services/company.service';
-import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
-import { IReadPeriodModel } from '../../shared/interfaces/period.interface';
-import { IReadClientModel } from '../../shared/interfaces/client.interface';
-import { ClientService } from '../../shared/services/client.service';
+} from 'src/app/modules/purchases/interfaces/purchase.interface';
+import { PurchaseService } from 'src/app/modules/purchases/services/purchase.service';
 
 @Component({
-  selector: 'app-recent-purchases',
-  templateUrl: './recent-purchases.component.html',
-  styleUrl: './recent-purchases.component.scss',
+  selector: 'app-recent-logistics',
+  templateUrl: './recent-logistics.component.html',
+  styleUrl: './recent-logistics.component.scss',
 })
-export class RecentPurchasesComponent implements OnInit {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.RECENT_PRUCHASES;
+export class RecentLogisticsComponent implements OnInit {
+  PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.RECENT_LOGISTICS;
 
   private unsubscribe: Subscription[] = [];
 
