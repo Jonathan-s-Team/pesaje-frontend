@@ -73,7 +73,7 @@ export class PurchaseService {
     userId: string | null,
     periodId: string | null,
     clientId: string | null,
-    controlNumber: number | null
+    controlNumber: string | null
   ): Observable<IReducedDetailedPurchaseModel[]> {
     this.isLoadingSubject.next(true);
 
