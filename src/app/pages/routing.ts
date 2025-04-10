@@ -29,8 +29,8 @@ const Routing: Routes = [
   {
     path: 'logistics',
     loadChildren: () =>
-      import('../modules/logistics/logistic.module').then(
-        (m) => m.LogisticModule
+      import('../modules/logistics/logistics.module').then(
+        (m) => m.LogisticsModule
       ),
   },
   {

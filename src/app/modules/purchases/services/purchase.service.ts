@@ -7,6 +7,7 @@ import {
   ICreatePurchaseModel,
   IDetailedPurchaseModel,
   IListPurchaseModel,
+  IReducedDetailedPurchaseModel,
   IUpdatePurchaseModel,
 } from '../interfaces/purchase.interface';
 
@@ -73,7 +74,7 @@ export class PurchaseService {
     periodId: string | null,
     clientId: string | null,
     controlNumber: number | null
-  ): Observable<IListPurchaseModel[]> {
+  ): Observable<IReducedDetailedPurchaseModel[]> {
     this.isLoadingSubject.next(true);
 
     const params = new URLSearchParams();
@@ -85,7 +86,7 @@ export class PurchaseService {
       params.append('controlNumber', controlNumber.toString());
 
     return this.http
-      .get<{ ok: boolean; data: IListPurchaseModel[] }>(
+      .get<{ ok: boolean; data: IReducedDetailedPurchaseModel[] }>(
         `${API_PURCHASE_URL}/by-params?${params.toString()}`
       )
       .pipe(

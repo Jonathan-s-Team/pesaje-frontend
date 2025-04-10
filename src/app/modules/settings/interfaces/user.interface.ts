@@ -23,3 +23,8 @@ export interface IReadUserModel {
   roles: IRoleModel[];
   username: string;
 }
+
+export interface IReducedUserModel {
+  id: string;
+  fullName: string;
+}

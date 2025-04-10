@@ -5,8 +5,8 @@
   </div>
 </div>
 
-<!-- Purchase Form -->
 <div *ngIf="!(isLoading$ | async)">
+  <!-- Purchase Form -->
   <form #purchaseForm="ngForm" (ngSubmit)="confirmSave($event,purchaseForm)" novalidate>
 
     <!-- First Section: General Purchase Info -->

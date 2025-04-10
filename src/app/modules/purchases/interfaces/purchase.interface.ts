@@ -1,9 +1,15 @@
 import { IReadBrokerModel } from '../../personal-profile/interfaces/broker.interface';
-import { IReadUserModel } from '../../settings/interfaces/user.interface';
+import {
+  IReadUserModel,
+  IReducedUserModel,
+} from '../../settings/interfaces/user.interface';
 import { IReadClientModel } from '../../shared/interfaces/client.interface';
 import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
 import { IReadPeriodModel } from '../../shared/interfaces/period.interface';
-import { IReadShrimpFarmModel } from '../../shared/interfaces/shrimp-farm.interface';
+import {
+  IReadShrimpFarmModel,
+  IReducedShrimpFarmModel,
+} from '../../shared/interfaces/shrimp-farm.interface';
 
 export interface ICreatePurchaseModel {
   buyer: string;
@@ -68,6 +74,17 @@ export interface IListPurchaseModel extends IBasePurchaseModel {
   client: string;
   shrimpFarm: string;
   totalPayed?: number;
+}
+
+export interface IReducedDetailedPurchaseModel extends IBasePurchaseModel {
+  buyer: IReducedUserModel;
+  company: IReadCompanyModel;
+  period: string;
+  broker: IReducedUserModel;
+  client: IReducedUserModel;
+  shrimpFarm: IReducedShrimpFarmModel;
+  totalPayed?: number;
+  id: string;
 }
 
 export interface IUpdatePurchaseModel {

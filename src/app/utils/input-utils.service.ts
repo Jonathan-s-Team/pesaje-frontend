@@ -28,4 +28,16 @@ export class InputUtilsService {
       event.preventDefault();
     }
   }
+
+  /**
+   * 👉 Validates numeric input (only whole numbers allowed).
+   */
+  validateWholeNumber(event: KeyboardEvent): void {
+    const pattern = /^[0-9]$/;
+    const inputChar = event.key;
+
+    if (!pattern.test(inputChar)) {
+      event.preventDefault();
+    }
+  }
 }
