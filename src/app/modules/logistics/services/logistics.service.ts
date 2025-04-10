@@ -35,7 +35,7 @@ export class LogisticsService {
   getLogisticsByParams(
     includeDeleted: boolean,
     userId: string | null,
-    controlNumber: number | null
+    controlNumber: string | null
   ): Observable<IReadLogisticsModel[]> {
     this.isLoadingSubject.next(true);
 

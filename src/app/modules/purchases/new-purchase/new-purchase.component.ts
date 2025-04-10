@@ -63,11 +63,12 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
   roles: IRoleModel[];
   isOnlyBuyer = false;
+  isLocal = false;
 
   farmPlace: string = '';
   shrimpFarmSize: string = '';
   shrimpFarmSize2: string = '';
-  purchaseId: string | null = null;
+  purchaseId?: string;
 
   createPurchaseModel: ICreatePurchaseModel = {} as ICreatePurchaseModel;
 
@@ -102,44 +103,8 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.purchaseId = this.route.snapshot.paramMap.get('id') || '';
-
+    this.purchaseId = this.route.snapshot.paramMap.get('id') || undefined;
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
-
-    if (this.purchaseId) {
-      const purchaseSub = this.purchaseService
-        .getPurchaseById(this.purchaseId)
-        .subscribe({
-          next: (purchase: IListPurchaseModel) => {
-            this.createPurchaseModel = { ...purchase };
-
-            this.loadBrokers(this.createPurchaseModel.buyer);
-            this.loadClients(this.createPurchaseModel.buyer);
-            this.loadShrimpFarms(this.createPurchaseModel.client);
-            this.loadPeriods(this.createPurchaseModel.company);
-
-            // Format shrimp size calculations
-            this.shrimpFarmSize = this.inputUtils.formatToDecimal(
-              this.createPurchaseModel.averageGrams > 0
-                ? 1000 / this.createPurchaseModel.averageGrams
-                : 0
-            );
-            this.shrimpFarmSize2 = this.inputUtils.formatToDecimal(
-              this.createPurchaseModel.averageGrams2 &&
-                this.createPurchaseModel.averageGrams2! > 0
-                ? 1000 / this.createPurchaseModel.averageGrams2!
-                : 0
-            );
-
-            this.changeDetectorRef.detectChanges();
-          },
-          error: (error) => {
-            console.error('Error fetching purchases:', error);
-          },
-        });
-
-      this.unsubscribe.push(purchaseSub);
-    }
 
     if (this.isOnlyBuyer) {
       this.createPurchaseModel.buyer = this.authService.currentUserValue?.id!;
@@ -149,19 +114,65 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       this.loadBuyers();
     }
 
-    this.loadCompanies();
+    const companiesSub = this.loadCompanies().subscribe({
+      next: (companies) => {
+        this.companiesList = companies;
+
+        if (this.purchaseId) {
+          const purchaseSub = this.purchaseService
+            .getPurchaseById(this.purchaseId)
+            .subscribe({
+              next: (purchase: IListPurchaseModel) => {
+                this.createPurchaseModel = { ...purchase };
+
+                this.loadBrokers(this.createPurchaseModel.buyer);
+                this.loadClients(this.createPurchaseModel.buyer);
+                this.loadShrimpFarms(this.createPurchaseModel.client);
+
+                if (this.createPurchaseModel.company) {
+                  const selectedCompany = this.companiesList.find(
+                    (com) => com.id === this.createPurchaseModel.company
+                  );
+                  this.isLocal = selectedCompany?.name === 'Local';
+                  if (!this.isLocal) {
+                    this.loadPeriods(this.createPurchaseModel.company);
+                  }
+                } else {
+                  this.isLocal = false;
+                }
+
+                this.shrimpFarmSize = this.inputUtils.formatToDecimal(
+                  this.createPurchaseModel.averageGrams > 0
+                    ? 1000 / this.createPurchaseModel.averageGrams
+                    : 0
+                );
+                this.shrimpFarmSize2 = this.inputUtils.formatToDecimal(
+                  this.createPurchaseModel.averageGrams2 &&
+                    this.createPurchaseModel.averageGrams2! > 0
+                    ? 1000 / this.createPurchaseModel.averageGrams2!
+                    : 0
+                );
+
+                this.changeDetectorRef.detectChanges();
+              },
+              error: (error) => {
+                console.error('Error fetching purchases:', error);
+              },
+            });
+
+          this.unsubscribe.push(purchaseSub);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading companies:', error);
+      },
+    });
+
+    this.unsubscribe.push(companiesSub);
   }
 
-  loadCompanies(): void {
-    const companieSub = this.companyService
-      .getCompanies()
-      .pipe(distinctUntilChanged())
-      .subscribe({
-        next: (companies) => (this.companiesList = companies),
-        error: (err) => console.error('Error al cargar compañías', err),
-      });
-
-    this.unsubscribe.push(companieSub);
+  loadCompanies(): Observable<IReadCompanyModel[]> {
+    return this.companyService.getCompanies().pipe(distinctUntilChanged());
   }
 
   loadPeriods(companyId: string): void {
@@ -254,12 +265,18 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   onCompanyChange(event: Event) {
-    this.createPurchaseModel.period = '';
+    this.createPurchaseModel.period = undefined;
 
     const companyId = (event.target as HTMLSelectElement).value;
+
     if (companyId) {
-      // Fetch periods for the selected company
-      this.loadPeriods(companyId);
+      const selectedCompany = this.companiesList.find(
+        (com) => com.id === companyId
+      );
+      this.isLocal = selectedCompany?.name === 'Local';
+      if (!this.isLocal) this.loadPeriods(companyId); // Fetch periods for the selected company
+    } else {
+      this.isLocal = false;
     }
   }
 
@@ -300,6 +317,10 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   submitForm(): void {
+    // if (this.isLocal) {
+    //   this.createPurchaseModel.period = null;
+    // }
+
     if (this.purchaseId) {
       // ✅ Update Purchase if ID exists
       this.purchaseService

@@ -56,7 +56,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
   personnelLogisticsReloadEvent: EventEmitter<boolean> = new EventEmitter();
   inputLogisticsReloadEvent: EventEmitter<boolean> = new EventEmitter();
-  controlNumber: number;
+  controlNumber: string;
 
   logisticsModel: ICreateUpdateLogisticsModel;
   purchaseModel: IReducedDetailedPurchaseModel;
@@ -335,7 +335,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
               title: 'Sin resultados',
               text: 'No se encontró ninguna compra con ese número de control.',
             });
-            this.purchaseModel = {} as IReducedDetailedPurchaseModel;
+            this.initialize();
             return;
           }
 
@@ -358,7 +358,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
                       ? 'Ya se han creado los 2 registros logísticos permitidos para compras locales.'
                       : 'Ya existe un registro logístico para esta compra.',
                   });
-                  this.purchaseModel = {} as IReducedDetailedPurchaseModel;
+                  this.initialize();
                 } else {
                   this.purchaseModel = purchase;
                 }
@@ -379,6 +379,11 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
       });
 
     this.unsubscribe.push(purchaseSub);
+  }
+
+  canSaveLogistics(): boolean {
+    if (this.purchaseModel) return true;
+    return false;
   }
 
   createLogistics() {

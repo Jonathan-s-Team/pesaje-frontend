@@ -98,7 +98,8 @@
           <div class="col-md-6">
             <label for="company" class="required fw-semibold fs-6 mb-2">Compañía</label>
             <select id="company" name="company" class="form-select form-select-sm"
-              [(ngModel)]="createPurchaseModel.company" #company="ngModel" required (change)="onCompanyChange($event)">
+              [(ngModel)]="createPurchaseModel.company" #company="ngModel" required [disabled]="!!purchaseId"
+              (change)="onCompanyChange($event)">
               <option value="" disabled selected>Seleccione una opción</option>
               <option *ngFor="let company of companiesList" [value]="company.id">
                 {{ company.name }}
@@ -111,10 +112,10 @@
           </div>
 
           <!-- Period -->
-          <div class="col-md-6">
+          <div *ngIf="!isLocal" class="col-md-6">
             <label for="period" class="required fw-semibold fs-6 mb-2">Período</label>
             <select id="period" name="period" class="form-select form-select-sm"
-              [(ngModel)]="createPurchaseModel.period" #period="ngModel" required>
+              [(ngModel)]="createPurchaseModel.period" #period="ngModel" required [disabled]="!!purchaseId">
               <option value="" disabled selected>Seleccione una opción</option>
               <option *ngFor="let period of existingPeriods" [value]="period.id">
                 {{ period.name }}

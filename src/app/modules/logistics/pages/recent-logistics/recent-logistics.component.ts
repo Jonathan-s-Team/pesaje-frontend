@@ -170,17 +170,13 @@ export class RecentLogisticsComponent implements OnInit {
       ? this.authService.currentUserValue?.id ?? null
       : null;
 
-    const parsedControlNumber = Number(this.controlNumber);
-
     const purchaseSub = this.purchaseService
       .getPurchaseByParams(
         false,
         userId,
         this.selectedPeriod ? this.selectedPeriod : null,
         this.selectedClient ? this.selectedClient : null,
-        !this.controlNumber || isNaN(parsedControlNumber)
-          ? null
-          : parsedControlNumber
+        this.controlNumber ? this.controlNumber : null
       )
       .subscribe({
         next: (purchases: IReducedDetailedPurchaseModel[]) => {

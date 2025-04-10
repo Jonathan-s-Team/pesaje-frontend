@@ -26,9 +26,8 @@
           <!-- Control number -->
           <div class="col-md-3">
             <label for="controlNumber" class="fw-semibold fs-6 mb-2">Número de control</label>
-            <input type="number" id="controlNumber" name="controlNumber" placeholder="0"
-              class="form-control form-control-sm text-end" (keydown.enter)="searchPurchase($event)"
-              [(ngModel)]="controlNumber" />
+            <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
+              (keydown.enter)="searchPurchase($event)" [(ngModel)]="controlNumber" />
           </div>
 
           <!-- Logistics Type -->
@@ -278,7 +277,7 @@
 
       <div class="card-footer d-flex justify-content-end py-6 px-9">
         <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary me-3" [disabled]="isLoading$ | async">
+        <button type="submit" class="btn btn-primary me-3" [disabled]="canSaveLogistics()">
           Guardar
         </button>
       </div>

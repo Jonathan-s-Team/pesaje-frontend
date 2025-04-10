@@ -14,7 +14,7 @@ import {
 export interface ICreatePurchaseModel {
   buyer: string;
   company: string;
-  period: string;
+  period?: string;
   broker: string;
   client: string;
   status?: PurchaseStatusEnum;
@@ -33,7 +33,7 @@ export interface ICreatePurchaseModel {
   hasInvoice: boolean;
   invoice?: string;
   purchaseDate: string;
-  controlNumber?: number;
+  controlNumber?: string;
 }
 
 export interface IBasePurchaseModel {
@@ -54,7 +54,7 @@ export interface IBasePurchaseModel {
   deletedAt: string | null;
   purchaseDate: string;
   id: string;
-  controlNumber?: number;
+  controlNumber?: string;
 }
 
 export interface IDetailedPurchaseModel extends IBasePurchaseModel {
