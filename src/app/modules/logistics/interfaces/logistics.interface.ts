@@ -14,10 +14,12 @@ export interface ICreateUpdateLogisticsModel {
 
 export interface IReadLogisticsModel {
   purchase: string;
+  controlNumber: string;
   items: ILogisticsItemModel[];
   type: LogisticsTypeEnum;
   logisticsDate: string;
   grandTotal: number;
+  description: string;
   deletedAt: string | null;
   id: string;
 }
