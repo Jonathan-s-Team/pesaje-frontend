@@ -1,389 +1,382 @@
-<div *ngIf="isLoading$ | async" class="text-center py-5">
-  <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Loading...</span>
+<!-- First Section: Search Info -->
+<div class="card card-xl-stretch mb-xl-8">
+  <div class="card-header border-0 pt-5">
+    <h4 class="card-title align-items-start flex-column">
+      <span class="card-label fw-bolder fs-3 mb-1">Buscar por número de control</span>
+    </h4>
   </div>
+  <div class="card-body py-3">
+    <div class="col-md-6 d-flex align-items-center">
+      <label for="controlNumber" class="fw-semibold fs-6 mb-2 me-3 mb-0" style="min-width: 160px;">
+        Número de control
+      </label>
+      <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
+        (keydown.enter)="searchPurchase($event)" [(ngModel)]="controlNumber" />
+    </div>
+  </div>
+
 </div>
+<!-- end::First Section: Search Info -->
 
-<div *ngIf="!(isLoading$ | async)">
-  <!-- Logistics Form -->
-  <form #logisticsForm="ngForm" (ngSubmit)="confirmSave($event, logisticsForm)" novalidate>
+<!-- Logistics Form -->
+<form #logisticsForm="ngForm" (ngSubmit)="confirmSave($event, logisticsForm)" novalidate>
 
-    <!-- First Section: Search Info -->
-    <div class="card card-xl-stretch mb-xl-8">
-      <!-- begin::Header -->
-      <div class="card-header border-0 pt-5">
-        <h4 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1">Buscar por número de control</span>
-        </h4>
-      </div>
-      <!-- end::Header -->
+  <!-- Second Section: Logistics Info -->
+  <div class="card card-xl-stretch mb-xl-8 mt-2">
+    <!-- begin::Header -->
+    <div class="card-header border-0 pt-5">
+      <h4 class="card-title align-items-start flex-column">
+        <span class="card-label fw-bolder fs-3 mb-1">Información General</span>
+      </h4>
+    </div>
+    <!-- end::Header -->
 
-      <!-- begin::Body -->
-      <div class="card-body py-3">
-        <!-- begin::Row -->
-        <div class="row g-5 g-xl-8">
-
-          <!-- Control number -->
-          <div class="col-md-3">
-            <label for="controlNumber" class="fw-semibold fs-6 mb-2">Número de control</label>
-            <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
-              (keydown.enter)="searchPurchase($event)" [(ngModel)]="controlNumber" />
+    <!-- begin::Body -->
+    <div class="card-body py-3">
+      <!-- begin::Row -->
+      <div class="row g-5 g-xl-8">
+        <!-- Logistics Type -->
+        <div class="col-md-6">
+          <label for="type" class="required fw-semibold fs-6 mb-2">Tipo</label>
+          <select id="type" name="type" class="form-select form-select-sm" [(ngModel)]="logisticsModel.type"
+            #type="ngModel" required>
+            <option value="" disabled selected>Seleccione una opción</option>
+            <option *ngFor="let option of logisticsTypes" [ngValue]="option">
+              {{ logisticsTypeLabels[option] }}
+            </option>
+          </select>
+          <div *ngIf="logisticsForm.submitted && type.invalid"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>Debe seleccionar una opción.</div>
           </div>
+        </div>
 
-          <!-- Logistics Type -->
-          <div class="col-md-4">
-            <label for="type" class="required fw-semibold fs-6 mb-2">Tipo</label>
-            <select id="type" name="type" class="form-select form-select-sm" [(ngModel)]="logisticsModel.type"
-              #type="ngModel" required>
-              <option value="" disabled selected>Seleccione una opción</option>
-              <option *ngFor="let option of logisticsTypes" [ngValue]="option">
-                {{ logisticsTypeLabels[option] }}
+        <!-- Logistic Date -->
+        <div class="col-md-6">
+          <label for="logisticsDate" class="required fw-semibold fs-6 mb-2">Fecha de logística</label>
+          <input type="date" class="form-control form-control-sm" id="logisticsDate" name="logisticsDate"
+            [ngModel]="logisticsDateFormatted" (ngModelChange)="onDateChange($event)" required #logisticsDate="ngModel">
+          <div
+            *ngIf="(logisticsForm.submitted || logisticsDate.dirty || logisticsDate.touched) && logisticsDate.errors?.['required']"
+            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+            <div>La fecha de logística es obligatoria.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end::Second Section: Logistics Info -->
+
+  <!-- Third Section: Purchase Info -->
+  <div class="card card-xl-stretch mb-xl-8 mt-2">
+
+    <!-- begin::Header -->
+    <div class="card-header border-0 pt-5">
+      <h4 class="card-title align-items-start flex-column">
+        <span class="card-label fw-bolder fs-3 mb-1">Información de la Compra</span>
+      </h4>
+    </div>
+    <!-- end::Header -->
+
+    <!-- begin::Body -->
+    <div class="card-body py-3">
+
+      <div class="row g-5 g-xl-8">
+        <!-- Purchase Date -->
+        <div class="col-md-6">
+          <label for="purchaseDate" class="fw-semibold fs-6 mb-2">Fecha de la compra</label>
+          <input type="date" class="form-control form-control-sm" id="purchaseDate" name="purchaseDate"
+            [(ngModel)]="purchaseDateFormatted" disabled>
+        </div>
+
+        <!-- Buyer -->
+        <div class="col-md-6">
+          <label for="buyer" class="fw-semibold fs-6 mb-2">Comprador Responsable</label>
+          <input type="text" id="buyer" name="buyer" class="form-control form-control-sm"
+            [(ngModel)]="purchaseModel.buyer.fullName" disabled />
+        </div>
+
+        <!-- Bróker -->
+        <div class="col-md-6">
+          <label for="broker" class="fw-semibold fs-6 mb-2">Bróker</label>
+          <input type="text" id="broker" name="broker" class="form-control form-control-sm"
+            [(ngModel)]="purchaseModel.broker.fullName" disabled />
+        </div>
+
+        <!-- Client -->
+        <div class="col-md-6">
+          <label for="company" class="fw-semibold fs-6 mb-2">Propietario de la Piscina</label>
+          <input type="text" id="company" name="company" class="form-control form-control-sm"
+            [(ngModel)]="purchaseModel.client.fullName" disabled />
+        </div>
+
+        <!-- Shrimp Farm -->
+        <div class="col-md-6">
+          <label for="shrimpFarm" class="fw-semibold fs-6 mb-2">Nombre de la Piscina</label>
+          <input type="text" id="shrimpFarm" name="shrimpFarm" class="form-control form-control-sm"
+            [(ngModel)]="purchaseModel.shrimpFarm.identifier" disabled />
+        </div>
+
+        <!-- Farm Place-->
+        <div class="col-md-6">
+          <label for="farmPlace" class="fw-semibold fs-6 mb-2">Ubicación de la Piscina</label>
+          <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm"
+            [(ngModel)]="purchaseModel.shrimpFarm.place" disabled />
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end::Third Section: Purchase Info -->
+
+  <!-- Fourth Section: Personnel Logistics Details -->
+  <div class="card card-xl-stretch mb-xl-8 mt-2">
+
+    <!-- begin::Header -->
+    <div class="card-header border-0 pt-8">
+      <h4 class="card-title align-items-start flex-column">
+        <span class="card-label fw-bolder fs-3 mb-1">Personal</span>
+      </h4>
+
+      <button id="btn1" name="btn1" *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary"
+        (click)="createLogistics('personnel')">
+        Agregar
+      </button>
+    </div>
+    <!-- end::Header -->
+
+    <div class="card-body py-3">
+      <div class="row g-5 g-xl-8">
+
+        <app-crud [datatableConfig]="personnelLogisticsDatatableConfig" [permissionRoute]="PERMISSION_ROUTE"
+          (deleteEvent)="deletePersonnelLogistics($event.toString())"
+          (editEvent)="editPersonnelLogistics($event.toString())" [reload]="personnelLogisticsReloadEvent"
+          [modal]="personnelLogisticsFormModal">
+        </app-crud>
+      </div>
+    </div>
+  </div>
+  <!-- end::Fourth Section: Personnel Logistics Details -->
+
+  <!-- Fifth Section: Inputs Logistics Details -->
+  <div class="card card-xl-stretch mb-xl-8 mt-2">
+
+    <!-- begin::Header -->
+    <div class="card-header border-0 pt-8">
+      <h4 class="card-title align-items-start flex-column">
+        <span class="card-label fw-bolder fs-3 mb-1">Productos e Insumos</span>
+      </h4>
+
+      <button id="btn2" name="btn2" *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary"
+        (click)="createLogistics('input')">
+        Agregar
+      </button>
+    </div>
+    <!-- end::Header -->
+
+    <div class="card-body py-3">
+      <div class="row g-5 g-xl-8">
+
+        <app-crud [datatableConfig]="inputLogisticsDatatableConfig" [permissionRoute]="PERMISSION_ROUTE"
+          (deleteEvent)="deleteInputLogistics($event.toString())" (editEvent)="editInputLogistics($event.toString())"
+          [reload]="inputLogisticsReloadEvent" [modal]="inputLogisticsFormModal">
+        </app-crud>
+      </div>
+    </div>
+
+    <div class="card-footer d-flex justify-content-end py-6 px-9">
+      <!-- Submit Button -->
+      <button type="submit" class="btn btn-primary me-3" [disabled]="canSaveLogistics()">
+        Guardar
+      </button>
+    </div>
+  </div>
+  <!-- end::Fifth Section: Inputs Logistics Details -->
+
+</form>
+<!-- end::Logistics Form -->
+
+<ng-template #personnelLogisticsFormModal let-personnelModal>
+  <form #personnelLogisticsForm="ngForm" (ngSubmit)="onSubmitPersonnelLogisticsForm($event, personnelLogisticsForm)">
+
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Detalles de Personal</h4>
+      <button type="button" class="btn-close" aria-label="Cerrar"
+        (click)="personnelModal.dismiss('Cross click')"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
+        <!--begin::Payment information form-->
+        <div class="collapse show">
+
+          <!-- Logistics Category -->
+          <div class="mb-3">
+            <label for="logisticsCategory" class="required fw-semibold fs-6 mb-2">Tipo de Personal</label>
+            <select id="logisticsCategory" name="logisticsCategory" class="form-select form-select-sm"
+              [(ngModel)]="logisticsItemModel.logisticsCategory" #logisticsCategory="ngModel" required>
+              <option [ngValue]="null" disabled>Seleccione una opción</option>
+              <option *ngFor="let logisticsCategory of personnelLogisticsCategoryList" [ngValue]="logisticsCategory">
+                {{ logisticsCategory.name }}
               </option>
             </select>
-            <div *ngIf="logisticsForm.submitted && type.invalid"
-              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>Debe seleccionar una opción.</div>
-            </div>
-          </div>
-
-          <!-- Logistic Date -->
-          <div class="col-md-5">
-            <label for="logisticsDate" class="required fw-semibold fs-6 mb-2">Fecha de logística</label>
-            <input type="date" class="form-control form-control-sm" id="logisticsDate" name="logisticsDate"
-              [ngModel]="logisticsDateFormatted" (ngModelChange)="onDateChange($event)" required
-              #logisticsDate="ngModel">
             <div
-              *ngIf="(logisticsForm.submitted || logisticsDate.dirty || logisticsDate.touched) && logisticsDate.errors?.['required']"
+              *ngIf="(personnelLogisticsForm.submitted || logisticsCategory.dirty || logisticsCategory.touched) && logisticsCategory.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>La fecha de logística es obligatoria.</div>
+              <div>El tipo de logística es obligatorio.</div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Second Section: Purchase Info -->
-    <div class="card card-xl-stretch mb-xl-8 mt-2">
-
-      <!-- begin::Header -->
-      <div class="card-header border-0 pt-5">
-        <h4 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1">Información de la Compra</span>
-        </h4>
-      </div>
-      <!-- end::Header -->
-
-      <!-- begin::Body -->
-      <div class="card-body py-3">
-
-        <div class="row g-5 g-xl-8">
-          <!-- Purchase Date -->
-          <div class="col-md-6">
-            <label for="purchaseDate" class="fw-semibold fs-6 mb-2">Fecha de la compra</label>
-            <input type="date" class="form-control form-control-sm" id="purchaseDate" name="purchaseDate"
-              [(ngModel)]="purchaseDateFormatted" disabled>
-          </div>
-
-          <!-- Buyer -->
-          <div class="col-md-6">
-            <label for="buyer" class="fw-semibold fs-6 mb-2">Comprador Responsable</label>
-            <input type="text" id="buyer" name="buyer" class="form-control form-control-sm"
-              [(ngModel)]="purchaseModel.buyer.fullName" disabled />
-          </div>
-
-          <!-- Bróker -->
-          <div class="col-md-6">
-            <label for="broker" class="fw-semibold fs-6 mb-2">Bróker</label>
-            <input type="text" id="broker" name="broker" class="form-control form-control-sm"
-              [(ngModel)]="purchaseModel.broker.fullName" disabled />
-          </div>
-
-          <!-- Client -->
-          <div class="col-md-6">
-            <label for="company" class="fw-semibold fs-6 mb-2">Propietario de la Piscina</label>
-            <input type="text" id="company" name="company" class="form-control form-control-sm"
-              [(ngModel)]="purchaseModel.client.fullName" disabled />
-          </div>
-
-          <!-- Shrimp Farm -->
-          <div class="col-md-6">
-            <label for="shrimpFarm" class="fw-semibold fs-6 mb-2">Nombre de la Piscina</label>
-            <input type="text" id="shrimpFarm" name="shrimpFarm" class="form-control form-control-sm"
-              [(ngModel)]="purchaseModel.shrimpFarm.identifier" disabled />
-          </div>
-
-          <!-- Farm Place-->
-          <div class="col-md-6">
-            <label for="farmPlace" class="fw-semibold fs-6 mb-2">Ubicación de la Piscina</label>
-            <input type="text" id="farmPlace" name="farmPlace" class="form-control form-control-sm"
-              [(ngModel)]="purchaseModel.shrimpFarm.place" disabled />
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- end::Second Section: Purchase Info -->
-
-    <!-- Third Section: Personnel Logistics Details -->
-    <div class="card card-xl-stretch mb-xl-8 mt-2">
-
-      <!-- begin::Header -->
-      <div class="card-header border-0 pt-5">
-        <h4 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1">Personal</span>
-        </h4>
-
-        <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create"
-          (click)="createLogistics()">
-          Agregar
-        </button>
-      </div>
-      <!-- end::Header -->
-
-      <div class="card-body py-3">
-        <div class="row g-5 g-xl-8">
-
-          <app-crud [datatableConfig]="personnelLogisticsDatatableConfig" [permissionRoute]="PERMISSION_ROUTE"
-            (deleteEvent)="deletePersonnelLogistics($event.toString())"
-            (editEvent)="editPersonnelLogistics($event.toString())" (createEvent)="createLogistics()"
-            [reload]="personnelLogisticsReloadEvent" [modal]="personnelLogisticsFormModal">
-          </app-crud>
-        </div>
-      </div>
-    </div>
-
-    <ng-template #personnelLogisticsFormModal let-personnelModal>
-      <form #personnelLogisticsForm="ngForm"
-        (ngSubmit)="onSubmitPersonnelLogisticsForm($event, personnelLogisticsForm)">
-
-        <div class="modal-header">
-          <h4 class="modal-title" id="modal-basic-title">Detalles de Personal</h4>
-          <button type="button" class="btn-close" aria-label="Cerrar"
-            (click)="personnelModal.dismiss('Cross click')"></button>
-        </div>
-
-        <div class="modal-body">
-          <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
-            <!--begin::Payment information form-->
-            <div class="collapse show">
-
-              <!-- Logistics Category -->
-              <div class="mb-3">
-                <label for="logisticsCategory" class="required fw-semibold fs-6 mb-2">Tipo de Personal</label>
-                <select id="logisticsCategory" name="logisticsCategory" class="form-select form-select-sm"
-                  [(ngModel)]="logisticsItemModel.logisticsCategory" #logisticsCategory="ngModel" required>
-                  <option [ngValue]="null" disabled>Seleccione una opción</option>
-                  <option *ngFor="let logisticsCategory of personnelLogisticsCategoryList"
-                    [ngValue]="logisticsCategory">
-                    {{ logisticsCategory.name }}
-                  </option>
-                </select>
-                <div
-                  *ngIf="(personnelLogisticsForm.submitted || logisticsCategory.dirty || logisticsCategory.touched) && logisticsCategory.errors?.['required']"
-                  class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                  <div>El tipo de logística es obligatorio.</div>
-                </div>
+          <!-- Units -->
+          <div class="mb-3">
+            <label for="unit" class="required fw-semibold fs-6 mb-2">Unidades</label>
+            <div class="input-group">
+              <input type="number" class="form-control form-control-sm" id="unit" name="unit"
+                [(ngModel)]="logisticsItemModel.unit" (keypress)="validateWholeNumber($event)"
+                (input)="calculateTotal(personnelLogisticsForm)" required #unit="ngModel">
+              <div *ngIf="(personnelLogisticsForm.submitted || unit.dirty || unit.touched) && unit.errors?.['required']"
+                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div>Las unidades son obligatorias.</div>
               </div>
-
-              <!-- Units -->
-              <div class="mb-3">
-                <label for="unit" class="required fw-semibold fs-6 mb-2">Unidades</label>
-                <div class="input-group">
-                  <input type="number" class="form-control form-control-sm" id="unit" name="unit"
-                    [(ngModel)]="logisticsItemModel.unit" (keypress)="validateWholeNumber($event)"
-                    (input)="calculateTotal(personnelLogisticsForm)" required #unit="ngModel">
-                  <div
-                    *ngIf="(personnelLogisticsForm.submitted || unit.dirty || unit.touched) && unit.errors?.['required']"
-                    class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                    <div>Las unidades son obligatorias.</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Cost -->
-              <div class="mb-3">
-                <label for="cost" class="required fw-semibold fs-6 mb-2">Costo</label>
-                <div class="input-group">
-                  <span class="input-group-text">$</span>
-                  <input type="number" class="form-control form-control-sm" id="cost" name="cost"
-                    [(ngModel)]="logisticsItemModel.cost" (blur)="formatDecimal(personnelLogisticsForm, 'cost')"
-                    (keypress)="validateNumber($event)" (input)="calculateTotal(personnelLogisticsForm)" required
-                    #cost="ngModel">
-                  <div
-                    *ngIf="(personnelLogisticsForm.submitted || cost.dirty || cost.touched) && cost.errors?.['required']"
-                    class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                    <div>El costo es obligatorio.</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Total -->
-              <div class="mb-3">
-                <label for="total" class="required fw-semibold fs-6 mb-2">Total</label>
-                <div class="input-group">
-                  <span class="input-group-text">$</span>
-                  <input type="number" class="form-control form-control-sm" id="total" name="total"
-                    [(ngModel)]="logisticsItemModel.total" disabled #total="ngModel">
-                </div>
-              </div>
-
             </div>
-            <!--end::Payment information form-->
           </div>
+
+          <!-- Cost -->
+          <div class="mb-3">
+            <label for="cost" class="required fw-semibold fs-6 mb-2">Costo</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control form-control-sm" id="cost" name="cost"
+                [(ngModel)]="logisticsItemModel.cost" (blur)="formatDecimal(personnelLogisticsForm, 'cost')"
+                (keypress)="validateNumber($event)" (input)="calculateTotal(personnelLogisticsForm)" required
+                #cost="ngModel">
+              <div *ngIf="(personnelLogisticsForm.submitted || cost.dirty || cost.touched) && cost.errors?.['required']"
+                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div>El costo es obligatorio.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total -->
+          <div class="mb-3">
+            <label for="total" class="required fw-semibold fs-6 mb-2">Total</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control form-control-sm" id="total" name="total"
+                [(ngModel)]="logisticsItemModel.total" disabled #total="ngModel">
+            </div>
+          </div>
+
         </div>
-
-        <div class="modal-footer flex-center">
-          <button type="button" class="btn btn-light me-3" (click)="personnelModal.dismiss('cancel')">
-            Cancelar
-          </button>
-          <button type="submit" class="btn btn-primary" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
-            <span class="indicator-label">Guardar</span>
-            <span class="indicator-progress">
-              Por favor, espera... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-            </span>
-          </button>
-        </div>
-
-      </form>
-
-    </ng-template>
-    <!-- end::Third Section: Personnel Logistics Details -->
-
-
-    <!-- Fourth Section: Inputs Logistics Details -->
-    <div class="card card-xl-stretch mb-xl-8 mt-2">
-
-      <!-- begin::Header -->
-      <div class="card-header border-0 pt-5">
-        <h4 class="card-title align-items-start flex-column">
-          <span class="card-label fw-bolder fs-3 mb-1">Productos e Insumos</span>
-        </h4>
-
-        <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create"
-          (click)="createLogistics()">
-          Agregar
-        </button>
-      </div>
-      <!-- end::Header -->
-
-      <div class="card-body py-3">
-        <div class="row g-5 g-xl-8">
-
-          <app-crud [datatableConfig]="inputLogisticsDatatableConfig" [permissionRoute]="PERMISSION_ROUTE"
-            (deleteEvent)="deleteInputLogistics($event.toString())" (editEvent)="editInputLogistics($event.toString())"
-            (createEvent)="createLogistics()" [reload]="inputLogisticsReloadEvent" [modal]="inputLogisticsFormModal">
-          </app-crud>
-        </div>
-      </div>
-
-      <div class="card-footer d-flex justify-content-end py-6 px-9">
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary me-3" [disabled]="canSaveLogistics()">
-          Guardar
-        </button>
+        <!--end::Payment information form-->
       </div>
     </div>
 
-    <ng-template #inputLogisticsFormModal let-inputModal>
-      <form #inputLogisticsForm="ngForm" (ngSubmit)="onSubmitInputLogisticsForm($event, inputLogisticsForm)">
-
-        <div class="modal-header">
-          <h4 class="modal-title" id="modal-basic-title">Detalles de Productos o Insumos</h4>
-          <button type="button" class="btn-close" aria-label="Cerrar"
-            (click)="inputModal.dismiss('Cross click')"></button>
-        </div>
-
-        <div class="modal-body">
-          <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
-            <!--begin::Payment information form-->
-            <div class="collapse show">
-
-              <!-- Logistics Category -->
-              <div class="mb-3">
-                <label for="logisticsCategory" class="required fw-semibold fs-6 mb-2">Producto o Insumo</label>
-                <select id="logisticsCategory" name="logisticsCategory" class="form-select form-select-sm"
-                  [(ngModel)]="logisticsItemModel.logisticsCategory" #logisticsCategory="ngModel" required>
-                  <option [ngValue]="null" disabled>Seleccione una opción</option>
-                  <option *ngFor="let logisticsCategory of inputLogisticsCategoryList" [ngValue]="logisticsCategory">
-                    {{ logisticsCategory.name }}
-                  </option>
-                </select>
-                <div
-                  *ngIf="(inputLogisticsForm.submitted || logisticsCategory.dirty || logisticsCategory.touched) && logisticsCategory.errors?.['required']"
-                  class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                  <div>El tipo de logística es obligatorio.</div>
-                </div>
-              </div>
-
-              <!-- Description -->
-              <div class="mb-3">
-                <label for="description" class="fw-semibold fs-6 mb-2">Descripción</label>
-                <div class="input-group">
-                  <input type="text" class="form-control form-control-sm" id="description" name="description"
-                    [(ngModel)]="logisticsItemModel.description" #description="ngModel">
-                </div>
-              </div>
-
-              <!-- Units -->
-              <div class="mb-3">
-                <label for="unit" class="required fw-semibold fs-6 mb-2">Unidades</label>
-                <div class="input-group">
-                  <input type="number" class="form-control form-control-sm" id="unit" name="unit"
-                    [(ngModel)]="logisticsItemModel.unit" (keypress)="validateWholeNumber($event)"
-                    (input)="calculateTotal(inputLogisticsForm)" required #unit="ngModel">
-                  <div *ngIf="(inputLogisticsForm.submitted || unit.dirty || unit.touched) && unit.errors?.['required']"
-                    class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                    <div>Las unidades son obligatorias.</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Cost -->
-              <div class="mb-3">
-                <label for="cost" class="required fw-semibold fs-6 mb-2">Costo</label>
-                <div class="input-group">
-                  <span class="input-group-text">$</span>
-                  <input type="number" class="form-control form-control-sm" id="cost" name="cost"
-                    [(ngModel)]="logisticsItemModel.cost" (blur)="formatDecimal(inputLogisticsForm, 'cost')"
-                    (keypress)="validateNumber($event)" (input)="calculateTotal(inputLogisticsForm)" required
-                    #cost="ngModel">
-                  <div *ngIf="(inputLogisticsForm.submitted || cost.dirty || cost.touched) && cost.errors?.['required']"
-                    class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-                    <div>El costo es obligatorio.</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Total -->
-              <div class="mb-3">
-                <label for="total" class="required fw-semibold fs-6 mb-2">Total</label>
-                <div class="input-group">
-                  <span class="input-group-text">$</span>
-                  <input type="number" class="form-control form-control-sm" id="total" name="total"
-                    [(ngModel)]="logisticsItemModel.total" disabled #total="ngModel">
-                </div>
-              </div>
-
-            </div>
-            <!--end::Payment information form-->
-          </div>
-        </div>
-
-        <div class="modal-footer flex-center">
-          <button type="button" class="btn btn-light me-3" (click)="inputModal.dismiss('cancel')">
-            Cancelar
-          </button>
-          <button type="submit" class="btn btn-primary" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
-            <span class="indicator-label">Guardar</span>
-            <span class="indicator-progress">
-              Por favor, espera... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-            </span>
-          </button>
-        </div>
-
-      </form>
-
-    </ng-template>
-    <!-- end::Fourth Section: Inputs Logistics Details -->
+    <div class="modal-footer flex-center">
+      <button type="button" class="btn btn-light me-3" (click)="personnelModal.dismiss('cancel')">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary">
+        Guardar
+      </button>
+    </div>
 
   </form>
-</div>
+
+</ng-template>
+
+<ng-template #inputLogisticsFormModal let-inputModal>
+  <form #inputLogisticsForm="ngForm" (ngSubmit)="onSubmitInputLogisticsForm($event, inputLogisticsForm)">
+
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Detalles de Productos o Insumos</h4>
+      <button type="button" class="btn-close" aria-label="Cerrar" (click)="inputModal.dismiss('Cross click')"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px">
+        <!--begin::Payment information form-->
+        <div class="collapse show">
+
+          <!-- Logistics Category -->
+          <div class="mb-3">
+            <label for="logisticsCategory" class="required fw-semibold fs-6 mb-2">Producto o Insumo</label>
+            <select id="logisticsCategory" name="logisticsCategory" class="form-select form-select-sm"
+              [(ngModel)]="logisticsItemModel.logisticsCategory" #logisticsCategory="ngModel" required>
+              <option [ngValue]="null" disabled>Seleccione una opción</option>
+              <option *ngFor="let logisticsCategory of inputLogisticsCategoryList" [ngValue]="logisticsCategory">
+                {{ logisticsCategory.name }}
+              </option>
+            </select>
+            <div
+              *ngIf="(inputLogisticsForm.submitted || logisticsCategory.dirty || logisticsCategory.touched) && logisticsCategory.errors?.['required']"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>El tipo de logística es obligatorio.</div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-3">
+            <label for="description" class="fw-semibold fs-6 mb-2">Descripción</label>
+            <div class="input-group">
+              <input type="text" class="form-control form-control-sm" id="description" name="description"
+                [(ngModel)]="logisticsItemModel.description" #description="ngModel">
+            </div>
+          </div>
+
+          <!-- Units -->
+          <div class="mb-3">
+            <label for="unit" class="required fw-semibold fs-6 mb-2">Unidades</label>
+            <div class="input-group">
+              <input type="number" class="form-control form-control-sm" id="unit" name="unit"
+                [(ngModel)]="logisticsItemModel.unit" (keypress)="validateWholeNumber($event)"
+                (input)="calculateTotal(inputLogisticsForm)" required #unit="ngModel">
+              <div *ngIf="(inputLogisticsForm.submitted || unit.dirty || unit.touched) && unit.errors?.['required']"
+                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div>Las unidades son obligatorias.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cost -->
+          <div class="mb-3">
+            <label for="cost" class="required fw-semibold fs-6 mb-2">Costo</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control form-control-sm" id="cost" name="cost"
+                [(ngModel)]="logisticsItemModel.cost" (blur)="formatDecimal(inputLogisticsForm, 'cost')"
+                (keypress)="validateNumber($event)" (input)="calculateTotal(inputLogisticsForm)" required
+                #cost="ngModel">
+              <div *ngIf="(inputLogisticsForm.submitted || cost.dirty || cost.touched) && cost.errors?.['required']"
+                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                <div>El costo es obligatorio.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total -->
+          <div class="mb-3">
+            <label for="total" class="required fw-semibold fs-6 mb-2">Total</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control form-control-sm" id="total" name="total"
+                [(ngModel)]="logisticsItemModel.total" disabled #total="ngModel">
+            </div>
+          </div>
+
+        </div>
+        <!--end::Payment information form-->
+      </div>
+    </div>
+
+    <div class="modal-footer flex-center">
+      <button type="button" class="btn btn-light me-3" (click)="inputModal.dismiss('cancel')">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary">
+        Guardar
+      </button>
+    </div>
+
+  </form>
+
+</ng-template>

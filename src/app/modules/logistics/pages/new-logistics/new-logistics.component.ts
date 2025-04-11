@@ -5,9 +5,10 @@ import {
   NgZone,
   OnDestroy,
   OnInit,
+  TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { DateUtilsService } from '../../../../utils/date-utils.service';
 import { AuthService } from '../../../auth';
@@ -46,13 +47,12 @@ import { v4 as uuidv4 } from 'uuid';
 export class NewLogisticsComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.NEW_LOGISTICS;
 
-  @ViewChild('personnelLogisticsForm') personnelLogisticsForm!: NgForm;
-  @ViewChild('inputLogisticsForm') inputLogisticsForm!: NgForm;
-
-  isLoading$: Observable<boolean>;
+  @ViewChild('personnelLogisticsFormModal')
+  personnelLogisticsFormModal: TemplateRef<any>;
+  @ViewChild('inputLogisticsFormModal')
+  inputLogisticsFormModal: TemplateRef<any>;
 
   isOnlyBuyer = false;
-  isLoading = false;
 
   personnelLogisticsReloadEvent: EventEmitter<boolean> = new EventEmitter();
   inputLogisticsReloadEvent: EventEmitter<boolean> = new EventEmitter();
@@ -61,11 +61,8 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   logisticsModel: ICreateUpdateLogisticsModel;
   purchaseModel: IReducedDetailedPurchaseModel;
 
-  logisticsTypes = Object.values(LogisticsTypeEnum);
-  logisticsTypeLabels: Record<LogisticsTypeEnum, string> = {
-    [LogisticsTypeEnum.SHIPMENT]: 'Envío a Compañía/Local',
-    [LogisticsTypeEnum.LOCAL_PROCESSING]: 'Procesamiento Local',
-  };
+  logisticsTypes: LogisticsTypeEnum[];
+  logisticsTypeLabels: { [key in LogisticsTypeEnum]?: string } = {};
 
   logisticsItemModel: ILogisticsItemModel = {} as ILogisticsItemModel;
   logisticsItems: ILogisticsItemModel[] = [];
@@ -210,14 +207,14 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
     private logisticsService: LogisticsService,
+    private modalService: NgbModal,
     private cdr: ChangeDetectorRef
-  ) {
-    this.isLoading$ = this.purchaseService.isLoading$;
-  }
+  ) {}
 
   ngOnInit(): void {
-    this.initialize();
+    this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
+    this.initialize();
     this.loadLogisticsCategories();
   }
 
@@ -259,6 +256,20 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
   confirmSave(event: Event, form: NgForm) {
     if (form && form.invalid) {
+      return;
+    }
+
+    // Check if both lists are empty
+    if (
+      (!this.personnellogisticsItems ||
+        this.personnellogisticsItems.length === 0) &&
+      (!this.inputlogisticsItems || this.inputlogisticsItems.length === 0)
+    ) {
+      this.alertService.showAlert({
+        icon: 'warning',
+        title: 'Detalle faltante',
+        text: 'Ingrese detalle de logística',
+      });
       return;
     }
 
@@ -317,8 +328,14 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     }
   }
 
+  canSaveLogistics(): boolean {
+    if (this.purchaseModel.id) return false;
+    return true;
+  }
+
   searchPurchase($event: Event): void {
     $event.preventDefault();
+    $event.stopPropagation();
 
     const userId =
       this.isOnlyBuyer && this.authService.currentUserValue?.id
@@ -361,6 +378,20 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
                   this.initialize();
                 } else {
                   this.purchaseModel = purchase;
+
+                  if (purchase.controlNumber?.includes('CO')) {
+                    this.logisticsTypeLabels = {
+                      [LogisticsTypeEnum.SHIPMENT]: 'Envío a Compañía',
+                    };
+                    this.logisticsTypes = [LogisticsTypeEnum.SHIPMENT];
+                  } else {
+                    this.logisticsTypeLabels = {
+                      [LogisticsTypeEnum.SHIPMENT]: 'Envío Local',
+                      [LogisticsTypeEnum.LOCAL_PROCESSING]:
+                        'Procesamiento Local',
+                    };
+                    this.logisticsTypes = Object.values(LogisticsTypeEnum);
+                  }
                 }
                 this.cdr.detectChanges();
               },
@@ -381,14 +412,22 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     this.unsubscribe.push(purchaseSub);
   }
 
-  canSaveLogistics(): boolean {
-    if (this.purchaseModel) return true;
-    return false;
-  }
-
-  createLogistics() {
+  createLogistics(type: 'personnel' | 'input') {
     this.logisticsItemModel = {} as ILogisticsItemModel;
     this.logisticsItemModel.id = uuidv4();
+
+    const modalRef =
+      type === 'personnel'
+        ? this.modalService.open(this.personnelLogisticsFormModal, {
+            centered: true,
+            backdrop: true,
+            keyboard: true,
+          })
+        : this.modalService.open(this.inputLogisticsFormModal, {
+            centered: true,
+            backdrop: true,
+            keyboard: true,
+          });
   }
 
   onSubmitPersonnelLogisticsForm(event: Event, myForm: NgForm): void {
