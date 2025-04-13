@@ -6,7 +6,6 @@ export interface ILogisticsItemModel {
   cost: number;
   total: number;
   description?: string;
-  id?: string;
 }
 
 export interface ICreateUpdateLogisticsItemModel {

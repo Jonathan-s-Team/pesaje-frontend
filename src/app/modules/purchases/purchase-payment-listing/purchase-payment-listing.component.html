@@ -26,8 +26,7 @@
           <!--begin::Toolbar-->
           <div class="d-flex justify-content-end">
             <!--begin::Add payment-->
-            <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create"
-              (click)="create()">
+            <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create">
               Agregar Pago
             </button>
             <!--end::Add payment-->
@@ -112,7 +111,7 @@
             Cancelar
           </button>
           <button type="submit" class="btn btn-primary" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'"
-            (click)="modal.dismiss('submit')">
+            (click)="onClickAfterSubmit(myForm, modal)">
             <span class="indicator-label">Guardar</span>
             <span class="indicator-progress">
               Por favor, espera... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>

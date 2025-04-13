@@ -7,9 +7,14 @@ import { CrudModule } from '../crud/crud.module';
 import { SharedModule } from '../shared/shared.module';
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { RecentLogisticsComponent } from './pages/recent-logistics/recent-logistics.component';
+import { LogisticsItemsListingComponent } from './widgets/logistics-items-listing/logistics-items-listing.component';
 
 @NgModule({
-  declarations: [NewLogisticsComponent, RecentLogisticsComponent],
+  declarations: [
+    NewLogisticsComponent,
+    RecentLogisticsComponent,
+    LogisticsItemsListingComponent,
+  ],
   imports: [
     CommonModule,
     LogisticsRoutingModule,

@@ -151,6 +151,14 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
     this.unsubscribe.push(paymentMethodSub);
   }
 
+  onClickAfterSubmit(myForm: NgForm, modal: NgbActiveModal) {
+    if (myForm && myForm.invalid) {
+      return;
+    }
+
+    modal.dismiss('submit');
+  }
+
   onSubmit(event: Event, myForm: NgForm): void {
     if (myForm && myForm.invalid) {
       return;
