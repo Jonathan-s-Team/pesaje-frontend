@@ -233,7 +233,6 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
         .updateLogistics(this.logisticsId, this.logisticsModel)
         .subscribe({
           next: (response) => {
-            console.log('Purchase updated successfully:', response);
             this.alertService.showSuccessAlert({});
           },
           error: (error) => {
@@ -245,6 +244,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
       this.logisticsService.createLogistics(this.logisticsModel).subscribe({
         next: (response) => {
           this.logisticsId = response.id; // ✅ Store the new ID for future updates
+          this.cdr.detectChanges();
           this.alertService.showSuccessAlert({});
         },
         error: (error) => {
