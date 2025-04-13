@@ -7,20 +7,11 @@ import {
 import { Config } from 'datatables.net';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
 import { AuthService } from '../../../auth';
-import { distinctUntilChanged, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { Router } from '@angular/router';
-import { PeriodService } from '../../../shared/services/period.service';
-import { CompanyService } from '../../../shared/services/company.service';
-import { IReadCompanyModel } from '../../../shared/interfaces/company.interface';
-import { IReadPeriodModel } from '../../../shared/interfaces/period.interface';
-import { IReadClientModel } from '../../../shared/interfaces/client.interface';
-import { ClientService } from '../../../shared/services/client.service';
-import {
-  IReducedDetailedPurchaseModel,
-  PurchaseStatusEnum,
-} from 'src/app/modules/purchases/interfaces/purchase.interface';
-import { PurchaseService } from 'src/app/modules/purchases/services/purchase.service';
+import { IReadLogisticsModel } from '../../interfaces/logistics.interface';
+import { LogisticsService } from '../../services/logistics.service';
 
 @Component({
   selector: 'app-recent-logistics',
@@ -35,14 +26,8 @@ export class RecentLogisticsComponent implements OnInit {
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
   isLoading = false;
   isOnlyBuyer = false;
-  recentPurchases: IReducedDetailedPurchaseModel[] = [];
+  recentLogistics: IReadLogisticsModel[] = [];
 
-  companies: IReadCompanyModel[] = [];
-  existingPeriods: IReadPeriodModel[] = [];
-  clients: IReadClientModel[] = [];
-  selectedPeriod = '';
-  selectedCompany = '';
-  selectedClient = '';
   controlNumber = '';
 
   datatableConfig: Config = {
@@ -59,24 +44,15 @@ export class RecentLogisticsComponent implements OnInit {
         },
       },
       {
-        title: 'Estado',
-        data: 'status',
-        render: function (data: PurchaseStatusEnum) {
-          switch (data) {
-            case PurchaseStatusEnum.DRAFT:
-              return `<span class="badge bg-secondary">Sin pagos</span>`;
-            case PurchaseStatusEnum.IN_PROGRESS:
-              return `<span class="badge bg-warning text-dark">En progreso</span>`;
-            case PurchaseStatusEnum.COMPLETED:
-              return `<span class="badge bg-success">Completado</span>`;
-            default:
-              return `<span class="badge bg-light text-dark">Desconocido</span>`;
-          }
+        title: 'Tipo',
+        data: 'description',
+        render: function (data) {
+          return data ? data : '-';
         },
       },
       {
-        title: 'Fecha de Compra',
-        data: 'purchaseDate',
+        title: 'Fecha de Logística',
+        data: 'logisticsDate',
         render: function (data) {
           if (!data) return '-';
           const date = new Date(data);
@@ -84,50 +60,8 @@ export class RecentLogisticsComponent implements OnInit {
         },
       },
       {
-        title: 'Subtotal',
-        data: 'subtotal',
-        render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-      {
-        title: 'Subtotal 2',
-        data: 'subtotal2',
-        render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-      {
         title: 'Total',
         data: 'grandTotal',
-        render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-      {
-        title: 'Total Acordado',
-        data: 'totalAgreedToPay',
         render: function (data) {
           if (!data && data !== 0) return '-';
 
@@ -150,120 +84,52 @@ export class RecentLogisticsComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private purchaseService: PurchaseService,
-    private companyService: CompanyService,
-    private periodService: PeriodService,
-    private clientService: ClientService,
+    private logisticsService: LogisticsService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
-    this.loadCompanies();
-    this.loadClients();
-    this.loadRecentPurchases();
+    this.loadRecentLogistics();
   }
 
-  loadRecentPurchases() {
+  loadRecentLogistics() {
     const userId: string | null = this.isOnlyBuyer
       ? this.authService.currentUserValue?.id ?? null
       : null;
 
-    const purchaseSub = this.purchaseService
-      .getPurchaseByParams(
+    const logisticsSub = this.logisticsService
+      .getLogisticsByParams(
         false,
         userId,
-        this.selectedPeriod ? this.selectedPeriod : null,
-        this.selectedClient ? this.selectedClient : null,
         this.controlNumber ? this.controlNumber : null
       )
       .subscribe({
-        next: (purchases: IReducedDetailedPurchaseModel[]) => {
-          this.recentPurchases = purchases;
+        next: (logistics: IReadLogisticsModel[]) => {
+          this.recentLogistics = logistics;
           this.datatableConfig = {
             ...this.datatableConfig,
-            data: [...this.recentPurchases],
+            data: [...this.recentLogistics],
           };
           this.reloadEvent.emit(true);
           this.cdr.detectChanges();
         },
         error: (error) => {
-          console.error('Error fetching purchases:', error);
+          console.error('Error fetching logistics:', error);
         },
       });
-    this.unsubscribe.push(purchaseSub);
+    this.unsubscribe.push(logisticsSub);
   }
 
   edit(id: string) {
-    this.router.navigate(['purchases', 'edit', id]);
-  }
-
-  loadCompanies(): void {
-    const companySub = this.companyService
-      .getCompanies()
-      .pipe(distinctUntilChanged())
-      .subscribe({
-        next: (companies) => (this.companies = companies),
-        error: (err) => console.error('Error al cargar compañías', err),
-      });
-
-    this.unsubscribe.push(companySub);
-  }
-
-  onCompanyChange() {
-    if (!this.selectedCompany) {
-      this.existingPeriods = [];
-      return;
-    }
-
-    // Fetch periods for the selected company
-    this.periodService.getPeriodsByCompany(this.selectedCompany).subscribe({
-      next: (periods) => {
-        this.existingPeriods = periods;
-      },
-      error: (err) => {
-        console.error('Error al cargar periodos:', err);
-      },
-    });
-
-    this.selectedPeriod = '';
-  }
-
-  loadClients(): void {
-    const userId: string | null = this.isOnlyBuyer
-      ? this.authService.currentUserValue?.id ?? null
-      : null;
-
-    let clientSub;
-    if (userId) {
-      clientSub = this.clientService
-        .getClientsByUser(userId)
-        .pipe(distinctUntilChanged())
-        .subscribe({
-          next: (clients) => (this.clients = clients),
-          error: (err) => console.error('Error al cargar clientes', err),
-        });
-    } else {
-      clientSub = this.clientService
-        .getAllClients(false)
-        .pipe(distinctUntilChanged())
-        .subscribe({
-          next: (clients) => (this.clients = clients),
-          error: (err) => console.error('Error al cargar clientes', err),
-        });
-    }
-
-    this.unsubscribe.push(clientSub);
+    this.router.navigate(['logistics', 'edit', id]);
   }
 
   clearFilters() {
-    this.selectedClient = '';
-    this.selectedCompany = '';
-    this.selectedPeriod = '';
     this.controlNumber = '';
 
-    this.loadRecentPurchases();
+    this.loadRecentLogistics();
   }
 
   ngOnDestroy(): void {

@@ -13,44 +13,9 @@
           [(ngModel)]="controlNumber" />
       </div>
 
-      <div class="col-md-5">
-        <label for="client" class="fw-semibold fs-6 mb-2">Cliente</label>
-        <select id="client" name="client" class="form-select form-select-sm" [(ngModel)]="selectedClient">
-          <option value="" selected>Seleccione una opción</option>
-          <option *ngFor="let client of clients" [value]="client.id">
-            {{ client.person.names }} {{ client.person.lastNames }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Spacer to keep layout tidy -->
-      <div class="col-md-4"></div>
-
-      <!-- Row 2: Compañía + Periodo + Buttons -->
-      <div class="col-md-4">
-        <label for="company" class="fw-semibold fs-6 mb-2">Compañía</label>
-        <select id="company" name="company" class="form-select form-select-sm" [(ngModel)]="selectedCompany"
-          (change)="onCompanyChange()">
-          <option value="" selected>Seleccione una opción</option>
-          <option *ngFor="let company of companies" [value]="company.id">
-            {{ company.name }}
-          </option>
-        </select>
-      </div>
-
-      <div class="col-md-4">
-        <label for="period" class="fw-semibold fs-6 mb-2">Período</label>
-        <select id="period" name="period" class="form-select form-select-sm" [(ngModel)]="selectedPeriod">
-          <option value="" selected>Seleccione una opción</option>
-          <option *ngFor="let period of existingPeriods" [value]="period.id">
-            {{ period.name }}
-          </option>
-        </select>
-      </div>
-
       <!-- Button Group -->
       <div class="col-md-4 d-flex align-items-end justify-content-end gap-2">
-        <button class="btn btn-primary btn-sm px-4" (click)="loadRecentPurchases()">Buscar</button>
+        <button class="btn btn-primary btn-sm px-4" (click)="loadRecentLogistics()">Buscar</button>
         <button class="btn btn-secondary btn-sm px-4" (click)="clearFilters()">Limpiar Filtros</button>
       </div>
 

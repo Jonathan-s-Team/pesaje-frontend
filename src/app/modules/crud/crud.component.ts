@@ -89,6 +89,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       ...this.datatableConfig,
     };
+
     this.renderActionColumn();
 
     this.setupSweetAlert();
@@ -206,7 +207,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // this.reload.unsubscribe();
+    this.reload.unsubscribe();
     if (this.clickListener) {
       this.clickListener();
     }

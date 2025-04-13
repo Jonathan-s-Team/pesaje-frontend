@@ -5,6 +5,7 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import {
   ICreateUpdateLogisticsModel,
+  IDetailedReadLogisticsModel,
   IReadLogisticsModel,
 } from '../interfaces/logistics.interface';
 
@@ -51,6 +52,31 @@ export class LogisticsService {
       )
       .pipe(
         map((response) => response.data || []),
+        finalize(() => this.isLoadingSubject.next(false))
+      );
+  }
+
+  getLogisticsById(id: string): Observable<IDetailedReadLogisticsModel> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .get<{ ok: boolean; data: IDetailedReadLogisticsModel }>(
+        `${API_LOGISTICS_URL}/${id}`
+      )
+      .pipe(
+        map((response) => response.data),
+        finalize(() => this.isLoadingSubject.next(false))
+      );
+  }
+
+  updateLogistics(
+    id: string,
+    payload: ICreateUpdateLogisticsModel
+  ): Observable<IReadLogisticsModel> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .put<{ data: IReadLogisticsModel }>(`${API_LOGISTICS_URL}/${id}`, payload)
+      .pipe(
+        map((response) => response.data),
         finalize(() => this.isLoadingSubject.next(false))
       );
   }

@@ -1,31 +1,27 @@
 import {
   ChangeDetectorRef,
   Component,
-  EventEmitter,
-  NgZone,
   OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { DateUtilsService } from '../../../../utils/date-utils.service';
 import { AuthService } from '../../../auth';
 import { IReducedDetailedPurchaseModel } from '../../../purchases/interfaces/purchase.interface';
 import { PurchaseService } from '../../../purchases/services/purchase.service';
-import { Config } from 'datatables.net';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
 import {
   ILogisticsCategoryModel,
   LogisticsCategoryEnum,
 } from '../../../shared/interfaces/logistic-type.interface';
-import { FormUtilsService } from '../../../../utils/form-utils.service';
-import { InputUtilsService } from '../../../../utils/input-utils.service';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '../../../../utils/alert.service';
 import { LogisticsCategoryService } from '../../../shared/services/logistics-category.service';
 import {
   ICreateUpdateLogisticsModel,
+  IDetailedReadLogisticsModel,
   IReadLogisticsModel,
   LogisticsTypeEnum,
 } from '../../interfaces/logistics.interface';
@@ -36,7 +32,8 @@ import {
 } from '../../interfaces/logistics-item.interface';
 import { IReducedUserModel } from '../../../settings/interfaces/user.interface';
 import { IReducedShrimpFarmModel } from '../../../shared/interfaces/shrimp-farm.interface';
-import { v4 as uuidv4 } from 'uuid';
+import { ActivatedRoute, Router } from '@angular/router';
+import { LogisticsItemsListingComponent } from '../../widgets/logistics-items-listing/logistics-items-listing.component';
 
 @Component({
   selector: 'app-new-logistics',
@@ -46,28 +43,21 @@ import { v4 as uuidv4 } from 'uuid';
 export class NewLogisticsComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.NEW_LOGISTICS;
 
-  @ViewChild('personnelLogisticsForm') personnelLogisticsForm!: NgForm;
-  @ViewChild('inputLogisticsForm') inputLogisticsForm!: NgForm;
+  @ViewChild('personnelListing')
+  personnelListingComp: LogisticsItemsListingComponent;
 
-  isLoading$: Observable<boolean>;
+  @ViewChild('inputListing')
+  inputListingComp: LogisticsItemsListingComponent;
 
   isOnlyBuyer = false;
-  isLoading = false;
-
-  personnelLogisticsReloadEvent: EventEmitter<boolean> = new EventEmitter();
-  inputLogisticsReloadEvent: EventEmitter<boolean> = new EventEmitter();
   controlNumber: string;
 
   logisticsModel: ICreateUpdateLogisticsModel;
   purchaseModel: IReducedDetailedPurchaseModel;
 
-  logisticsTypes = Object.values(LogisticsTypeEnum);
-  logisticsTypeLabels: Record<LogisticsTypeEnum, string> = {
-    [LogisticsTypeEnum.SHIPMENT]: 'Envío a Compañía/Local',
-    [LogisticsTypeEnum.LOCAL_PROCESSING]: 'Procesamiento Local',
-  };
+  logisticsTypes: LogisticsTypeEnum[];
+  logisticsTypeLabels: { [key in LogisticsTypeEnum]?: string } = {};
 
-  logisticsItemModel: ILogisticsItemModel = {} as ILogisticsItemModel;
   logisticsItems: ILogisticsItemModel[] = [];
   personnellogisticsItems: ILogisticsItemModel[] = [];
   inputlogisticsItems: ILogisticsItemModel[] = [];
@@ -75,130 +65,9 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   personnelLogisticsCategoryList: ILogisticsCategoryModel[] = [];
   inputLogisticsCategoryList: ILogisticsCategoryModel[] = [];
 
-  logisticsId: string;
+  logisticsId: string | undefined;
 
   private unsubscribe: Subscription[] = [];
-
-  personnelLogisticsDatatableConfig: Config = {
-    serverSide: false,
-    paging: true,
-    pageLength: 10,
-    data: [],
-    columns: [
-      {
-        title: 'Personal',
-        data: 'logisticsCategory',
-        render: function (data) {
-          return data ? data.name : '-';
-        },
-      },
-      {
-        title: 'Unidades',
-        data: 'unit',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Costo',
-        data: 'cost',
-        render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-      {
-        title: 'Total',
-        data: 'total',
-        render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-    ],
-    language: {
-      url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
-    },
-    createdRow: function (row, data, dataIndex) {
-      $('td:eq(0)', row).addClass('d-flex align-items-center');
-    },
-  };
-
-  inputLogisticsDatatableConfig: Config = {
-    serverSide: false,
-    paging: true,
-    pageLength: 10,
-    data: [],
-    columns: [
-      {
-        title: 'Producto o Insumo',
-        data: 'logisticsCategory',
-        render: function (data) {
-          return data ? data.name : '-';
-        },
-      },
-      {
-        title: 'Descripción',
-        data: 'description',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Unidades',
-        data: 'unit',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Costo',
-        data: 'cost',
-        render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-      {
-        title: 'Total',
-        data: 'total',
-        render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-    ],
-    language: {
-      url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
-    },
-    createdRow: function (row, data, dataIndex) {
-      $('td:eq(0)', row).addClass('d-flex align-items-center');
-    },
-  };
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -207,19 +76,11 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     private dateUtils: DateUtilsService,
     private logisticsCategoryService: LogisticsCategoryService,
     private purchaseService: PurchaseService,
-    private formUtils: FormUtilsService,
-    private inputUtils: InputUtilsService,
     private logisticsService: LogisticsService,
+    private route: ActivatedRoute,
+    private router: Router,
     private cdr: ChangeDetectorRef
-  ) {
-    this.isLoading$ = this.purchaseService.isLoading$;
-  }
-
-  ngOnInit(): void {
-    this.initialize();
-
-    this.loadLogisticsCategories();
-  }
+  ) {}
 
   get logisticsDateFormatted(): string | null {
     return this.dateUtils.formatISOToDateInput(
@@ -231,7 +92,66 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     return this.dateUtils.formatISOToDateInput(this.purchaseModel.purchaseDate);
   }
 
-  initialize() {
+  ngOnInit(): void {
+    this.logisticsId = this.route.snapshot.paramMap.get('id') || undefined;
+    this.isOnlyBuyer = this.authService.isOnlyBuyer;
+
+    this.initializeModels();
+    this.loadLogisticsCategories();
+
+    if (this.logisticsId) {
+      const logisticsSub = this.logisticsService
+        .getLogisticsById(this.logisticsId)
+        .subscribe({
+          next: (logistics: IDetailedReadLogisticsModel) => {
+            this.logisticsModel = {
+              id: logistics.id,
+              purchase: logistics.purchase?.id,
+              type: logistics.type,
+              logisticsDate: logistics.logisticsDate,
+              grandTotal: logistics.grandTotal,
+              items: [],
+            };
+            this.controlNumber = logistics.purchase.controlNumber!;
+            this.purchaseModel = logistics.purchase;
+
+            this.personnellogisticsItems = logistics.items.filter(
+              (item) =>
+                item.logisticsCategory.category ===
+                LogisticsCategoryEnum.PERSONNEL
+            );
+
+            this.inputlogisticsItems = logistics.items.filter(
+              (item) =>
+                item.logisticsCategory.category === LogisticsCategoryEnum.INPUTS
+            );
+
+            if (this.purchaseModel.controlNumber?.includes('CO')) {
+              this.logisticsTypeLabels = {
+                [LogisticsTypeEnum.SHIPMENT]: 'Envío a Compañía',
+              };
+              this.logisticsTypes = [LogisticsTypeEnum.SHIPMENT];
+            } else {
+              this.logisticsTypeLabels = {
+                [LogisticsTypeEnum.SHIPMENT]: 'Envío Local',
+                [LogisticsTypeEnum.LOCAL_PROCESSING]: 'Procesamiento Local',
+              };
+              this.logisticsTypes = Object.values(LogisticsTypeEnum);
+            }
+
+            this.cdr.detectChanges();
+          },
+          error: (error) => {
+            console.error('Error fetching logistics:', error);
+            this.alertService.showErrorAlert({});
+          },
+        });
+
+      this.unsubscribe.push(logisticsSub);
+    }
+  }
+
+  initializeModels() {
     this.logisticsModel = {} as ICreateUpdateLogisticsModel;
 
     this.purchaseModel = {} as IReducedDetailedPurchaseModel;
@@ -247,6 +167,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
         this.personnelLogisticsCategoryList = categories.filter(
           (logistic) => logistic.category === LogisticsCategoryEnum.PERSONNEL
         );
+
         this.inputLogisticsCategoryList = categories.filter(
           (logistic) => logistic.category === LogisticsCategoryEnum.INPUTS
         );
@@ -259,6 +180,23 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
   confirmSave(event: Event, form: NgForm) {
     if (form && form.invalid) {
+      return;
+    }
+
+    this.personnelListingComp.emitCurrentValidItems();
+    this.inputListingComp.emitCurrentValidItems();
+
+    // Check if both lists are empty
+    if (
+      (!this.personnellogisticsItems ||
+        this.personnellogisticsItems.length === 0) &&
+      (!this.inputlogisticsItems || this.inputlogisticsItems.length === 0)
+    ) {
+      this.alertService.showAlert({
+        icon: 'warning',
+        title: 'Detalle faltante',
+        text: 'Ingrese detalle de logística',
+      });
       return;
     }
 
@@ -291,18 +229,18 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
       0
     );
     if (this.logisticsId) {
-      // this.logisticsService
-      //   .updatePurchase(this.purchaseId, this.createPurchaseModel)
-      //   .subscribe({
-      //     next: (response) => {
-      //       console.log('Purchase updated successfully:', response);
-      //       this.alertService.showSuccessAlert({});
-      //     },
-      //     error: (error) => {
-      //       console.error('Error updating purchase:', error);
-      //       this.alertService.showErrorAlert({ error });
-      //     },
-      //   });
+      this.logisticsService
+        .updateLogistics(this.logisticsId, this.logisticsModel)
+        .subscribe({
+          next: (response) => {
+            console.log('Purchase updated successfully:', response);
+            this.alertService.showSuccessAlert({});
+          },
+          error: (error) => {
+            console.error('Error updating logistics:', error);
+            this.alertService.showErrorAlert({ error });
+          },
+        });
     } else {
       this.logisticsService.createLogistics(this.logisticsModel).subscribe({
         next: (response) => {
@@ -317,8 +255,14 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     }
   }
 
+  canSaveLogistics(): boolean {
+    if (this.purchaseModel.id) return false;
+    return true;
+  }
+
   searchPurchase($event: Event): void {
     $event.preventDefault();
+    $event.stopPropagation();
 
     const userId =
       this.isOnlyBuyer && this.authService.currentUserValue?.id
@@ -335,7 +279,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
               title: 'Sin resultados',
               text: 'No se encontró ninguna compra con ese número de control.',
             });
-            this.initialize();
+            this.initializeModels();
             return;
           }
 
@@ -358,9 +302,23 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
                       ? 'Ya se han creado los 2 registros logísticos permitidos para compras locales.'
                       : 'Ya existe un registro logístico para esta compra.',
                   });
-                  this.initialize();
+                  this.initializeModels();
                 } else {
                   this.purchaseModel = purchase;
+
+                  if (purchase.controlNumber?.includes('CO')) {
+                    this.logisticsTypeLabels = {
+                      [LogisticsTypeEnum.SHIPMENT]: 'Envío a Compañía',
+                    };
+                    this.logisticsTypes = [LogisticsTypeEnum.SHIPMENT];
+                  } else {
+                    this.logisticsTypeLabels = {
+                      [LogisticsTypeEnum.SHIPMENT]: 'Envío Local',
+                      [LogisticsTypeEnum.LOCAL_PROCESSING]:
+                        'Procesamiento Local',
+                    };
+                    this.logisticsTypes = Object.values(LogisticsTypeEnum);
+                  }
                 }
                 this.cdr.detectChanges();
               },
@@ -381,97 +339,26 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     this.unsubscribe.push(purchaseSub);
   }
 
-  canSaveLogistics(): boolean {
-    if (this.purchaseModel) return true;
-    return false;
-  }
+  handleNewLogistics(): void {
+    const currentUrl = this.router.url;
 
-  createLogistics() {
-    this.logisticsItemModel = {} as ILogisticsItemModel;
-    this.logisticsItemModel.id = uuidv4();
-  }
-
-  onSubmitPersonnelLogisticsForm(event: Event, myForm: NgForm): void {
-    if (myForm && myForm.invalid) {
-      return;
-    }
-
-    const index = this.personnellogisticsItems.findIndex(
-      (item) => item.id === this.logisticsItemModel.id
-    );
-
-    if (index > -1) {
-      // If item exists, update it
-      this.personnellogisticsItems[index] = { ...this.logisticsItemModel };
+    if (currentUrl === '/logistics/new') {
+      // If already on /logistics/new, reload the route (force component reset)
+      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        this.router.navigate(['/logistics/new']);
+      });
     } else {
-      this.personnellogisticsItems.push({ ...this.logisticsItemModel });
+      // Otherwise, navigate to /logistics/new
+      this.router.navigate(['/logistics/new']);
     }
-
-    this.personnelLogisticsDatatableConfig = {
-      ...this.personnelLogisticsDatatableConfig,
-      data: [...this.personnellogisticsItems],
-    };
-
-    this.cdr.detectChanges();
-    this.personnelLogisticsReloadEvent.emit(true);
   }
 
-  editPersonnelLogistics(id: string): void {
-    const foundItem = this.personnellogisticsItems.find(
-      (item) => item.id === id
-    );
-    this.logisticsItemModel = foundItem ?? ({} as ILogisticsItemModel);
+  handlePersonnelLogisticsItems(items: ILogisticsItemModel[]) {
+    this.personnellogisticsItems = items;
   }
 
-  deletePersonnelLogistics(id: string): void {
-    this.personnellogisticsItems = this.personnellogisticsItems.filter(
-      (item) => item.id !== id
-    );
-    this.personnelLogisticsReloadEvent.emit(true);
-  }
-
-  onSubmitInputLogisticsForm(event: Event, myForm: NgForm): void {
-    if (myForm && myForm.invalid) {
-      return;
-    }
-
-    const index = this.inputlogisticsItems.findIndex(
-      (item) => item.id === this.logisticsItemModel.id
-    );
-
-    if (index > -1) {
-      // If item exists, update it
-      this.inputlogisticsItems[index] = { ...this.logisticsItemModel };
-    } else {
-      this.inputlogisticsItems.push({ ...this.logisticsItemModel });
-    }
-
-    this.inputLogisticsDatatableConfig = {
-      ...this.inputLogisticsDatatableConfig,
-      data: [...this.inputlogisticsItems],
-    };
-
-    this.cdr.detectChanges();
-    this.inputLogisticsReloadEvent.emit(true);
-  }
-
-  editInputLogistics(id: string): void {
-    const foundItem = this.inputlogisticsItems.find((item) => item.id === id);
-    this.logisticsItemModel = foundItem ?? ({} as ILogisticsItemModel);
-  }
-
-  deleteInputLogistics(id: string): void {
-    this.inputlogisticsItems = this.inputlogisticsItems.filter(
-      (item) => item.id !== id
-    );
-    this.inputLogisticsReloadEvent.emit(true);
-  }
-
-  formatDecimal(form: NgForm, controlName: string) {
-    const control = form.controls[controlName];
-    if (control) {
-      this.formUtils.formatControlToDecimal(control);
-    }
+  handleInputLogisticsItems(items: ILogisticsItemModel[]) {
+    this.inputlogisticsItems = items;
   }
 
   onDateChange(event: any): void {
@@ -479,22 +366,6 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
     this.logisticsModel.logisticsDate =
       this.dateUtils.convertLocalDateToUTC(event);
-  }
-
-  calculateTotal(form: NgForm): void {
-    const unit = Number(this.logisticsItemModel.unit || 0);
-    const cost = Number(this.logisticsItemModel.cost || 0);
-    this.logisticsItemModel.total = unit * cost;
-    form.controls.total?.setValue(this.logisticsItemModel.total);
-    this.formatDecimal(form, 'total');
-  }
-
-  validateNumber(event: KeyboardEvent) {
-    this.inputUtils.validateNumber(event);
-  }
-
-  validateWholeNumber(event: KeyboardEvent) {
-    this.inputUtils.validateWholeNumber(event);
   }
 
   ngOnDestroy(): void {
