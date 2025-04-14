@@ -315,5 +315,6 @@
 <!-- end::Sale Form -->
 
 <!-- Fourth Section: Company Sale Items -->
-<app-company-sale-items-listing />
+<app-company-sale-items-listing #companySaleItemsListingComponent [periodId]="purchaseModel.period"
+  [canAddItems]="!!purchaseModel.period" (companySaleItemsChange)="handleCompanySaleItemsChange($event)" />
 <!-- end::Fourth Section: Company Sale Items -->

@@ -17,8 +17,15 @@ import {
   CompanySaleStyleEnum,
   ICreateUpdateCompanySaleItemModel,
 } from '../../interfaces/company-sale-item.interface';
-import { Subscription } from 'rxjs';
+import { Subscription, map } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
+import { SizeService } from 'src/app/modules/shared/services/size.service';
+import {
+  IReadSizeModel,
+  SizeTypeEnum,
+} from 'src/app/modules/shared/interfaces/size.interface';
+import { PeriodService } from 'src/app/modules/shared/services/period.service';
+import { IReadPeriodModel } from 'src/app/modules/shared/interfaces/period.interface';
 
 @Component({
   selector: 'app-company-sale-items-listing',
@@ -28,15 +35,28 @@ import { v4 as uuidv4 } from 'uuid';
 export class CompanySaleItemsListingComponent implements OnInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.NEW_COMPANY;
 
-  @Input() title: string = '';
+  private _periodId: string;
 
-  @Output() logisticsItemsChange = new EventEmitter<ILogisticsItemModel[]>();
+  @Input()
+  set periodId(value: string) {
+    if (value) {
+      this._periodId = value;
+      this.loadPeriod();
+    }
+  }
+
+  @Input() canAddItems: boolean;
+
+  @Output() companySaleItemsChange = new EventEmitter<
+    ICreateUpdateCompanySaleItemModel[]
+  >();
 
   @ViewChild('myForm') myForm!: NgForm;
 
   private unsubscribe: Subscription[] = [];
 
   isLoading = false;
+  isWhole = false;
 
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
@@ -48,6 +68,12 @@ export class CompanySaleItemsListingComponent implements OnInit {
   companySaleStyles: CompanySaleStyleEnum[];
   companySaleStylesLabels: { [key in CompanySaleStyleEnum]?: string } = {};
 
+  wholeSizes: IReadSizeModel[];
+  tailSizes: IReadSizeModel[];
+  shrimpClassList: { type: string; label: string }[] = [];
+  sizeList: string[] = [];
+  periodModel: IReadPeriodModel;
+
   datatableConfig: Config = {
     serverSide: false,
     paging: true,
@@ -57,10 +83,26 @@ export class CompanySaleItemsListingComponent implements OnInit {
       {
         title: 'Estilo',
         data: 'style',
+        render: function (data) {
+          if (!data && data !== 0) return '-';
+
+          if (data === CompanySaleStyleEnum.WHOLE) return 'Entero';
+
+          return 'Cola';
+        },
       },
       {
         title: 'Clase',
         data: 'class',
+        render: function (data, type, full) {
+          if (!data && data !== 0) return '-';
+
+          if (full.style === CompanySaleStyleEnum.WHOLE) {
+            return data;
+          }
+
+          return data.replace('TAIL-', '');
+        },
       },
       {
         title: 'Talla',
@@ -146,17 +188,72 @@ export class CompanySaleItemsListingComponent implements OnInit {
   };
 
   constructor(
+    private sizeService: SizeService,
+    private periodService: PeriodService,
     private inputUtils: InputUtilsService,
     private formUtils: FormUtilsService,
     private cdr: ChangeDetectorRef
   ) {}
 
+  get periodId(): string {
+    return this._periodId;
+  }
+
   ngOnInit(): void {
+    this.loadSizes();
     this.companySaleStylesLabels = {
       [CompanySaleStyleEnum.WHOLE]: 'Entero',
       [CompanySaleStyleEnum.TAIL]: 'Cola',
     };
     this.companySaleStyles = Object.values(CompanySaleStyleEnum);
+  }
+
+  loadSizes(): void {
+    const sizesSub = this.sizeService
+      .getSizes(
+        [
+          SizeTypeEnum.WHOLE,
+          SizeTypeEnum['TAIL-A'],
+          SizeTypeEnum['TAIL-A-'],
+          SizeTypeEnum['TAIL-B'],
+        ].join(',')
+      )
+      .subscribe({
+        next: (sizes) => {
+          this.wholeSizes = sizes.filter(
+            (size) => size.type === SizeTypeEnum.WHOLE
+          );
+          this.tailSizes = sizes.filter(
+            (size) => size.type !== SizeTypeEnum.WHOLE
+          );
+
+          const uniqueTypes = new Set(this.tailSizes.map((s) => s.type));
+          this.shrimpClassList = Array.from(uniqueTypes).map((type) => ({
+            type,
+            label: type.replace('TAIL-', ''),
+          }));
+        },
+        error: (err) => {
+          console.error('Error al cargar tallas', err);
+        },
+      });
+
+    this.unsubscribe.push(sizesSub);
+  }
+
+  loadPeriod(): void {
+    const periodSub = this.periodService
+      .getPeriodById(this.periodId)
+      .subscribe({
+        next: (period) => {
+          this.periodModel = period;
+        },
+        error: (err) => {
+          console.error('Error al cargar período', err);
+        },
+      });
+
+    this.unsubscribe.push(periodSub);
   }
 
   onSubmit(event: Event, myForm: NgForm): void {
@@ -234,6 +331,10 @@ export class CompanySaleItemsListingComponent implements OnInit {
       foundItem ?? ({} as ICreateUpdateCompanySaleItemModel);
   }
 
+  emitCurrentValidItems(): void {
+    this.companySaleItemsChange.emit(this.companySaleItems);
+  }
+
   validateNumber(event: KeyboardEvent) {
     this.inputUtils.validateNumber(event);
   }
@@ -250,6 +351,46 @@ export class CompanySaleItemsListingComponent implements OnInit {
     const pounds = Number(this.companySaleItem.pounds) || 0;
     const price = Number(this.companySaleItem.price) || 0;
     this.companySaleItem.total = pounds * price;
+  }
+
+  onStyleChange(style: string): void {
+    this.companySaleItem.class = '';
+    this.companySaleItem.size = '';
+    this.companySaleItem.referencePrice = undefined;
+
+    this.isWhole = style === CompanySaleStyleEnum.WHOLE;
+
+    if (this.isWhole) {
+      this.sizeList = this.wholeSizes.map((size) => size.size);
+    } else {
+      if (this.companySaleItem.class) {
+        this.sizeList = this.tailSizes
+          .filter((size) => size.type === this.companySaleItem.class)
+          .map((size) => size.size);
+      }
+    }
+  }
+
+  onClassChange(selectedClass: string): void {
+    this.companySaleItem.size = '';
+    this.companySaleItem.referencePrice = undefined;
+
+    this.sizeList = this.tailSizes
+      .filter((size) => size.type === selectedClass)
+      .map((size) => size.size);
+  }
+
+  onSizeChange(size: string): void {
+    if (this.companySaleItem.style === CompanySaleStyleEnum.WHOLE) {
+      this.companySaleItem.referencePrice = this.periodModel.sizePrices?.filter(
+        (x) => x.size.size === size && x.size.type === SizeTypeEnum.WHOLE
+      )[0].price;
+    } else {
+      this.companySaleItem.referencePrice = this.periodModel.sizePrices?.filter(
+        (x) =>
+          x.size.size === size && x.size.type === this.companySaleItem.class
+      )[0].price;
+    }
   }
 
   ngOnDestroy(): void {

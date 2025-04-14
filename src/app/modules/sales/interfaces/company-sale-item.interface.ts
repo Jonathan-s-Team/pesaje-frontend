@@ -5,7 +5,7 @@ export interface ICreateUpdateCompanySaleItemModel {
   size: string;
   pounds: number;
   price: number;
-  referencePrice: number;
+  referencePrice?: number;
   total: number;
   percentage: number;
 }

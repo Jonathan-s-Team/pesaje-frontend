@@ -25,6 +25,7 @@ import { ICreateUpdateCompanySaleItemModel } from '../../interfaces/company-sale
 import { CompanySaleService } from '../../services/company-sale.service';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
+import { CompanySaleItemsListingComponent } from '../../widgets/company-sale-items-listing/company-sale-items-listing.component';
 
 @Component({
   selector: 'app-new-company-sale',
@@ -35,6 +36,8 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.NEW_COMPANY;
 
   @ViewChild('saleForm') saleForm!: NgForm;
+  @ViewChild('companySaleItemsListingComponent')
+  companySaleItemsListingComponent: CompanySaleItemsListingComponent;
 
   isOnlyBuyer = false;
   controlNumber: string;
@@ -159,14 +162,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.saleModel.receptionDateTime = this.dateUtils.toISODateTime(
-      this.receptionDate,
-      this.receptionTime
-    );
-    this.saleModel.settleDateTime = this.dateUtils.toISODateTime(
-      this.settleDate,
-      this.settleTime
-    );
+    this.companySaleItemsListingComponent.emitCurrentValidItems();
     console.log(this.saleModel);
 
     // Check if both lists are empty
@@ -188,7 +184,27 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
 
   submitCompanySaleForm() {
     this.saleModel.purchase = this.purchaseModel.id;
-    this.saleModel.items = this.companySaleItems;
+    this.saleModel.receptionDateTime = this.dateUtils.toISODateTime(
+      this.receptionDate,
+      this.receptionTime
+    );
+    this.saleModel.settleDateTime = this.dateUtils.toISODateTime(
+      this.settleDate,
+      this.settleTime
+    );
+    this.saleModel.items = this.companySaleItems.map(({ id, ...rest }) => rest);
+    this.saleModel.poundsGrandTotal = this.companySaleItems.reduce(
+      (sum, item) => sum + Number(item.pounds || 0),
+      0
+    );
+    this.saleModel.priceGrandTotal = this.companySaleItems.reduce(
+      (sum, item) => sum + Number(item.price || 0),
+      0
+    );
+    this.saleModel.percentageTotal = this.companySaleItems.reduce(
+      (sum, item) => sum + Number(item.percentage || 0),
+      0
+    );
 
     if (this.saleId) {
       // this.logisticsService
@@ -269,6 +285,10 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
       // Otherwise, navigate to /logistics/new
       this.router.navigate(['/sales/company']);
     }
+  }
+
+  handleCompanySaleItemsChange(items: ICreateUpdateCompanySaleItemModel[]) {
+    this.companySaleItems = items;
   }
 
   onDateChange(event: any): void {

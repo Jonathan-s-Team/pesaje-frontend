@@ -15,7 +15,8 @@
       <!--begin::Toolbar-->
       <div class="d-flex justify-content-end">
         <!--begin::Add payment info-->
-        <button *appCanEdit="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create">
+        <button *appCanEdit="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create"
+          [disabled]="!canAddItems">
           Agregar
         </button>
         <!--end::Add payment info-->
@@ -52,7 +53,7 @@
           <div class="mb-3">
             <label for="style" class="required fw-semibold fs-6 mb-2">Estilo</label>
             <select id="style" name="style" class="form-select form-select-sm" [(ngModel)]="companySaleItem.style"
-              #style="ngModel" required>
+              (ngModelChange)="onStyleChange($event)" #style="ngModel" required>
               <option value="" disabled selected>Seleccione una opción</option>
               <option *ngFor="let option of companySaleStyles" [ngValue]="option">
                 {{ companySaleStylesLabels[option] }}
@@ -64,8 +65,8 @@
             </div>
           </div>
 
-          <!-- Clase -->
-          <div class="mb-3">
+          <!-- Clase - Whole -->
+          <div *ngIf="companySaleItem.style && isWhole" class="mb-3">
             <label for="class" class="required fw-semibold fs-6 mb-2">Clase</label>
             <input type="text" class="form-control" id="class" name="class" [(ngModel)]="companySaleItem.class" required
               #class="ngModel">
@@ -75,16 +76,49 @@
             </div>
           </div>
 
+          <!-- Clase - Tail -->
+          <div *ngIf="companySaleItem.style &&!isWhole" class="mb-3">
+            <label for="class" class="required fw-semibold fs-6 mb-2">Clase</label>
+            <select id="class" name="class" class="form-select form-select-sm" [(ngModel)]="companySaleItem.class"
+              (ngModelChange)="onClassChange($event)" #class="ngModel" required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option *ngFor="let option of shrimpClassList" [ngValue]="option.type">
+                {{ option.label }}
+              </option>
+            </select>
+            <div *ngIf="(myForm.submitted || class.dirty || class.touched) && class.errors?.['required']"
+              class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+              <div>El campo es obligatorio.</div>
+            </div>
+          </div>
+
           <!-- Talla -->
           <div class="mb-3">
             <label for="size" class="required fw-semibold fs-6 mb-2">Talla</label>
-            <input type="text" class="form-control" id="size" name="size" [(ngModel)]="companySaleItem.size" required
-              #size="ngModel">
+            <select id="size" name="size" class="form-select form-select-sm" [(ngModel)]="companySaleItem.size"
+              (ngModelChange)="onSizeChange($event)" #size="ngModel" required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option *ngFor="let option of sizeList" [ngValue]="option">
+                {{ option }}
+              </option>
+            </select>
             <div *ngIf="(myForm.submitted || size.dirty || size.touched) && size.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
               <div>El campo es obligatorio.</div>
             </div>
           </div>
+
+          <!-- Precio referencial ($) -->
+          <div class="mb-3">
+            <label for="referencePrice" class="fw-semibold fs-6 mb-2">Precio Referencial ($)</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="text" id="referencePrice" name="referencePrice"
+                [value]="companySaleItem.referencePrice | number: '1.2-2'" class="form-control form-control-sm"
+                disabled />
+            </div>
+          </div>
+
 
           <!-- Libras (lb) -->
           <div class="mb-3">
