@@ -14,6 +14,11 @@ export const PERMISSION_ROUTES = {
     NEW_LOGISTICS: '/logistics/new',
     RECENT_LOGISTICS: '/logistics/list',
   },
+  SALES: {
+    NEW_COMPANY: '/sales/company',
+    NEW_LOCAL: '/sales/local',
+    RECENT_SALES: '/sales/list',
+  },
   SETTINGS: {
     USERS: '/settings/users',
     BROKERS: '/settings/brokers',
