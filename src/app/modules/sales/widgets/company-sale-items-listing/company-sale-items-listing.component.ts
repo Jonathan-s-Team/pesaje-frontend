@@ -81,6 +81,20 @@ export class CompanySaleItemsListingComponent implements OnInit {
         },
       },
       {
+        title: 'Precio Referencial($)',
+        data: 'referencePrice',
+        render: function (data) {
+          if (!data && data !== 0) return '-';
+
+          const formatted = new Intl.NumberFormat('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(data);
+
+          return `$${formatted}`;
+        },
+      },
+      {
         title: 'Precio ($)',
         data: 'price',
         render: function (data) {
@@ -146,55 +160,53 @@ export class CompanySaleItemsListingComponent implements OnInit {
   }
 
   onSubmit(event: Event, myForm: NgForm): void {
-    if (myForm && myForm.invalid) {
-      return;
-    }
+    if (myForm?.invalid) return;
 
     this.isLoading = true;
 
-    const completeFn = () => {
+    const complete = () => {
       this.isLoading = false;
     };
 
-    const updateFn = () => {
+    const updateDatatableAndNotify = () => {
+      const totalSum = this.companySaleItems.reduce(
+        (sum, item) => sum + Number(item.total || 0),
+        0
+      );
+
+      this.companySaleItems = this.companySaleItems.map((item) => ({
+        ...item,
+        percentage:
+          totalSum > 0 ? (Number(item.total || 0) / totalSum) * 100 : 0,
+      }));
+
+      this.datatableConfig = {
+        ...this.datatableConfig,
+        data: [...this.companySaleItems],
+      };
+
+      this.cdr.detectChanges();
+      this.reloadEvent.emit(true);
+      complete();
+    };
+
+    if (this.companySaleItem.id) {
+      // Update existing item
       const index = this.companySaleItems.findIndex(
         (item) => item.id === this.companySaleItem.id
       );
 
       if (index > -1) {
-        this.companySaleItems[index] = this.companySaleItem;
+        this.companySaleItems[index] = { ...this.companySaleItem }; // Ensure copy
       }
 
-      this.datatableConfig = {
-        ...this.datatableConfig,
-        data: [...this.companySaleItems],
-      };
-
-      this.cdr.detectChanges();
-      this.reloadEvent.emit(true);
-
-      completeFn();
-    };
-
-    const createFn = () => {
-      this.companySaleItem.id = uuidv4();
-      this.companySaleItems.push(this.companySaleItem);
-
-      this.datatableConfig = {
-        ...this.datatableConfig,
-        data: [...this.companySaleItems],
-      };
-
-      this.cdr.detectChanges();
-      this.reloadEvent.emit(true);
-
-      completeFn();
-    };
-
-    if (this.companySaleItem.id) {
-      updateFn();
+      updateDatatableAndNotify();
     } else {
-      createFn();
+      // Create new item
+      this.companySaleItem.id = uuidv4();
+      this.companySaleItems.push({ ...this.companySaleItem });
+
+      updateDatatableAndNotify();
     }
   }
 
