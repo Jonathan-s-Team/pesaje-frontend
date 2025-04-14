@@ -171,6 +171,8 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
         this.inputLogisticsCategoryList = categories.filter(
           (logistic) => logistic.category === LogisticsCategoryEnum.INPUTS
         );
+
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error fetching logistics categories:', error);
