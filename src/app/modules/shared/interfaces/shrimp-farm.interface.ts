@@ -36,6 +36,7 @@ export interface IReducedShrimpFarmModel {
   identifier: string;
   place: string;
   id: string;
+  transportationMethod: string;
 }
 
 export enum TransportationMethodEnum {
