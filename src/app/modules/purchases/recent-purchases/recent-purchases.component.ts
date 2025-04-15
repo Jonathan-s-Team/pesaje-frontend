@@ -85,33 +85,54 @@ export class RecentPurchasesComponent implements OnInit {
         },
       },
       {
-        title: 'Subtotal',
-        data: 'subtotal',
+        title: 'Compañía',
+        data: 'company.name',
         render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
+          return data ? data : '-';
         },
       },
       {
-        title: 'Subtotal 2',
-        data: 'subtotal2',
+        title: 'Tiene Factura?',
+        data: 'hasInvoice',
         render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
+          return data ? 'Si' : 'No';
         },
       },
+      {
+        title: 'Número Factura',
+        data: 'invoice',
+        render: function (data) {
+          return data ? data : '-';
+        },
+      },
+      // {
+      //   title: 'Subtotal',
+      //   data: 'subtotal',
+      //   render: function (data) {
+      //     if (!data && data !== 0) return '-';
+
+      //     const formatted = new Intl.NumberFormat('es-ES', {
+      //       minimumFractionDigits: 2,
+      //       maximumFractionDigits: 2,
+      //     }).format(data);
+
+      //     return `$${formatted}`;
+      //   },
+      // },
+      // {
+      //   title: 'Subtotal 2',
+      //   data: 'subtotal2',
+      //   render: function (data) {
+      //     if (!data && data !== 0) return '-';
+
+      //     const formatted = new Intl.NumberFormat('es-ES', {
+      //       minimumFractionDigits: 2,
+      //       maximumFractionDigits: 2,
+      //     }).format(data);
+
+      //     return `$${formatted}`;
+      //   },
+      // },
       {
         title: 'Total',
         data: 'grandTotal',
@@ -131,6 +152,20 @@ export class RecentPurchasesComponent implements OnInit {
         data: 'totalAgreedToPay',
         render: function (data) {
           if (!data && data !== 0) return '-';
+
+          const formatted = new Intl.NumberFormat('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(data);
+
+          return `$${formatted}`;
+        },
+      },
+      {
+        title: 'Total Abonado',
+        data: 'totalPaid',
+        render: function (data) {
+          if (!data || data === 0) return '-';
 
           const formatted = new Intl.NumberFormat('es-ES', {
             minimumFractionDigits: 2,

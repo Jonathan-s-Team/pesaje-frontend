@@ -60,6 +60,20 @@ export class RecentLogisticsComponent implements OnInit {
         },
       },
       {
+        title: 'Total Libras (lb)',
+        data: 'totalPounds',
+        render: function (data) {
+          if (!data && data !== 0) return '-';
+
+          const formatted = new Intl.NumberFormat('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(data);
+
+          return `${formatted}`;
+        },
+      },
+      {
         title: 'Total',
         data: 'grandTotal',
         render: function (data) {

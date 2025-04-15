@@ -262,10 +262,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     return true;
   }
 
-  searchPurchase($event: Event): void {
-    $event.preventDefault();
-    $event.stopPropagation();
-
+  searchPurchase(): void {
     const userId =
       this.isOnlyBuyer && this.authService.currentUserValue?.id
         ? this.authService.currentUserValue.id

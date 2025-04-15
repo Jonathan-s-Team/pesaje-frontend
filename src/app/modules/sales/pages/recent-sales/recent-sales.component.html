@@ -23,8 +23,10 @@
 
 
     <div class="mt-5">
-      <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="PERMISSION_ROUTE"
+      <!-- <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="PERMISSION_ROUTE"
         (editEvent)="edit($event.toString())" [reload]="reloadEvent">
+      </app-crud> -->
+      <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="PERMISSION_ROUTE" [reload]="reloadEvent">
       </app-crud>
     </div>
   </div>

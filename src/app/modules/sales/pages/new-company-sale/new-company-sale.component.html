@@ -10,8 +10,10 @@
       <label for="controlNumber" class="fw-semibold fs-6 mb-2 me-3 mb-0" style="min-width: 160px;">
         Número de control
       </label>
-      <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
-        [disabled]="!!saleId" (keydown.enter)="searchPurchase($event)" [(ngModel)]="controlNumber" />
+      <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end me-3"
+        [disabled]="!!saleId" [(ngModel)]="controlNumber" />
+      <button class="btn btn-primary btn-sm px-4" (click)="searchPurchase()">Buscar</button>
+
     </div>
   </div>
 

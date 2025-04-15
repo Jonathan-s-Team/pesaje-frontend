@@ -50,7 +50,7 @@
           <div class="col-md-6">
             <label for="hasInvoice" class="required fw-semibold fs-6 mb-2">¿Factura recibida?</label>
             <select id="hasInvoice" name="hasInvoice" class="form-select form-select-sm"
-              [(ngModel)]="createPurchaseModel.hasInvoice" #hasInvoice="ngModel" required>
+              [(ngModel)]="createPurchaseModel.hasInvoice" (ngModelChange)="onHasInvoiceChange($event)" #hasInvoice="ngModel" required>
               <option [ngValue]="null" disabled selected>Seleccione una opción</option>
               <option [ngValue]="true">Si</option>
               <option [ngValue]="false">No</option>

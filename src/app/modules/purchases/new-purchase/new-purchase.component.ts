@@ -316,6 +316,10 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
       this.dateUtils.convertLocalDateToUTC(event);
   }
 
+  onHasInvoiceChange(hasInvoice: boolean) {
+    if (!hasInvoice) this.createPurchaseModel.invoice = undefined;
+  }
+
   submitForm(): void {
     // if (this.isLocal) {
     //   this.createPurchaseModel.period = null;
