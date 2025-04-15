@@ -1,6 +1,6 @@
 import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
-import { RecentLogisticsComponent } from './pages/recent-logistics/recent-logistics.component';
+import { RecentSalesComponent } from './pages/recent-sales/recent-sales.component';
 import { NewCompanySaleComponent } from './pages/new-company-sale/new-company-sale.component';
 
 const routes: Routes = [
@@ -14,7 +14,7 @@ const routes: Routes = [
   },
   {
     path: 'list',
-    component: RecentLogisticsComponent,
+    component: RecentSalesComponent,
   },
   { path: '', redirectTo: 'new', pathMatch: 'full' },
   { path: '**', redirectTo: 'new', pathMatch: 'full' },

@@ -197,8 +197,8 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
       (sum, item) => sum + Number(item.pounds || 0),
       0
     );
-    this.saleModel.priceGrandTotal = this.companySaleItems.reduce(
-      (sum, item) => sum + Number(item.price || 0),
+    this.saleModel.grandTotal = this.companySaleItems.reduce(
+      (sum, item) => sum + Number(item.total || 0),
       0
     );
     this.saleModel.percentageTotal = this.companySaleItems.reduce(

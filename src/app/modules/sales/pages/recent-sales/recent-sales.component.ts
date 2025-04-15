@@ -10,23 +10,23 @@ import { AuthService } from '../../../auth';
 import { Subscription } from 'rxjs';
 
 import { Router } from '@angular/router';
-import { IReadLogisticsModel } from 'src/app/modules/logistics/interfaces/logistics.interface';
-import { LogisticsService } from 'src/app/modules/logistics/services/logistics.service';
+import { SaleService } from '../../services/sale.service';
+import { ISaleModel, SaleTypeEnum } from '../../interfaces/sale.interface';
 
 @Component({
-  selector: 'app-recent-logistics',
-  templateUrl: './recent-logistics.component.html',
-  styleUrl: './recent-logistics.component.scss',
+  selector: 'app-recent-sales',
+  templateUrl: './recent-sales.component.html',
+  styleUrl: './recent-sales.component.scss',
 })
-export class RecentLogisticsComponent implements OnInit {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.RECENT_LOGISTICS;
+export class RecentSalesComponent implements OnInit {
+  PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.RECENT_SALES;
 
   private unsubscribe: Subscription[] = [];
 
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
   isLoading = false;
   isOnlyBuyer = false;
-  recentLogistics: IReadLogisticsModel[] = [];
+  recentSales: ISaleModel[] = [];
 
   controlNumber = '';
 
@@ -45,14 +45,18 @@ export class RecentLogisticsComponent implements OnInit {
       },
       {
         title: 'Tipo',
-        data: 'description',
+        data: 'type',
         render: function (data) {
-          return data ? data : '-';
+          if (!data) return '-';
+
+          if (data === SaleTypeEnum.COMPANY) return 'Venta a Compañía';
+
+          return 'Venta Local';
         },
       },
       {
-        title: 'Fecha de Logística',
-        data: 'logisticsDate',
+        title: 'Fecha de Venta',
+        data: 'saleDate',
         render: function (data) {
           if (!data) return '-';
           const date = new Date(data);
@@ -61,7 +65,7 @@ export class RecentLogisticsComponent implements OnInit {
       },
       {
         title: 'Total',
-        data: 'grandTotal',
+        data: 'total',
         render: function (data) {
           if (!data && data !== 0) return '-';
 
@@ -84,52 +88,52 @@ export class RecentLogisticsComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private logisticsService: LogisticsService,
+    private saleService: SaleService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
-    this.loadRecentLogistics();
+    this.loadRecentSales();
   }
 
-  loadRecentLogistics() {
+  loadRecentSales() {
     const userId: string | null = this.isOnlyBuyer
       ? this.authService.currentUserValue?.id ?? null
       : null;
 
-    const logisticsSub = this.logisticsService
-      .getLogisticsByParams(
+    const salesSub = this.saleService
+      .getSalesByParams(
         false,
         userId,
         this.controlNumber ? this.controlNumber : null
       )
       .subscribe({
-        next: (logistics: IReadLogisticsModel[]) => {
-          this.recentLogistics = logistics;
+        next: (sales: ISaleModel[]) => {
+          this.recentSales = sales;
           this.datatableConfig = {
             ...this.datatableConfig,
-            data: [...this.recentLogistics],
+            data: [...this.recentSales],
           };
           this.reloadEvent.emit(true);
           this.cdr.detectChanges();
         },
         error: (error) => {
-          console.error('Error fetching logistics:', error);
+          console.error('Error fetching sales:', error);
         },
       });
-    this.unsubscribe.push(logisticsSub);
+    this.unsubscribe.push(salesSub);
   }
 
   edit(id: string) {
-    this.router.navigate(['logistics', 'edit', id]);
+    this.router.navigate(['sales', 'edit', id]);
   }
 
   clearFilters() {
     this.controlNumber = '';
 
-    this.loadRecentLogistics();
+    this.loadRecentSales();
   }
 
   ngOnDestroy(): void {

@@ -4,6 +4,8 @@ import { ICreateUpdateCompanySaleItemModel } from './company-sale-item.interface
 export interface ISaleModel {
   id?: string;
   purchase: string;
+  controlNumber: string;
+  total: number;
   saleDate: string;
   type: SaleTypeEnum;
   deletedAt?: string;
@@ -27,7 +29,7 @@ export interface ICreateUpdateCompanySaleModel {
   processedPounds: number;
   performance: number;
   poundsGrandTotal: number;
-  priceGrandTotal: number;
+  grandTotal: number;
   percentageTotal: number;
   items: ICreateUpdateCompanySaleItemModel[];
 }
