@@ -19,6 +19,9 @@ export const PERMISSION_ROUTES = {
     NEW_LOCAL: '/sales/local',
     RECENT_SALES: '/sales/list',
   },
+  REPORTS: {
+    ECONOMIC: '/reports/economic',
+  },
   SETTINGS: {
     USERS: '/settings/users',
     BROKERS: '/settings/brokers',

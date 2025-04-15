@@ -39,6 +39,11 @@ const Routing: Routes = [
       import('../modules/sales/sales.module').then((m) => m.SalesModule),
   },
   {
+    path: 'reports',
+    loadChildren: () =>
+      import('../modules/report/report.module').then((m) => m.ReportsModule),
+  },
+  {
     path: 'settings',
     loadChildren: () =>
       import('../modules/settings/settings.module').then(
