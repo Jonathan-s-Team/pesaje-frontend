@@ -12,7 +12,7 @@
       </label>
       <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end me-3"
         [disabled]="!!logisticsId" [(ngModel)]="controlNumber" />
-      <button class="btn btn-primary btn-sm px-4" (click)="searchPurchase()">Buscar</button>
+      <button *ngIf="!logisticsId" class="btn btn-primary btn-sm px-4" (click)="searchPurchase()">Buscar</button>
 
     </div>
   </div>
