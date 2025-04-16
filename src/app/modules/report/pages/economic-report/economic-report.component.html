@@ -62,7 +62,7 @@
           <td><strong>Nombre de broker</strong></td>
           <td>{{ economicReportModel.purchase.brokerName }}</td>
           <td><strong>Estado</strong></td>
-          <td>{{ economicReportModel.purchase.status }}</td>
+          <td>{{ purchaseStatus }}</td>
         </tr>
       </tbody>
     </table>
@@ -73,7 +73,7 @@
       <tbody>
         <tr>
           <td><strong>Fecha de venta</strong></td>
-          <td>{{ economicReportModel.sale.saleDate }}</td>
+          <td>{{ economicReportModel.sale.saleDate | date: 'dd/MM/yyyy' }}</td>
           <td><strong>Libras netas recibidas</strong></td>
           <td>{{ economicReportModel.sale.netPoundsReceived }}</td>
           <td><strong>Total a recibir ($)</strong></td>
@@ -81,7 +81,7 @@
         </tr>
         <tr>
           <td><strong>Fecha de recepción</strong></td>
-          <td>{{ economicReportModel.sale.receptionDate }}</td>
+          <td>{{ economicReportModel.sale.receptionDate | date: 'dd/MM/yyyy' }}</td>
           <td><strong>Libras recibidas cabeza</strong></td>
           <td>{{ economicReportModel.sale.wholePoundsReceived }}</td>
         </tr>
@@ -143,7 +143,7 @@
       <tbody>
         <tr>
           <td><strong>Tipo</strong></td>
-          <td>{{ economicReportModel.logistics.type }}</td>
+          <td>{{ logisticsType }}</td>
           <td><strong>Gastos personal</strong></td>
           <td>{{ economicReportModel.logistics.personnelExpenses | number:'1.2-2' }}</td>
           <td><strong>Total a pagar ($)</strong></td>
@@ -151,7 +151,7 @@
         </tr>
         <tr>
           <td><strong>Fecha de logística</strong></td>
-          <td>{{ economicReportModel.logistics.logisticsDate }}</td>
+          <td>{{ economicReportModel.logistics.logisticsDate | date: 'dd/MM/yyyy'}}</td>
           <td><strong>Gasto productos e insumos</strong></td>
           <td>{{ economicReportModel.logistics.productAndSupplyExpenses | number:'1.2-2' }}</td>
         </tr>

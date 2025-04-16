@@ -1,3 +1,6 @@
+import { LogisticsTypeEnum } from '../../logistics/interfaces/logistics.interface';
+import { PurchaseStatusEnum } from '../../purchases/interfaces/purchase.interface';
+
 export interface IEconomicReportModel {
   grossProfit: number;
   purchase: IPurchaseDetailsModel;
@@ -17,7 +20,7 @@ export interface IPurchaseDetailsModel {
   purchaseDate: string; // ISO date string
   averageGram: number;
   invoiceNumber: string;
-  status: string;
+  status: PurchaseStatusEnum;
   price: number;
   pounds: number;
   averageGrams2: number;
@@ -42,7 +45,7 @@ export interface ISaleDetailsModel {
 }
 
 export interface ILogisticsDetailsModel {
-  type: string;
+  type: LogisticsTypeEnum;
   logisticsDate: string;
   personnelExpenses: number;
   productAndSupplyExpenses: number;
