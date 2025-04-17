@@ -1,4 +1,7 @@
-import { ICreateUpdateCompanySaleModel } from './../../interfaces/sale.interface';
+import {
+  ICompanySaleModel,
+  ICreateUpdateCompanySaleModel,
+} from './../../interfaces/sale.interface';
 import {
   ChangeDetectorRef,
   Component,
@@ -21,11 +24,12 @@ import {
   TransportationMethodEnum,
 } from '../../../shared/interfaces/shrimp-farm.interface';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ICreateUpdateCompanySaleItemModel } from '../../interfaces/company-sale-item.interface';
+import { ICompanySaleItemModel } from '../../interfaces/company-sale-item.interface';
 import { CompanySaleService } from '../../services/company-sale.service';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { CompanySaleItemsListingComponent } from '../../widgets/company-sale-items-listing/company-sale-items-listing.component';
+import { IReducedPeriodModel } from 'src/app/modules/shared/interfaces/period.interface';
 
 @Component({
   selector: 'app-new-company-sale',
@@ -42,7 +46,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   isOnlyBuyer = false;
   controlNumber: string;
 
-  saleModel: ICreateUpdateCompanySaleModel;
+  companySaleModel: ICreateUpdateCompanySaleModel;
   purchaseModel: IReducedDetailedPurchaseModel;
 
   receptionDate: string = '';
@@ -50,7 +54,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   settleDate: string = '';
   settleTime: string = '';
 
-  companySaleItems: ICreateUpdateCompanySaleItemModel[] = [];
+  companySaleItems: ICompanySaleItemModel[] = [];
 
   saleId: string | undefined;
 
@@ -71,7 +75,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   ) {}
 
   get saleDateFormatted(): string | null {
-    return this.dateUtils.formatISOToDateInput(this.saleModel.saleDate);
+    return this.dateUtils.formatISOToDateInput(this.companySaleModel.saleDate);
   }
 
   get purchaseDateFormatted(): string | null {
@@ -95,62 +99,52 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
 
     this.initializeModels();
 
-    // if (this.saleId) {
-    //   const logisticsSub = this.logisticsService
-    //     .getLogisticsById(this.saleId)
-    //     .subscribe({
-    //       next: (logistics: IDetailedReadLogisticsModel) => {
-    //         this.saleModel = {
-    //           id: logistics.id,
-    //           purchase: logistics.purchase?.id,
-    //           type: logistics.type,
-    //           logisticsDate: logistics.logisticsDate,
-    //           grandTotal: logistics.grandTotal,
-    //           items: [],
-    //         };
-    //         this.controlNumber = logistics.purchase.controlNumber!;
-    //         this.purchaseModel = logistics.purchase;
+    if (this.saleId) {
+      const companySaleSub = this.companySaleService
+        .getCompanySaleBySaleId(this.saleId)
+        .subscribe({
+          next: (companySale: ICompanySaleModel) => {
+            const { purchase, ...rest } = companySale;
+            this.companySaleModel = {
+              ...rest,
+              purchase: purchase.id,
+            };
+            this.controlNumber = companySale.purchase.controlNumber!;
+            this.purchaseModel = companySale.purchase;
 
-    //         this.personnellogisticsItems = logistics.items.filter(
-    //           (item) =>
-    //             item.logisticsCategory.category ===
-    //             LogisticsCategoryEnum.PERSONNEL
-    //         );
+            const { date: fetchedReceptionDate, time: fetchedReceptionTime } =
+              this.dateUtils.parseISODateTime(
+                this.companySaleModel.receptionDateTime
+              );
+            this.receptionDate = fetchedReceptionDate;
+            this.receptionTime = fetchedReceptionTime;
 
-    //         this.inputlogisticsItems = logistics.items.filter(
-    //           (item) =>
-    //             item.logisticsCategory.category === LogisticsCategoryEnum.INPUTS
-    //         );
+            const { date: fetchedSettleDate, time: fetchedSettleTime } =
+              this.dateUtils.parseISODateTime(
+                this.companySaleModel.settleDateTime
+              );
+            this.settleDate = fetchedSettleDate;
+            this.settleTime = fetchedSettleTime;
 
-    //         if (this.purchaseModel.controlNumber?.includes('CO')) {
-    //           this.logisticsTypeLabels = {
-    //             [LogisticsTypeEnum.SHIPMENT]: 'Envío a Compañía',
-    //           };
-    //           this.logisticsTypes = [LogisticsTypeEnum.SHIPMENT];
-    //         } else {
-    //           this.logisticsTypeLabels = {
-    //             [LogisticsTypeEnum.SHIPMENT]: 'Envío Local',
-    //             [LogisticsTypeEnum.LOCAL_PROCESSING]: 'Procesamiento Local',
-    //           };
-    //           this.logisticsTypes = Object.values(LogisticsTypeEnum);
-    //         }
+            this.companySaleItems = companySale.items;
 
-    //         this.cdr.detectChanges();
-    //       },
-    //       error: (error) => {
-    //         console.error('Error fetching logistics:', error);
-    //         this.alertService.showErrorAlert({});
-    //       },
-    //     });
+            this.cdr.detectChanges();
+          },
+          error: (error) => {
+            console.error('Error fetching logistics:', error);
+            this.alertService.showErrorAlert({});
+          },
+        });
 
-    //   this.unsubscribe.push(logisticsSub);
-    // }
+      this.unsubscribe.push(companySaleSub);
+    }
   }
 
   initializeModels() {
-    this.saleModel = {} as ICreateUpdateCompanySaleModel;
+    this.companySaleModel = {} as ICreateUpdateCompanySaleModel;
 
     this.purchaseModel = {} as IReducedDetailedPurchaseModel;
+    this.purchaseModel.period = {} as IReducedPeriodModel;
     this.purchaseModel.buyer = {} as IReducedUserModel;
     this.purchaseModel.broker = {} as IReducedUserModel;
     this.purchaseModel.client = {} as IReducedUserModel;
@@ -163,7 +157,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     }
 
     this.companySaleItemsListingComponent.emitCurrentValidItems();
-    console.log(this.saleModel);
+    console.log(this.companySaleModel);
 
     // Check if both lists are empty
     if (!this.companySaleItems || this.companySaleItems.length === 0) {
@@ -183,25 +177,27 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   }
 
   submitCompanySaleForm() {
-    this.saleModel.purchase = this.purchaseModel.id;
-    this.saleModel.receptionDateTime = this.dateUtils.toISODateTime(
+    this.companySaleModel.purchase = this.purchaseModel.id;
+    this.companySaleModel.receptionDateTime = this.dateUtils.toISODateTime(
       this.receptionDate,
       this.receptionTime
     );
-    this.saleModel.settleDateTime = this.dateUtils.toISODateTime(
+    this.companySaleModel.settleDateTime = this.dateUtils.toISODateTime(
       this.settleDate,
       this.settleTime
     );
-    this.saleModel.items = this.companySaleItems.map(({ id, ...rest }) => rest);
-    this.saleModel.poundsGrandTotal = this.companySaleItems.reduce(
+    this.companySaleModel.items = this.companySaleItems.map(
+      ({ id, ...rest }) => rest
+    );
+    this.companySaleModel.poundsGrandTotal = this.companySaleItems.reduce(
       (sum, item) => sum + Number(item.pounds || 0),
       0
     );
-    this.saleModel.grandTotal = this.companySaleItems.reduce(
+    this.companySaleModel.grandTotal = this.companySaleItems.reduce(
       (sum, item) => sum + Number(item.total || 0),
       0
     );
-    this.saleModel.percentageTotal = this.companySaleItems.reduce(
+    this.companySaleModel.percentageTotal = this.companySaleItems.reduce(
       (sum, item) => sum + Number(item.percentage || 0),
       0
     );
@@ -219,17 +215,19 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
       //     },
       //   });
     } else {
-      this.companySaleService.createCompanySale(this.saleModel).subscribe({
-        next: (response) => {
-          this.saleId = response.id; // ✅ Store the new ID for future updates
-          this.cdr.detectChanges();
-          this.alertService.showSuccessAlert({});
-        },
-        error: (error) => {
-          console.error('Error creating company sale:', error);
-          this.alertService.showErrorAlert({ error });
-        },
-      });
+      this.companySaleService
+        .createCompanySale(this.companySaleModel)
+        .subscribe({
+          next: (response) => {
+            this.saleId = response.id; // ✅ Store the new ID for future updates
+            this.cdr.detectChanges();
+            this.alertService.showSuccessAlert({});
+          },
+          error: (error) => {
+            console.error('Error creating company sale:', error);
+            this.alertService.showErrorAlert({ error });
+          },
+        });
     }
   }
 
@@ -245,7 +243,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
         : null;
 
     const purchaseSub = this.purchaseService
-      .getPurchaseByParams(false, userId, null, null, this.controlNumber)
+      .getPurchaseByParams(false, userId, null, null, null, this.controlNumber)
       .subscribe({
         next: (purchases: IReducedDetailedPurchaseModel[]) => {
           if (purchases.length === 0) {
@@ -284,14 +282,15 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleCompanySaleItemsChange(items: ICreateUpdateCompanySaleItemModel[]) {
+  handleCompanySaleItemsChange(items: ICompanySaleItemModel[]) {
     this.companySaleItems = items;
   }
 
   onDateChange(event: any): void {
     if (!event) return;
 
-    this.saleModel.saleDate = this.dateUtils.convertLocalDateToUTC(event);
+    this.companySaleModel.saleDate =
+      this.dateUtils.convertLocalDateToUTC(event);
   }
 
   formatDecimal(controlName: string) {

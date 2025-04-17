@@ -24,8 +24,11 @@ export class RecentSalesComponent implements OnInit {
   private unsubscribe: Subscription[] = [];
 
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
+
   isLoading = false;
   isOnlyBuyer = false;
+
+  salesModel: ISaleModel;
   recentSales: ISaleModel[] = [];
 
   controlNumber = '';
@@ -75,6 +78,20 @@ export class RecentSalesComponent implements OnInit {
           }).format(data);
 
           return `$${formatted}`;
+        },
+      },
+      {
+        title: 'Comprador',
+        data: 'buyer.fullName',
+        render: function (data) {
+          return data ? data : '-';
+        },
+      },
+      {
+        title: 'Cliente',
+        data: 'client.fullName',
+        render: function (data) {
+          return data ? data : '-';
         },
       },
     ],
@@ -127,7 +144,14 @@ export class RecentSalesComponent implements OnInit {
   }
 
   edit(id: string) {
-    this.router.navigate(['sales', 'edit', id]);
+    const foundItem = this.recentSales.find((item) => item.id === id);
+    this.salesModel = foundItem ? { ...foundItem } : ({} as ISaleModel);
+
+    if (this.salesModel.type === SaleTypeEnum.COMPANY) {
+      this.router.navigate(['sales', 'company', 'edit', id]);
+    } else {
+      this.router.navigate(['sales', 'local', 'edit', id]);
+    }
   }
 
   clearFilters() {

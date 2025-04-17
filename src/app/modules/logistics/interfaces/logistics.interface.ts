@@ -1,4 +1,5 @@
 import { IReducedDetailedPurchaseModel } from '../../purchases/interfaces/purchase.interface';
+import { IReducedUserModel } from '../../settings/interfaces/user.interface';
 import { ILogisticsCategoryModel } from '../../shared/interfaces/logistic-type.interface';
 import {
   ICreateUpdateLogisticsItemModel,
@@ -34,6 +35,8 @@ export interface IReadLogisticsModel {
   logisticsDate: string;
   grandTotal: number;
   description: string;
+  buyer: IReducedUserModel;
+  client: IReducedUserModel;
   deletedAt: string | null;
   id: string;
 }

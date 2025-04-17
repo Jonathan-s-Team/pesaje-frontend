@@ -18,7 +18,7 @@ import { Config } from 'datatables.net';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 import { IPaymentInfoModel } from '../../../interfaces/payment-info.interface';
 import { PaymentInfoService } from '../../../services/payment-info.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ROUTES } from '@angular/router';
 
 @Component({
   selector: 'app-payment-information',
@@ -79,6 +79,9 @@ export class PaymentInformationComponent
   ) {}
 
   ngOnInit(): void {
+    if (!this.permissionRoute) {
+      this.permissionRoute = PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE;
+    }
     // If personId is not provided as an input, get it from route resolver
     if (!this.personId) {
       this.route.data.subscribe((data) => {

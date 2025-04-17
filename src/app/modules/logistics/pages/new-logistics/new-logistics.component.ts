@@ -269,7 +269,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
         : null;
 
     const purchaseSub = this.purchaseService
-      .getPurchaseByParams(false, userId, null, null, this.controlNumber)
+      .getPurchaseByParams(false, userId, null, null, null, this.controlNumber)
       .subscribe({
         next: (purchases: IReducedDetailedPurchaseModel[]) => {
           if (purchases.length === 0) {

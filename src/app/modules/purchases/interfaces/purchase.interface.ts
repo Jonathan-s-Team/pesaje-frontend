@@ -5,7 +5,10 @@ import {
 } from '../../settings/interfaces/user.interface';
 import { IReadClientModel } from '../../shared/interfaces/client.interface';
 import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
-import { IReadPeriodModel } from '../../shared/interfaces/period.interface';
+import {
+  IReadPeriodModel,
+  IReducedPeriodModel,
+} from '../../shared/interfaces/period.interface';
 import {
   IReadShrimpFarmModel,
   IReducedShrimpFarmModel,
@@ -79,7 +82,7 @@ export interface IListPurchaseModel extends IBasePurchaseModel {
 export interface IReducedDetailedPurchaseModel extends IBasePurchaseModel {
   buyer: IReducedUserModel;
   company: IReadCompanyModel;
-  period: string;
+  period: IReducedPeriodModel;
   broker: IReducedUserModel;
   client: IReducedUserModel;
   shrimpFarm: IReducedShrimpFarmModel;

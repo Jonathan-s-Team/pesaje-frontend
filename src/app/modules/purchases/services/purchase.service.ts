@@ -71,6 +71,7 @@ export class PurchaseService {
   getPurchaseByParams(
     includeDeleted: boolean,
     userId: string | null,
+    companyId: string | null,
     periodId: string | null,
     clientId: string | null,
     controlNumber: string | null
@@ -80,6 +81,7 @@ export class PurchaseService {
     const params = new URLSearchParams();
     params.append('includeDeleted', includeDeleted.toString());
     if (userId) params.append('userId', userId);
+    if (companyId) params.append('companyId', companyId);
     if (periodId) params.append('periodId', periodId);
     if (clientId) params.append('clientId', clientId);
     if (controlNumber !== null)

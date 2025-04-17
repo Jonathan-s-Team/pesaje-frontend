@@ -90,7 +90,8 @@ export class SizePriceComponent implements OnInit, OnDestroy {
       .getCompanies()
       .pipe(distinctUntilChanged())
       .subscribe({
-        next: (companies) => (this.companies = companies),
+        next: (companies) =>
+          (this.companies = companies.filter((c) => c.name !== 'Local')),
         error: (err) => console.error('Error al cargar compañías', err),
       });
 

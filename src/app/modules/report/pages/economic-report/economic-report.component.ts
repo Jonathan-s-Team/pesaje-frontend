@@ -2,9 +2,15 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { IEconomicReportModel } from '../../interfaces/economic-report.interface';
+import {
+  IEconomicReportModel,
+  IPurchaseDetailsModel,
+} from '../../interfaces/economic-report.interface';
 import { ReportService } from '../../services/report.service';
-import { PurchaseStatusEnum } from 'src/app/modules/purchases/interfaces/purchase.interface';
+import {
+  IReducedDetailedPurchaseModel,
+  PurchaseStatusEnum,
+} from 'src/app/modules/purchases/interfaces/purchase.interface';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { LogisticsTypeEnum } from 'src/app/modules/logistics/interfaces/logistics.interface';
 

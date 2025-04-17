@@ -1,5 +1,6 @@
 import { IReducedDetailedPurchaseModel } from '../../purchases/interfaces/purchase.interface';
-import { ICreateUpdateCompanySaleItemModel } from './company-sale-item.interface';
+import { IReducedUserModel } from '../../settings/interfaces/user.interface';
+import { ICompanySaleItemModel } from './company-sale-item.interface';
 
 export interface ISaleModel {
   id?: string;
@@ -7,6 +8,8 @@ export interface ISaleModel {
   controlNumber: string;
   total: number;
   saleDate: string;
+  buyer: IReducedUserModel;
+  client: IReducedUserModel;
   type: SaleTypeEnum;
   deletedAt?: string;
 }
@@ -14,6 +17,30 @@ export interface ISaleModel {
 export interface ICreateUpdateCompanySaleModel {
   id?: string;
   purchase: string;
+  saleDate: string;
+  document: string;
+  batch: string;
+  provider: string;
+  np?: string;
+  serialNumber: number;
+  receptionDateTime: string;
+  settleDateTime: string;
+  batchAverageGram: number;
+  wholeReceivedPounds: number;
+  trashPounds: number;
+  netReceivedPounds: number;
+  processedPounds: number;
+  performance: number;
+  poundsGrandTotal: number;
+  grandTotal: number;
+  percentageTotal: number;
+  items: ICompanySaleItemModel[];
+}
+
+export interface ICompanySaleModel {
+  id: string;
+  purchase: IReducedDetailedPurchaseModel;
+  sale: string;
   saleDate: string;
   document: string;
   batch: string;
@@ -31,29 +58,7 @@ export interface ICreateUpdateCompanySaleModel {
   poundsGrandTotal: number;
   grandTotal: number;
   percentageTotal: number;
-  items: ICreateUpdateCompanySaleItemModel[];
-}
-
-export interface ICompanySaleModel {
-  id: string;
-  sale: string;
-  document: string;
-  batch: string;
-  provider: string;
-  np: string;
-  serialNumber: number;
-  receptionDateTime: string;
-  settleDateTime: string;
-  batchAverageGram: number;
-  wholeReceivedPounds: number;
-  trashPounds: number;
-  netReceivedPounds: number;
-  processedPounds: number;
-  performance: number;
-  poundsGrandTotal: number;
-  priceGrandTotal: number;
-  percentageTotal: number;
-  items: string[];
+  items: ICompanySaleItemModel[];
 }
 
 export enum SaleTypeEnum {

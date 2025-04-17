@@ -87,6 +87,34 @@ export class RecentLogisticsComponent implements OnInit {
           return `$${formatted}`;
         },
       },
+      {
+        title: 'Precio por Libra ($/lb)',
+        data: 'grandTotal',
+        render: function (data, type, full) {
+          if (!data && data !== 0) return '-';
+
+          const formatted = new Intl.NumberFormat('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(data / full.totalPounds);
+
+          return `$${formatted}`;
+        },
+      },
+      {
+        title: 'Comprador',
+        data: 'buyer.fullName',
+        render: function (data) {
+          return data ? data : '-';
+        },
+      },
+      {
+        title: 'Cliente',
+        data: 'client.fullName',
+        render: function (data) {
+          return data ? data : '-';
+        },
+      },
     ],
     language: {
       url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',

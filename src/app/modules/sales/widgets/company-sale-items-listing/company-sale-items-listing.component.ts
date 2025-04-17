@@ -15,7 +15,7 @@ import { ILogisticsItemModel } from 'src/app/modules/logistics/interfaces/logist
 import { Config } from 'datatables.net';
 import {
   CompanySaleStyleEnum,
-  ICreateUpdateCompanySaleItemModel,
+  ICompanySaleItemModel,
 } from '../../interfaces/company-sale-item.interface';
 import { Subscription, map } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
@@ -36,6 +36,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.NEW_COMPANY;
 
   private _periodId: string;
+  private _companySaleItems: ICompanySaleItemModel[] = [];
 
   @Input()
   set periodId(value: string) {
@@ -45,10 +46,22 @@ export class CompanySaleItemsListingComponent implements OnInit {
     }
   }
 
+  @Input()
+  set companySaleItems(value: ICompanySaleItemModel[]) {
+    this._companySaleItems = value ?? [];
+    this.datatableConfig = {
+      ...this.datatableConfig,
+      data: [...this._companySaleItems],
+    };
+
+    this.cdr.detectChanges();
+    this.reloadEvent.emit(true);
+  }
+
   @Input() canAddItems: boolean;
 
   @Output() companySaleItemsChange = new EventEmitter<
-    ICreateUpdateCompanySaleItemModel[]
+    ICompanySaleItemModel[]
   >();
 
   @ViewChild('myForm') myForm!: NgForm;
@@ -60,10 +73,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
 
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
-  companySaleItem: ICreateUpdateCompanySaleItemModel =
-    {} as ICreateUpdateCompanySaleItemModel;
-
-  companySaleItems: ICreateUpdateCompanySaleItemModel[] = [];
+  companySaleItem: ICompanySaleItemModel = {} as ICompanySaleItemModel;
 
   companySaleStyles: CompanySaleStyleEnum[];
   companySaleStylesLabels: { [key in CompanySaleStyleEnum]?: string } = {};
@@ -187,6 +197,10 @@ export class CompanySaleItemsListingComponent implements OnInit {
     },
   };
 
+  get companySaleItems(): ICompanySaleItemModel[] {
+    return this._companySaleItems;
+  }
+
   constructor(
     private sizeService: SizeService,
     private periodService: PeriodService,
@@ -308,7 +322,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
   }
 
   create() {
-    this.companySaleItem = {} as ICreateUpdateCompanySaleItemModel;
+    this.companySaleItem = {} as ICompanySaleItemModel;
   }
 
   delete(id: string): void {
@@ -327,8 +341,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
 
   edit(id: string): void {
     const foundItem = this.companySaleItems.find((item) => item.id === id);
-    this.companySaleItem =
-      foundItem ?? ({} as ICreateUpdateCompanySaleItemModel);
+    this.companySaleItem = foundItem ?? ({} as ICompanySaleItemModel);
   }
 
   emitCurrentValidItems(): void {

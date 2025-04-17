@@ -85,8 +85,71 @@ export class RecentPurchasesComponent implements OnInit {
         },
       },
       {
+        title: 'Total',
+        data: 'grandTotal',
+        render: function (data) {
+          if (!data && data !== 0) return '-';
+
+          const formatted = new Intl.NumberFormat('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(data);
+
+          return `$${formatted}`;
+        },
+      },
+      {
+        title: 'Total Acordado',
+        data: 'totalAgreedToPay',
+        render: function (data) {
+          if (!data && data !== 0) return '-';
+
+          const formatted = new Intl.NumberFormat('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(data);
+
+          return `$${formatted}`;
+        },
+      },
+      {
+        title: 'Total Abonado',
+        data: 'totalPaid',
+        render: function (data) {
+          if (!data || data === 0) return '-';
+
+          const formatted = new Intl.NumberFormat('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(data);
+
+          return `$${formatted}`;
+        },
+      },
+      {
+        title: 'Comprador',
+        data: 'buyer.fullName',
+        render: function (data) {
+          return data ? data : '-';
+        },
+      },
+      {
+        title: 'Cliente',
+        data: 'client.fullName',
+        render: function (data) {
+          return data ? data : '-';
+        },
+      },
+      {
         title: 'Compañía',
         data: 'company.name',
+        render: function (data) {
+          return data ? data : '-';
+        },
+      },
+      {
+        title: 'Período',
+        data: 'period.name',
         render: function (data) {
           return data ? data : '-';
         },
@@ -133,48 +196,6 @@ export class RecentPurchasesComponent implements OnInit {
       //     return `$${formatted}`;
       //   },
       // },
-      {
-        title: 'Total',
-        data: 'grandTotal',
-        render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-      {
-        title: 'Total Acordado',
-        data: 'totalAgreedToPay',
-        render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-      {
-        title: 'Total Abonado',
-        data: 'totalPaid',
-        render: function (data) {
-          if (!data || data === 0) return '-';
-
-          const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
     ],
     language: {
       url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
@@ -210,6 +231,7 @@ export class RecentPurchasesComponent implements OnInit {
       .getPurchaseByParams(
         false,
         userId,
+        this.selectedCompany ? this.selectedCompany : null,
         this.selectedPeriod ? this.selectedPeriod : null,
         this.selectedClient ? this.selectedClient : null,
         this.controlNumber ? this.controlNumber : null

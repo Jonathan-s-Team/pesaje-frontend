@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
-import { ICreateUpdateCompanySaleItemModel } from '../interfaces/company-sale-item.interface';
+import { ICompanySaleItemModel } from '../interfaces/company-sale-item.interface';
 import {
   ICompanySaleModel,
   ICreateUpdateCompanySaleModel,

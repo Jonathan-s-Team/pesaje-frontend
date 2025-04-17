@@ -65,7 +65,7 @@ export class ShrimpFarmInformationComponent
         visible: false,
       },
       {
-        title: 'Identificador',
+        title: 'Nombre de la Piscina',
         data: 'identifier',
         render: (data) => `${data}`,
       },

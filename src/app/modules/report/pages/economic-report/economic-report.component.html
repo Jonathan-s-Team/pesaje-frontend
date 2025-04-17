@@ -21,7 +21,7 @@
 <!-- end::First Section: Search Info -->
 
 <!-- Second Section: Econocmic Report -->
-<div class="card card-xl-stretch mb-xl-8 mt-2">
+<div *ngIf="economicReportModel" class="card card-xl-stretch mb-xl-8 mt-2">
   <!-- Card Header -->
   <div class="card-header border-0 pt-5">
     <h3 class="card-title fw-bolder fs-2 mb-1">REPORTE ECONÓMICO</h3>
@@ -154,6 +154,9 @@
           <td>{{ economicReportModel.logistics.logisticsDate | date: 'dd/MM/yyyy'}}</td>
           <td><strong>Gasto productos e insumos</strong></td>
           <td>{{ economicReportModel.logistics.productAndSupplyExpenses | number:'1.2-2' }}</td>
+          <td><strong>Precio por Libra ($/lb)</strong></td>
+          <td>{{ economicReportModel.logistics.totalToPay / economicReportModel.purchase.pounds | number:'1.2-2' }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -161,7 +164,7 @@
     <!-- UTILIDAD BRUTA -->
     <h5 class="fw-bold text-end mt-4">
       UTILIDAD BRUTA ($):
-      <span class="ms-2 text-primary">
+      <span class="ms-2" [ngClass]="economicReportModel.grossProfit < 0 ? 'text-danger' : 'text-primary'">
         {{ economicReportModel.grossProfit | number:'1.2-2' }}
       </span>
     </h5>

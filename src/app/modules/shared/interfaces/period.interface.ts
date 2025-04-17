@@ -23,6 +23,11 @@ export interface IReadPeriodModel {
   sizePrices?: IReadSizePriceModel[];
 }
 
+export interface IReducedPeriodModel {
+  id: string;
+  name: string;
+}
+
 export interface IUpdatePeriodModel {
   receivedDateTime: string;
   fromDate: string;

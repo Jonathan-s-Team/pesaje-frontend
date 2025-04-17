@@ -1,4 +1,4 @@
-export interface ICreateUpdateCompanySaleItemModel {
+export interface ICompanySaleItemModel {
   id?: string;
   style: CompanySaleStyleEnum;
   class: string;

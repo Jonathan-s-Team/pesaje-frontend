@@ -47,7 +47,7 @@
         <div class="collapse show">
           <!-- Identificador -->
           <div class="fv-row mb-7">
-            <label class="required fw-semibold fs-6 mb-2">Identificador</label>
+            <label class="required fw-semibold fs-6 mb-2">Nombre de la Piscina</label>
             <input type="text" class="form-control form-control-solid" name="identifier"
               [(ngModel)]="shrimpFarmInfo.identifier" #identifier="ngModel" required minlength="3" />
             <div *ngIf="myForm.submitted && identifier.invalid"
