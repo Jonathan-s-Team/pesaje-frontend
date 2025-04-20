@@ -340,7 +340,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error updating purchase:', error);
-            this.alertService.showErrorAlert({ error });
+            this.alertService.showErrorAlert({});
           },
         });
     } else {
@@ -355,7 +355,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error creating purchase:', error);
-          this.alertService.showErrorAlert({ error });
+          this.alertService.showErrorAlert({});
         },
       });
     }

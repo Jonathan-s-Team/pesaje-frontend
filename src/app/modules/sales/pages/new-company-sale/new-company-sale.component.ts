@@ -225,7 +225,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error creating company sale:', error);
-            this.alertService.showErrorAlert({ error });
+            this.alertService.showErrorAlert({});
           },
         });
     }

@@ -12,11 +12,11 @@
   </table>
 </div>
 
-<swal #deleteSwal [swalOptions]="swalOptions" title="Está seguro de eliminar el registro?"
-  text="Esta acción no es reversible" icon="warning" [showCancelButton]="true" [focusCancel]="true"
-  (confirm)="triggerDelete()" [customClass]="{confirmButton: 'btn btn-danger', cancelButton: 'btn btn-active-light'}">
+<swal #deleteSwal [swalOptions]="swalOptions" [title]="confirmDeleteTitle" [text]="confirmDeleteText" icon="warning"
+  [showCancelButton]="true" [focusCancel]="true" (confirm)="triggerDelete()"
+  [customClass]="{ confirmButton: 'btn btn-danger', cancelButton: 'btn btn-active-light' }">
 </swal>
 
-<swal #successSwal [swalOptions]="swalOptions" title="Eliminación exitosa!" text="" icon="success"
-  [customClass]="{confirmButton: 'btn btn-success'}">
+<swal #successSwal [swalOptions]="swalOptions" [title]="deleteSuccessTitle" icon="success"
+  [customClass]="{ confirmButton: 'btn btn-success' }">
 </swal>

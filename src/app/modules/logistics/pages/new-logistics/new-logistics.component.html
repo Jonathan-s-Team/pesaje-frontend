@@ -1,9 +1,21 @@
 <!-- First Section: Search Info -->
 <div class="card card-xl-stretch mb-xl-8">
-  <div class="card-header border-0 pt-5">
+  <div class="card-header border-0 pt-5 d-flex justify-content-between align-items-center">
     <h4 class="card-title align-items-start flex-column">
       <span class="card-label fw-bolder fs-3 mb-1">Buscar por número de control</span>
     </h4>
+
+    <div class="d-flex gap-2">
+      <!-- Back Button -->
+      <button *ngIf="hasRouteId" type="button" class="btn btn-light btn-sm" (click)="goBack()">
+        <i class="bi bi-arrow-left me-1"></i> Volver
+      </button>
+
+      <!-- New Button -->
+      <button *ngIf="logisticsId" type="button" class="btn btn-outline-success btn-sm" (click)="handleNewLogistics()">
+        <i class="bi bi-plus-circle me-1"></i> Nuevo
+      </button>
+    </div>
   </div>
   <div class="card-body py-3">
     <div class="col-md-6 d-flex align-items-center">
@@ -96,10 +108,6 @@
         <!-- Submit Button -->
         <button type="submit" class="btn btn-primary" [disabled]="canSaveLogistics()">
           Guardar
-        </button>
-
-        <button *ngIf="logisticsId" type="button" class="btn btn-success" (click)="handleNewLogistics()">
-          Nuevo
         </button>
       </div>
     </div>

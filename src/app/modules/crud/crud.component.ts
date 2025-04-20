@@ -23,6 +23,7 @@ import { debounceTime, map } from 'rxjs/operators';
 import { SweetAlertOptions } from 'sweetalert2';
 import { Api, Config } from 'datatables.net';
 import { PermissionService } from '../shared/services/permission.service';
+import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-crud',
@@ -65,6 +66,9 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   swalOptions: SweetAlertOptions = { buttonsStyling: false };
+  confirmDeleteTitle = '';
+  confirmDeleteText = '';
+  deleteSuccessTitle = '';
 
   private modalRef: NgbModalRef;
 
@@ -74,10 +78,17 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
     private renderer: Renderer2,
     private router: Router,
     private modalService: NgbModal,
+    private translate: TranslateService,
     private permissionService: PermissionService
   ) {}
 
   ngOnInit(): void {
+    this.loadTranslations(); // Load initially
+
+    this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
+      this.loadTranslations(); // Reload on language change
+    });
+
     this.dtOptions = {
       dom:
         "<'row'<'col-sm-12'tr>>" +
@@ -92,7 +103,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.renderActionColumn();
 
-    this.setupSweetAlert();
+    // this.setupSweetAlert();
 
     // if (this.reload) {
     //   this.reload.subscribe(data => {
@@ -241,11 +252,33 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  setupSweetAlert() {
-    this.swalOptions = {
-      buttonsStyling: false,
-      confirmButtonText: 'Aceptar',
-      cancelButtonText: 'Cancelar',
-    };
+  loadTranslations(): void {
+    this.translate
+      .get([
+        'GENERAL_MESSAGES.CONFIRM_DELETE',
+        'GENERAL_MESSAGES.CONFIRM_DELETE_BODY',
+        'GENERAL_MESSAGES.DELETE_SUCCESFULL',
+        'BUTTONS.OK',
+        'BUTTONS.CANCEL',
+      ])
+      .subscribe((translations) => {
+        this.confirmDeleteTitle =
+          translations['GENERAL_MESSAGES.CONFIRM_DELETE'];
+        this.confirmDeleteText =
+          translations['GENERAL_MESSAGES.CONFIRM_DELETE_BODY'];
+        this.deleteSuccessTitle =
+          translations['GENERAL_MESSAGES.DELETE_SUCCESFULL'];
+
+        this.swalOptions = {
+          confirmButtonText: translations['BUTTONS.OK'],
+          cancelButtonText: translations['BUTTONS.CANCEL'],
+        };
+      });
   }
+
+  // setupSweetAlert() {
+  //   this.swalOptions = {
+  //     buttonsStyling: false,
+  //   };
+  // }
 }

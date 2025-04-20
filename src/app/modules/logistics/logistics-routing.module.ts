@@ -5,11 +5,11 @@ import { NewLogisticsComponent } from './pages/new-logistics/new-logistics.compo
 
 const routes: Routes = [
   {
-    path: 'new',
+    path: 'form',
     component: NewLogisticsComponent,
   },
   {
-    path: 'edit/:id',
+    path: 'form/:id',
     component: NewLogisticsComponent,
   },
   {

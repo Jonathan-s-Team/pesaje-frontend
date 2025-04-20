@@ -23,6 +23,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from 'src/app/utils/alert.service';
 import { IPaymentMethodModel } from '../../shared/interfaces/payment-method.interface';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-purchase-payment-listing',
@@ -100,6 +101,7 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
     public activeModal: NgbActiveModal,
     private alertService: AlertService,
     private dateUtils: DateUtilsService,
+    private translate: TranslateService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -125,10 +127,7 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('❌ Error loading purchase payments:', error);
-          this.alertService.showErrorAlert({
-            title: 'Error al cargar los pagos',
-            error,
-          });
+          this.alertService.showErrorAlert({});
         },
       });
 
@@ -239,7 +238,16 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
             this.create(); // ✅ Reset the model (optional)
           },
           error: (error) => {
-            this.alertService.showErrorAlert({});
+            const rawMessage = error?.error?.message ?? '';
+            const matched = rawMessage.match(/amount of (\d+(\.\d+)?)/); // Extract number
+            const totalAgreed = matched ? matched[1] : '---';
+
+            this.alertService.showErrorAlert({
+              title: 'Error',
+              errorKey: 'ERROR_MESSAGES.PURCHASE_TOTAL_AGREED_EXCEEDED',
+              params: { total: totalAgreed },
+            });
+
             this.isLoading = false;
           },
           complete: completeFn,

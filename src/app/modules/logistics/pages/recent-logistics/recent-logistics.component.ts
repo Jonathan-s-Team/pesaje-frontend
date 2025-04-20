@@ -94,8 +94,8 @@ export class RecentLogisticsComponent implements OnInit {
           if (!data && data !== 0) return '-';
 
           const formatted = new Intl.NumberFormat('es-ES', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
+            minimumFractionDigits: 4,
+            maximumFractionDigits: 4,
           }).format(data / full.totalPounds);
 
           return `$${formatted}`;
@@ -165,7 +165,7 @@ export class RecentLogisticsComponent implements OnInit {
   }
 
   edit(id: string) {
-    this.router.navigate(['logistics', 'edit', id]);
+    this.router.navigate(['logistics', 'form', id]);
   }
 
   clearFilters() {

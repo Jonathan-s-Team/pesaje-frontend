@@ -17,7 +17,7 @@ import { FormUtilsService } from 'src/app/utils/form-utils.service';
   styleUrl: './logistics-items-listing.component.scss',
 })
 export class LogisticsItemsListingComponent implements OnInit {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.NEW_LOGISTICS;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.LOGISTICS_FORM;
 
   private _logisticsCategories: ILogisticsCategoryModel[] = [];
   private _logisticsItems: ILogisticsItemModel[] = [];

@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import Swal, { SweetAlertOptions, SweetAlertResult } from 'sweetalert2';
+import { TranslateService } from '@ngx-translate/core'; // Make sure this is imported
 
 @Injectable({
   providedIn: 'root',
 })
 export class AlertService {
+  constructor(private translate: TranslateService) {}
+
   /**
    * Show a confirmation alert with custom options.
    * @param options Partial SweetAlert options (optional)
@@ -71,21 +74,32 @@ export class AlertService {
 
   showErrorAlert({
     title = 'Error',
-    error,
+    errorKey,
+    params = {},
   }: {
     title?: string;
-    error?: any;
+    errorKey?: string;
+    params?: { [key: string]: any };
   }): void {
-    Swal.fire({
-      title: title,
-      html: `<strong>${
-        error?.message || 'Ocurrió un error inesperado.'
-      }</strong>`,
-      icon: 'error',
-      focusConfirm: false,
-      buttonsStyling: false,
-      confirmButtonText: 'Entendido',
-      customClass: { confirmButton: 'btn btn-danger' },
-    });
+    const fallbackKey = 'ERROR_MESSAGES.GENERAL';
+    const buttonKey = 'BUTTONS.OK';
+
+    this.translate
+      .get([errorKey || '', fallbackKey, buttonKey], params)
+      .subscribe((translations) => {
+        const message =
+          (errorKey && translations[errorKey]) || translations[fallbackKey];
+
+        Swal.fire({
+          title,
+          // html: `<strong>${message}</strong>`,
+          html: `${message}`,
+          icon: 'error',
+          focusConfirm: false,
+          buttonsStyling: false,
+          confirmButtonText: translations[buttonKey],
+          customClass: { confirmButton: 'btn btn-danger' },
+        });
+      });
   }
 }
