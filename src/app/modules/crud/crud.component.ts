@@ -255,21 +255,19 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   loadTranslations(): void {
     this.translate
       .get([
-        'GENERAL_MESSAGES.CONFIRM_DELETE',
-        'GENERAL_MESSAGES.CONFIRM_DELETE_BODY',
-        'GENERAL_MESSAGES.DELETE_SUCCESFULL',
+        'MESSAGES.DELETE_CONFIRM_TITLE',
+        'MESSAGES.DELETE_CONFIRM_TEXT',
+        'MESSAGES.DELETE_SUCCESS',
         'BUTTONS.OK',
         'BUTTONS.CANCEL',
       ])
       .subscribe((translations) => {
-        this.confirmDeleteTitle =
-          translations['GENERAL_MESSAGES.CONFIRM_DELETE'];
-        this.confirmDeleteText =
-          translations['GENERAL_MESSAGES.CONFIRM_DELETE_BODY'];
-        this.deleteSuccessTitle =
-          translations['GENERAL_MESSAGES.DELETE_SUCCESFULL'];
+        this.confirmDeleteTitle = translations['MESSAGES.DELETE_CONFIRM_TITLE'];
+        this.confirmDeleteText = translations['MESSAGES.DELETE_CONFIRM_TEXT'];
+        this.deleteSuccessTitle = translations['MESSAGES.DELETE_SUCCESS'];
 
         this.swalOptions = {
+          buttonsStyling: false,
           confirmButtonText: translations['BUTTONS.OK'],
           cancelButtonText: translations['BUTTONS.CANCEL'],
         };

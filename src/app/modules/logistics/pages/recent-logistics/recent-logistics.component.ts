@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { IReadLogisticsModel } from '../../interfaces/logistics.interface';
 import { LogisticsService } from '../../services/logistics.service';
+import { AlertService } from 'src/app/utils/alert.service';
 
 @Component({
   selector: 'app-recent-logistics',
@@ -127,6 +128,7 @@ export class RecentLogisticsComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private logisticsService: LogisticsService,
+    private alertService: AlertService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -166,6 +168,26 @@ export class RecentLogisticsComponent implements OnInit {
 
   edit(id: string) {
     this.router.navigate(['logistics', 'form', id]);
+  }
+
+  delete(id: string): void {
+    const deleteSub = this.logisticsService.deleteLogistics(id).subscribe({
+      next: () => {
+        this.recentLogistics = this.recentLogistics.filter(
+          (item) => item.id !== id
+        );
+        this.datatableConfig = {
+          ...this.datatableConfig,
+          data: [...this.recentLogistics],
+        };
+        this.reloadEvent.emit(true);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.alertService.showTranslatedAlert({ alertType: 'error' });
+      },
+    });
+    this.unsubscribe.push(deleteSub);
   }
 
   clearFilters() {

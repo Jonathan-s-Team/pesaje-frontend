@@ -80,4 +80,11 @@ export class LogisticsService {
         finalize(() => this.isLoadingSubject.next(false))
       );
   }
+
+  deleteLogistics(id: string): Observable<{ message: string }> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .delete<{ message: string }>(`${API_LOGISTICS_URL}/${id}`)
+      .pipe(finalize(() => this.isLoadingSubject.next(false)));
+  }
 }

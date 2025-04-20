@@ -23,7 +23,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from 'src/app/utils/alert.service';
 import { IPaymentMethodModel } from '../../shared/interfaces/payment-method.interface';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-purchase-payment-listing',
@@ -101,7 +100,6 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
     public activeModal: NgbActiveModal,
     private alertService: AlertService,
     private dateUtils: DateUtilsService,
-    private translate: TranslateService,
     private cdr: ChangeDetectorRef
   ) {}
 

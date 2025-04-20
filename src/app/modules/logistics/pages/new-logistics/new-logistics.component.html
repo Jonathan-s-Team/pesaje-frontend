@@ -114,13 +114,6 @@
       <h4 class="card-title align-items-start flex-column">
         <span class="card-label fw-bolder fs-3 mb-1">Información de Logística</span>
       </h4>
-
-      <div class="d-flex gap-2">
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary" [disabled]="canSaveLogistics()">
-          Guardar
-        </button>
-      </div>
     </div>
     <!-- end::Header -->
 
@@ -160,35 +153,42 @@
   </div>
   <!-- end::Third Section: Logistics Info -->
 
+
+  <!-- Fourth Section: Personnel Logistics Details -->
+  <div class="card card-xl-stretch mb-xl-8 mt-2">
+
+    <app-logistics-items-listing *ngIf="personnelLogisticsCategoryList.length>0" title="Personal"
+      [logisticsCategories]="personnelLogisticsCategoryList" [logisticsItems]="personnelLogisticsItems"
+      (logisticsItemsChange)="handlePersonnelLogisticsItems($event)" />
+  </div>
+  <!-- end::Fourth Section: Personnel Logistics Details -->
+
+  <!-- Fifth Section: Inputs Logistics Details -->
+  <div class="card card-xl-stretch mb-xl-8 mt-2">
+
+    <app-logistics-items-listing *ngIf="inputLogisticsCategoryList.length>0" title="Productos e Insumos"
+      [logisticsCategories]="inputLogisticsCategoryList" [logisticsItems]="inputLogisticsItems" [hasDescription]="true"
+      (logisticsItemsChange)="handleInputLogisticsItems($event)" />
+
+  </div>
+  <!-- end::Fifth Section: Inputs Logistics Details -->
+
+  <!-- Sixth Section: Grand Total -->
+  <div class="card card-xl-stretch mb-xl-8 mt-2">
+
+    <div class="card-body py-3 text-end fw-bold fs-4">
+      <label class="me-20">Total a pagar de logística</label>
+      <span>$ {{ grandTotalDisplayed || 0 | number: '1.2-2' }}</span>
+    </div>
+
+    <div class="card-footer d-flex justify-content-end py-6 px-9">
+      <!-- Submit Button -->
+      <button type="submit" class="btn btn-primary" [disabled]="canSaveLogistics()">
+        Guardar
+      </button>
+    </div>
+  </div>
+  <!-- end::Fifth Section: Inputs Logistics Details -->
+
 </form>
 <!-- end::Logistics Form -->
-
-
-<!-- Fourth Section: Personnel Logistics Details -->
-<div class="card card-xl-stretch mb-xl-8 mt-2">
-
-  <app-logistics-items-listing #personnelListing *ngIf="personnelLogisticsCategoryList.length>0" title="Personal"
-    [logisticsCategories]="personnelLogisticsCategoryList" [logisticsItems]="personnellogisticsItems"
-    (logisticsItemsChange)="handlePersonnelLogisticsItems($event)" />
-</div>
-<!-- end::Fourth Section: Personnel Logistics Details -->
-
-<!-- Fifth Section: Inputs Logistics Details -->
-<div class="card card-xl-stretch mb-xl-8 mt-2">
-
-  <app-logistics-items-listing #inputListing *ngIf="inputLogisticsCategoryList.length>0" title="Productos e Insumos"
-    [logisticsCategories]="inputLogisticsCategoryList" [logisticsItems]="inputlogisticsItems" [hasDescription]="true"
-    (logisticsItemsChange)="handleInputLogisticsItems($event)" />
-
-</div>
-<!-- end::Fifth Section: Inputs Logistics Details -->
-
-<!-- Sixth Section: Grand Total -->
-<!-- <div class="card card-xl-stretch mb-xl-8 mt-2">
-
-  <div class="card-body py-3 text-end fw-bold fs-4">
-    <label class="me-2">Total a pagar de logística:</label>
-    <span>$ {{ logisticsModel.grandTotal || 0 | number: '1.2-2' }}</span>
-  </div>
-</div> -->
-<!-- end::Fifth Section: Inputs Logistics Details -->

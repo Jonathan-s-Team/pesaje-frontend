@@ -10,6 +10,7 @@ import { ILogisticsCategoryModel } from '../../../shared/interfaces/logistic-typ
 import { ILogisticsItemModel } from '../../interfaces/logistics-item.interface';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
+import { debounceTime, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-logistics-items-listing',
@@ -19,33 +20,48 @@ import { FormUtilsService } from 'src/app/utils/form-utils.service';
 export class LogisticsItemsListingComponent implements OnInit {
   PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.LOGISTICS_FORM;
 
-  private _logisticsCategories: ILogisticsCategoryModel[] = [];
   private _logisticsItems: ILogisticsItemModel[] = [];
+  private formChangesSub: Subscription;
 
   @Input() title: string = '';
-  @Input() hasDescription = false;
-
-  @Input()
-  set logisticsCategories(value: ILogisticsCategoryModel[]) {
-    this._logisticsCategories = (value ?? []).sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
-  }
+  @Input() hasDescription: boolean = false;
+  @Input() logisticsCategories: ILogisticsCategoryModel[];
 
   @Input()
   set logisticsItems(value: ILogisticsItemModel[]) {
     this._logisticsItems = value ?? [];
-    this.buildFormFromItemsAndCategories();
+
+    if (
+      this.form &&
+      this.formArray.length === this.logisticsCategories.length
+    ) {
+      this._logisticsItems.forEach((item) => {
+        const index = this.logisticsCategories.findIndex(
+          (cat) => cat.id === item.logisticsCategory.id
+        );
+
+        if (index > -1) {
+          const group = this.formArray.at(index);
+          group.patchValue(
+            {
+              unit: item.unit,
+              cost: item.cost,
+              total: item.unit && item.cost ? item.unit * item.cost : 0,
+              description: item.description,
+            },
+            { emitEvent: false }
+          );
+        }
+      });
+
+      this.updateTotalPersonal();
+    }
   }
 
   @Output() logisticsItemsChange = new EventEmitter<ILogisticsItemModel[]>();
 
   form: FormGroup;
   total = 0;
-
-  get logisticsCategories(): ILogisticsCategoryModel[] {
-    return this._logisticsCategories;
-  }
 
   get formArray(): FormArray {
     return this.form?.get('items') as FormArray;
@@ -57,7 +73,9 @@ export class LogisticsItemsListingComponent implements OnInit {
     private formUtils: FormUtilsService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.initializeForm();
+  }
 
   createItemFormGroup(categoryId: string): FormGroup {
     return this.fb.group({
@@ -75,7 +93,11 @@ export class LogisticsItemsListingComponent implements OnInit {
     const cost = Number(group.get('cost')?.value || 0);
     const total = unit * cost;
 
-    group.get('total')?.setValue(total, { emitEvent: false });
+    const currentTotal = Number(group.get('total')?.value || 0);
+    if (currentTotal !== total) {
+      group.get('total')?.setValue(total, { emitEvent: false });
+    }
+
     this.updateTotalPersonal();
   }
 
@@ -117,38 +139,32 @@ export class LogisticsItemsListingComponent implements OnInit {
     }
   }
 
-  emitCurrentValidItems(): void {
-    if (!this.form || !this.form.valid) return;
-
-    const validItems = this.getValidLogisticsItems();
-    this.logisticsItemsChange.emit(validItems);
-  }
-
-  private buildFormFromItemsAndCategories(): void {
-    const formGroups = this._logisticsCategories.map((category) => {
-      const matchedItem = this._logisticsItems.find(
-        (item) => item.logisticsCategory.id === category.id
-      );
-
-      const unit = matchedItem?.unit ?? null;
-      const cost = matchedItem?.cost ?? null;
-      const total = unit && cost ? unit * cost : 0;
-
-      return this.fb.group({
+  private initializeForm(): void {
+    const formGroups = this.logisticsCategories.map((category) =>
+      this.fb.group({
         categoryId: [category.id],
-        unit: [unit],
-        cost: [cost],
-        total: [total],
-        description: [matchedItem?.description ?? ''],
-      });
-    });
+        unit: [null],
+        cost: [null],
+        total: [0],
+        description: [''],
+      })
+    );
 
     this.form = this.fb.group({
       items: this.fb.array(formGroups),
     });
 
-    this.formArray.controls.forEach((_, i) => this.calculateTotal(i));
+    this.subscribeToFormChanges();
+  }
 
-    this.updateTotalPersonal();
+  private subscribeToFormChanges(): void {
+    this.formChangesSub?.unsubscribe(); // unsubscribe if exists
+
+    this.formChangesSub = this.form?.valueChanges
+      .pipe(debounceTime(100))
+      .subscribe(() => {
+        const validItems = this.getValidLogisticsItems();
+        this.logisticsItemsChange.emit(validItems);
+      });
   }
 }

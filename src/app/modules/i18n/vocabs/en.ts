@@ -102,12 +102,12 @@ export const locale = {
       },
     },
     MESSAGES: {
-      CONFIRM_DELETE: 'Are you sure to delete?',
-      CONFIRM_DELETE_BODY: 'This cannot be undone',
-      DELETE_SUCCESFULL: 'Delete successfully!',
+      DELETE_CONFIRM_TITLE: 'Are you sure you want to delete?',
+      DELETE_CONFIRM_TEXT: 'This action cannot be undone.',
+      DELETE_SUCCESS: 'The item was deleted successfully!',
       PURCHASE_NOT_FOUND: 'Purchase not found.',
       LOGISTICS_LIMIT_REACHED:
-        '{{isLocal, select, true{Two logistics records have already been created for local purchases.} other{A logistics record already exists for this purchase.}}}',
+        '{{count}} logistics record(s) have already been created for this purchase.',
     },
     SUCCESS: {
       TITLE: 'Success!',

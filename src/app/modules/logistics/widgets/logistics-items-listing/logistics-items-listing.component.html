@@ -53,7 +53,7 @@
             </tr>
 
             <tr class="border-top">
-              <td [attr.colspan]="hasDescription ? 4 : 3" class="text-end fw-bold">Total a pagar</td>
+              <td [attr.colspan]="hasDescription ? 4 : 3" class="text-end fw-bold">Subtotal</td>
               <td class="text-end fw-bold">$ {{ total | number: '1.2-2' }}</td>
               <td *ngIf="hasDescription"></td>
             </tr>

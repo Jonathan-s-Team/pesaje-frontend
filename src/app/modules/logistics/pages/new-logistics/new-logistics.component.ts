@@ -1,10 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
@@ -34,7 +28,6 @@ import {
 import { IReducedUserModel } from '../../../settings/interfaces/user.interface';
 import { IReducedShrimpFarmModel } from '../../../shared/interfaces/shrimp-farm.interface';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LogisticsItemsListingComponent } from '../../widgets/logistics-items-listing/logistics-items-listing.component';
 
 @Component({
   selector: 'app-new-logistics',
@@ -43,12 +36,6 @@ import { LogisticsItemsListingComponent } from '../../widgets/logistics-items-li
 })
 export class NewLogisticsComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.LOGISTICS.LOGISTICS_FORM;
-
-  @ViewChild('personnelListing')
-  personnelListingComp: LogisticsItemsListingComponent;
-
-  @ViewChild('inputListing')
-  inputListingComp: LogisticsItemsListingComponent;
 
   isOnlyBuyer = false;
   hasRouteId = false;
@@ -62,8 +49,8 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   logisticsTypeLabels: { [key in LogisticsTypeEnum]?: string } = {};
 
   logisticsItems: ILogisticsItemModel[] = [];
-  personnellogisticsItems: ILogisticsItemModel[] = [];
-  inputlogisticsItems: ILogisticsItemModel[] = [];
+  personnelLogisticsItems: ILogisticsItemModel[] = [];
+  inputLogisticsItems: ILogisticsItemModel[] = [];
 
   personnelLogisticsCategoryList: ILogisticsCategoryModel[] = [];
   inputLogisticsCategoryList: ILogisticsCategoryModel[] = [];
@@ -96,6 +83,20 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     return this.dateUtils.formatISOToDateInput(this.purchaseModel.purchaseDate);
   }
 
+  get grandTotalDisplayed(): number {
+    const personnelTotal = this.personnelLogisticsItems?.reduce(
+      (sum, item) => sum + Number(item.total || 0),
+      0
+    );
+
+    const inputTotal = this.inputLogisticsItems?.reduce(
+      (sum, item) => sum + Number(item.total || 0),
+      0
+    );
+
+    return personnelTotal + inputTotal;
+  }
+
   ngOnInit(): void {
     this.logisticsId = this.route.snapshot.paramMap.get('id') || undefined;
     this.hasRouteId = !!this.logisticsId;
@@ -120,13 +121,13 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
             this.controlNumber = logistics.purchase.controlNumber!;
             this.purchaseModel = logistics.purchase;
 
-            this.personnellogisticsItems = logistics.items.filter(
+            this.personnelLogisticsItems = logistics.items.filter(
               (item) =>
                 item.logisticsCategory.category ===
                 LogisticsCategoryEnum.PERSONNEL
             );
 
-            this.inputlogisticsItems = logistics.items.filter(
+            this.inputLogisticsItems = logistics.items.filter(
               (item) =>
                 item.logisticsCategory.category === LogisticsCategoryEnum.INPUTS
             );
@@ -169,13 +170,17 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   loadLogisticsCategories(): void {
     this.logisticsCategoryService.getAllLogisticsCategories().subscribe({
       next: (categories) => {
-        this.personnelLogisticsCategoryList = categories.filter(
-          (logistic) => logistic.category === LogisticsCategoryEnum.PERSONNEL
-        );
+        this.personnelLogisticsCategoryList = categories
+          .filter(
+            (logistic) => logistic.category === LogisticsCategoryEnum.PERSONNEL
+          )
+          .sort((a, b) => a.name.localeCompare(b.name));
 
-        this.inputLogisticsCategoryList = categories.filter(
-          (logistic) => logistic.category === LogisticsCategoryEnum.INPUTS
-        );
+        this.inputLogisticsCategoryList = categories
+          .filter(
+            (logistic) => logistic.category === LogisticsCategoryEnum.INPUTS
+          )
+          .sort((a, b) => a.name.localeCompare(b.name));
 
         this.cdr.detectChanges();
       },
@@ -190,14 +195,11 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.personnelListingComp.emitCurrentValidItems();
-    this.inputListingComp.emitCurrentValidItems();
-
     // Check if both lists are empty
     if (
-      (!this.personnellogisticsItems ||
-        this.personnellogisticsItems.length === 0) &&
-      (!this.inputlogisticsItems || this.inputlogisticsItems.length === 0)
+      (!this.personnelLogisticsItems ||
+        this.personnelLogisticsItems.length === 0) &&
+      (!this.inputLogisticsItems || this.inputLogisticsItems.length === 0)
     ) {
       this.alertService.showTranslatedAlert({
         alertType: 'info',
@@ -214,8 +216,8 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
   submitLogisticsForm() {
     this.logisticsItems = [
-      ...this.personnellogisticsItems,
-      ...this.inputlogisticsItems,
+      ...this.personnelLogisticsItems,
+      ...this.inputLogisticsItems,
     ];
 
     this.logisticsModel.purchase = this.purchaseModel.id;
@@ -229,10 +231,8 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
           description: x.description,
         } as ICreateUpdateLogisticsItemModel)
     );
-    this.logisticsModel.grandTotal = this.logisticsItems.reduce(
-      (acc, item) => acc + Number(item.total || 0),
-      0
-    );
+    this.logisticsModel.grandTotal = this.grandTotalDisplayed;
+
     if (this.logisticsId) {
       this.logisticsService
         .updateLogistics(this.logisticsId, this.logisticsModel)
@@ -306,28 +306,55 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
                 if (logistics.length >= maxAllowed) {
                   this.alertService.showTranslatedAlert({
                     alertType: 'warning',
-                    messageKey: 'LOGISTICS_LIMIT_REACHED',
-                    params: { isLocal: isLocal },
+                    messageKey: 'MESSAGES.LOGISTICS_LIMIT_REACHED',
+                    params: { count: isLocal ? 2 : 1 },
                   });
 
                   this.initializeModels();
-                } else {
-                  this.purchaseModel = purchase;
-
-                  if (purchase.controlNumber?.includes('CO')) {
-                    this.logisticsTypeLabels = {
-                      [LogisticsTypeEnum.SHIPMENT]: 'Envío a Compañía',
-                    };
-                    this.logisticsTypes = [LogisticsTypeEnum.SHIPMENT];
-                  } else {
-                    this.logisticsTypeLabels = {
-                      [LogisticsTypeEnum.SHIPMENT]: 'Envío Local',
-                      [LogisticsTypeEnum.LOCAL_PROCESSING]:
-                        'Procesamiento Local',
-                    };
-                    this.logisticsTypes = Object.values(LogisticsTypeEnum);
-                  }
+                  this.cdr.detectChanges();
+                  return;
                 }
+
+                this.purchaseModel = purchase;
+
+                const controlNumberIncludesCO =
+                  purchase.controlNumber?.includes('CO');
+
+                if (controlNumberIncludesCO) {
+                  this.logisticsTypeLabels = {
+                    [LogisticsTypeEnum.SHIPMENT]: 'Envío a Compañía',
+                  };
+                  this.logisticsTypes = [LogisticsTypeEnum.SHIPMENT];
+
+                  this.cdr.detectChanges();
+                  return;
+                }
+
+                if (logistics.length === 0) {
+                  this.logisticsTypeLabels = {
+                    [LogisticsTypeEnum.SHIPMENT]: 'Envío Local',
+                    [LogisticsTypeEnum.LOCAL_PROCESSING]: 'Procesamiento Local',
+                  };
+                  this.logisticsTypes = Object.values(LogisticsTypeEnum);
+
+                  this.cdr.detectChanges();
+                  return;
+                }
+
+                const existingType = logistics[0].type;
+
+                if (existingType === LogisticsTypeEnum.SHIPMENT) {
+                  this.logisticsTypeLabels = {
+                    [LogisticsTypeEnum.LOCAL_PROCESSING]: 'Procesamiento Local',
+                  };
+                  this.logisticsTypes = [LogisticsTypeEnum.LOCAL_PROCESSING];
+                } else {
+                  this.logisticsTypeLabels = {
+                    [LogisticsTypeEnum.SHIPMENT]: 'Envío Local',
+                  };
+                  this.logisticsTypes = [LogisticsTypeEnum.SHIPMENT];
+                }
+
                 this.cdr.detectChanges();
               },
               error: (error) => {
@@ -366,11 +393,11 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   }
 
   handlePersonnelLogisticsItems(items: ILogisticsItemModel[]) {
-    this.personnellogisticsItems = items;
+    this.personnelLogisticsItems = items;
   }
 
   handleInputLogisticsItems(items: ILogisticsItemModel[]) {
-    this.inputlogisticsItems = items;
+    this.inputLogisticsItems = items;
   }
 
   onDateChange(event: any): void {

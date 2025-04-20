@@ -102,12 +102,12 @@ export const locale = {
       },
     },
     MESSAGES: {
-      CONFIRM_DELETE: '¿Está seguro de eliminar el registro?',
-      CONFIRM_DELETE_BODY: 'Esta acción no es reversible',
-      DELETE_SUCCESFULL: '!Eliminación exitosa!',
+      DELETE_CONFIRM_TITLE: '¿Estás seguro de que deseas eliminar?',
+      DELETE_CONFIRM_TEXT: 'Esta acción no se puede deshacer.',
+      DELETE_SUCCESS: '¡El elemento fue eliminado exitosamente!',
       PURCHASE_NOT_FOUND: 'No se encontró la compra.',
       LOGISTICS_LIMIT_REACHED:
-        '{{isLocal, select, true{Ya se han creado los 2 registros logísticos permitidos para compras locales.} other{Ya existe un registro logístico para esta compra.}}}',
+        'Ya se ha(n) creado {{count}} registro(s) logístico(s) permitido(s) para esta compra.',
     },
     SUCCESS: {
       TITLE: '¡Éxito!',

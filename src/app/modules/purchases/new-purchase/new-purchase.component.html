@@ -378,12 +378,12 @@
 
       <div class="card-footer d-flex justify-content-end py-6 px-9">
         <!-- Submit Button -->
-        <button *ngIf="canSavePurchase()" type="submit" class="btn btn-primary me-3" [disabled]="isLoading$ | async">
+        <button *ngIf="canSavePurchase()" type="submit" class="btn btn-primary" [disabled]="isLoading$ | async">
           Guardar
         </button>
 
         <!-- Payments List Button -->
-        <button *ngIf="canAddPayments()" type="button" (click)="openPaymentsModal()" class="btn btn-secondary"
+        <button *ngIf="canAddPayments()" type="button" (click)="openPaymentsModal()" class="btn btn-secondary ms-3"
           [disabled]="isLoading$ | async">
           Pagos
         </button>
