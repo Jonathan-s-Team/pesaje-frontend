@@ -6,7 +6,8 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import {
@@ -48,7 +49,7 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
     private dateUtils: DateUtilsService,
     private alertService: AlertService,
     private route: ActivatedRoute,
-    private router: Router,
+    private location: Location,
     private changeDetectorRef: ChangeDetectorRef,
     private roleService: RoleService
   ) {
@@ -179,7 +180,7 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['settings', 'users']);
+    this.location.back();
   }
 
   ngOnDestroy(): void {

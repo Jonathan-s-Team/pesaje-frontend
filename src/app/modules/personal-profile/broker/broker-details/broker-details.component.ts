@@ -6,10 +6,10 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BrokerService } from '../../services/broker.service';
 import {
-  BuyerModel,
   IReadBrokerModel,
   IUpdateBrokerModel,
 } from '../../interfaces/broker.interface';
@@ -58,6 +58,7 @@ export class BrokerDetailsComponent
     private dateUtils: DateUtilsService,
     private alertService: AlertService,
     private route: ActivatedRoute,
+    private location: Location,
     private router: Router,
     private changeDetectorRef: ChangeDetectorRef
   ) {
@@ -188,8 +189,7 @@ export class BrokerDetailsComponent
   }
 
   goBack(): void {
-    if (this.isOnlyBuyer) this.router.navigate(['personal-profile', 'brokers']);
-    else this.router.navigate(['settings', 'brokers']);
+    this.location.back();
   }
 
   /** 🔴 Unsubscribe from all subscriptions to avoid memory leaks */

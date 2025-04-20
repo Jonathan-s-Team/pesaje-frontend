@@ -30,7 +30,7 @@ import { DateUtilsService } from 'src/app/utils/date-utils.service';
   styleUrls: ['./purchase-payment-listing.component.scss'],
 })
 export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.PURCHASE_FORM;
 
   @Input() purchaseId!: string;
 

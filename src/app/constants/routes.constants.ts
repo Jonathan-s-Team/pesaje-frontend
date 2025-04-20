@@ -7,7 +7,7 @@ export const PERMISSION_ROUTES = {
   CLIENTS: '/clients',
   PRICES: '/prices',
   PURCHASES: {
-    NEW_PURCHASE: '/purchases/new',
+    PURCHASE_FORM: '/purchases/form',
     RECENT_PRUCHASES: '/purchases/list',
   },
   LOGISTICS: {

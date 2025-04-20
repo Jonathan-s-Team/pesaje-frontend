@@ -5,6 +5,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgForm } from '@angular/forms';
@@ -45,7 +46,7 @@ type Tabs = 'Details' | 'Payment Info';
   styleUrls: ['./new-purchase.component.scss'],
 })
 export class NewPurchaseComponent implements OnInit, OnDestroy {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.NEW_PURCHASE;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.PURCHASE_FORM;
 
   @ViewChild('purchaseForm') purchaseForm!: NgForm;
 
@@ -64,6 +65,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   roles: IRoleModel[];
   isOnlyBuyer = false;
   isLocal = false;
+  hasRouteId = false;
 
   farmPlace: string = '';
   shrimpFarmSize: string = '';
@@ -91,6 +93,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     private dateUtils: DateUtilsService,
     private route: ActivatedRoute,
     private router: Router,
+    private location: Location,
     private changeDetectorRef: ChangeDetectorRef
   ) {
     this.isLoading$ = this.purchaseService.isLoading$;
@@ -104,6 +107,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.purchaseId = this.route.snapshot.paramMap.get('id') || undefined;
+    this.hasRouteId = !!this.purchaseId;
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     if (this.isOnlyBuyer) {
@@ -395,6 +399,10 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   addNewClient() {
     if (this.isOnlyBuyer) this.router.navigate(['clients']);
     else this.router.navigate(['settings', 'clients']);
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
   onInputChange(): void {

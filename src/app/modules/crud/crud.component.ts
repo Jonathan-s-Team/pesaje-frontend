@@ -244,6 +244,8 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   setupSweetAlert() {
     this.swalOptions = {
       buttonsStyling: false,
+      confirmButtonText: 'Aceptar',
+      cancelButtonText: 'Cancelar',
     };
   }
 }

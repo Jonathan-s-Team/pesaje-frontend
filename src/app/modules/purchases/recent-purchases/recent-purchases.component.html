@@ -59,7 +59,7 @@
 
     <div class="mt-5">
       <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="PERMISSION_ROUTE"
-        (editEvent)="edit($event.toString())" [reload]="reloadEvent">
+        (editEvent)="edit($event.toString())" (deleteEvent)="delete($event.toString())" [reload]="reloadEvent">
       </app-crud>
     </div>
   </div>

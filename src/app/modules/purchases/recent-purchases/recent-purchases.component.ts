@@ -10,8 +10,6 @@ import { AuthService } from '../../auth';
 import { PurchaseService } from '../services/purchase.service';
 import { distinctUntilChanged, Subscription } from 'rxjs';
 import {
-  IDetailedPurchaseModel,
-  IListPurchaseModel,
   IReducedDetailedPurchaseModel,
   PurchaseStatusEnum,
 } from '../interfaces/purchase.interface';
@@ -22,6 +20,7 @@ import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
 import { IReadPeriodModel } from '../../shared/interfaces/period.interface';
 import { IReadClientModel } from '../../shared/interfaces/client.interface';
 import { ClientService } from '../../shared/services/client.service';
+import { AlertService } from 'src/app/utils/alert.service';
 
 @Component({
   selector: 'app-recent-purchases',
@@ -211,6 +210,7 @@ export class RecentPurchasesComponent implements OnInit {
     private companyService: CompanyService,
     private periodService: PeriodService,
     private clientService: ClientService,
+    private alertService: AlertService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -254,7 +254,27 @@ export class RecentPurchasesComponent implements OnInit {
   }
 
   edit(id: string) {
-    this.router.navigate(['purchases', 'edit', id]);
+    this.router.navigate(['purchases', 'form', id]);
+  }
+
+  delete(id: string): void {
+    const deleteSub = this.purchaseService.deletePurchase(id).subscribe({
+      next: () => {
+        this.recentPurchases = this.recentPurchases.filter(
+          (item) => item.id !== id
+        );
+        this.datatableConfig = {
+          ...this.datatableConfig,
+          data: [...this.recentPurchases],
+        };
+        this.reloadEvent.emit(true);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.alertService.showErrorAlert({});
+      },
+    });
+    this.unsubscribe.push(deleteSub);
   }
 
   loadCompanies(): void {

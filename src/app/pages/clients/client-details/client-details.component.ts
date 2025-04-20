@@ -6,6 +6,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
@@ -58,6 +59,7 @@ export class ClientDetailsComponent
     private dateUtils: DateUtilsService,
     private alertService: AlertService,
     private route: ActivatedRoute,
+    private location: Location,
     private router: Router,
     private changeDetectorRef: ChangeDetectorRef
   ) {
@@ -196,11 +198,7 @@ export class ClientDetailsComponent
   }
 
   goBack(): void {
-    if (this.isOnlyBuyer) {
-      this.router.navigate(['clients']);
-    } else {
-      this.router.navigate(['settings', 'clients']);
-    }
+    this.location.back();
   }
 
   private processSelectedBuyers(): void {

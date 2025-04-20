@@ -1,15 +1,15 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { NewPurchaseComponent } from './new-purchase/new-purchase.component';
-import {RecentPurchasesComponent} from "./recent-purchases/recent-purchases.component";
+import { RecentPurchasesComponent } from './recent-purchases/recent-purchases.component';
 
 const routes: Routes = [
   {
-    path: 'new',
+    path: 'form',
     component: NewPurchaseComponent,
   },
   {
-    path: 'edit/:id',
+    path: 'form/:id',
     component: NewPurchaseComponent,
   },
   {
