@@ -336,11 +336,11 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (response) => {
             console.log('Purchase updated successfully:', response);
-            this.alertService.showSuccessAlert({});
+            this.alertService.showTranslatedAlert({ alertType: 'success' });
           },
           error: (error) => {
             console.error('Error updating purchase:', error);
-            this.alertService.showErrorAlert({});
+            this.alertService.showTranslatedAlert({ alertType: 'error' });
           },
         });
     } else {
@@ -350,12 +350,12 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
           this.purchaseId = response.id; // ✅ Store the new ID for future updates
           this.createPurchaseModel.controlNumber = response.controlNumber;
           this.createPurchaseModel.status = response.status;
-          this.alertService.showSuccessAlert({});
+          this.alertService.showTranslatedAlert({ alertType: 'success' });
           // form.resetForm(); // Reset form after successful creation
         },
         error: (error) => {
           console.error('Error creating purchase:', error);
-          this.alertService.showErrorAlert({});
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
         },
       });
     }

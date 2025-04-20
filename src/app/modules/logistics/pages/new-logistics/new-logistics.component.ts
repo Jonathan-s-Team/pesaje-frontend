@@ -52,6 +52,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
 
   isOnlyBuyer = false;
   hasRouteId = false;
+  searchSubmitted = false;
   controlNumber: string;
 
   logisticsModel: ICreateUpdateLogisticsModel;
@@ -147,7 +148,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error fetching logistics:', error);
-            this.alertService.showErrorAlert({});
+            this.alertService.showTranslatedAlert({ alertType: 'error' });
           },
         });
 
@@ -198,10 +199,8 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
         this.personnellogisticsItems.length === 0) &&
       (!this.inputlogisticsItems || this.inputlogisticsItems.length === 0)
     ) {
-      this.alertService.showAlert({
-        icon: 'warning',
-        title: 'Detalle faltante',
-        text: 'Ingrese detalle de logística',
+      this.alertService.showTranslatedAlert({
+        alertType: 'info',
       });
       return;
     }
@@ -239,11 +238,11 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
         .updateLogistics(this.logisticsId, this.logisticsModel)
         .subscribe({
           next: (response) => {
-            this.alertService.showSuccessAlert({});
+            this.alertService.showTranslatedAlert({ alertType: 'success' });
           },
           error: (error) => {
             console.error('Error updating logistics:', error);
-            this.alertService.showErrorAlert({});
+            this.alertService.showTranslatedAlert({ alertType: 'error' });
           },
         });
     } else {
@@ -251,11 +250,11 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.logisticsId = response.id; // ✅ Store the new ID for future updates
           this.cdr.detectChanges();
-          this.alertService.showSuccessAlert({});
+          this.alertService.showTranslatedAlert({ alertType: 'success' });
         },
         error: (error) => {
           console.error('Error creating logistics:', error);
-          this.alertService.showErrorAlert({});
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
         },
       });
     }
@@ -267,6 +266,12 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   }
 
   searchPurchase(): void {
+    this.searchSubmitted = true;
+
+    if (!this.controlNumber?.trim()) {
+      return; // don't search if input is empty
+    }
+
     const userId =
       this.isOnlyBuyer && this.authService.currentUserValue?.id
         ? this.authService.currentUserValue.id
@@ -277,11 +282,12 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (purchases: IReducedDetailedPurchaseModel[]) => {
           if (purchases.length === 0) {
-            this.alertService.showAlert({
-              icon: 'warning',
-              title: 'Sin resultados',
-              text: 'No se encontró ninguna compra con ese número de control.',
+            this.alertService.showTranslatedAlert({
+              alertType: 'info',
+              messageKey: 'MESSAGES.PURCHASE_NOT_FOUND',
+              customIcon: 'info',
             });
+
             this.initializeModels();
             return;
           }
@@ -298,13 +304,12 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
                 const maxAllowed = isLocal ? 2 : 1;
 
                 if (logistics.length >= maxAllowed) {
-                  this.alertService.showAlert({
-                    icon: 'warning',
-                    title: 'Límite alcanzado',
-                    text: isLocal
-                      ? 'Ya se han creado los 2 registros logísticos permitidos para compras locales.'
-                      : 'Ya existe un registro logístico para esta compra.',
+                  this.alertService.showTranslatedAlert({
+                    alertType: 'warning',
+                    messageKey: 'LOGISTICS_LIMIT_REACHED',
+                    params: { isLocal: isLocal },
                   });
+
                   this.initializeModels();
                 } else {
                   this.purchaseModel = purchase;
@@ -327,7 +332,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
               },
               error: (error) => {
                 console.error('Error fetching logistics:', error);
-                this.alertService.showErrorAlert({});
+                this.alertService.showTranslatedAlert({ alertType: 'error' });
               },
             });
 
@@ -335,7 +340,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error fetching purchases:', error);
-          this.alertService.showErrorAlert({});
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
         },
       });
 

@@ -127,7 +127,7 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('❌ Error loading purchase payments:', error);
-          this.alertService.showErrorAlert({});
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
         },
       });
 
@@ -206,7 +206,7 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
               this.purchasePayments[index] = fullUpdatedPayment;
             }
 
-            this.alertService.showSuccessAlert({});
+            this.alertService.showTranslatedAlert({ alertType: 'success' });
 
             this.datatableConfig = {
               ...this.datatableConfig,
@@ -217,7 +217,7 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
             this.reloadEvent.emit(true);
           },
           error: (error) => {
-            this.alertService.showErrorAlert({});
+            this.alertService.showTranslatedAlert({ alertType: 'error' });
             this.isLoading = false;
           },
           complete: completeFn,
@@ -231,7 +231,7 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
         .createPurchasePayment(paymentPayload)
         .subscribe({
           next: () => {
-            this.alertService.showSuccessAlert({});
+            this.alertService.showTranslatedAlert({ alertType: 'success' });
             this.loadPurchasePaymentsById(this.purchaseId);
 
             this.paymentForm.resetForm(); // ✅ Clear the form
@@ -242,9 +242,9 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
             const matched = rawMessage.match(/amount of (\d+(\.\d+)?)/); // Extract number
             const totalAgreed = matched ? matched[1] : '---';
 
-            this.alertService.showErrorAlert({
-              title: 'Error',
-              errorKey: 'ERROR_MESSAGES.PURCHASE_TOTAL_AGREED_EXCEEDED',
+            this.alertService.showTranslatedAlert({
+              alertType: 'error',
+              messageKey: 'ERROR.PURCHASE_TOTAL_AGREED_EXCEEDED',
               params: { total: totalAgreed },
             });
 
@@ -280,7 +280,7 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
           this.reloadEvent.emit(true);
         },
         error: () => {
-          this.alertService.showErrorAlert({});
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
         },
       });
     this.unsubscribe.push(deleteSub);

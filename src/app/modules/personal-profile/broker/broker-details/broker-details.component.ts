@@ -152,26 +152,11 @@ export class BrokerDetailsComponent
       .updateBroker(this.brokerData.id, payload)
       .subscribe({
         next: () => {
-          this.alertService.showAlert({
-            title: '¡Éxito!',
-            text: 'Los cambios se guardaron correctamente',
-            icon: 'success',
-            confirmButtonText: 'Aceptar',
-            timer: 5000,
-            timerProgressBar: true,
-          });
+          this.alertService.showTranslatedAlert({ alertType: 'success' });
         },
         error: (error) => {
           console.error('Error updating broker', error);
-          this.alertService.showAlert({
-            title: 'Error',
-            html: `<strong>${
-              error.message || 'Ocurrió un error inesperado.'
-            }</strong>`,
-            icon: 'error',
-            confirmButtonText: 'Entendido',
-            focusConfirm: false,
-          });
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
         },
       });
 

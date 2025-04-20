@@ -150,11 +150,7 @@ export class ShrimpFarmInformationComponent
           this.reloadEvent.emit(true);
         },
         error: () => {
-          this.alertService.showAlert({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudo cargar la camaronera.',
-          });
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
         },
       });
     this.unsubscribe.push(paymentSub);
@@ -170,11 +166,7 @@ export class ShrimpFarmInformationComponent
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.alertService.showAlert({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo eliminar la camaronera.',
-        });
+        this.alertService.showTranslatedAlert({ alertType: 'error' });
       },
     });
     this.unsubscribe.push(deleteSub);
@@ -249,7 +241,7 @@ export class ShrimpFarmInformationComponent
 
             if (index > -1) this.shrimpFarmData[index] = { ...updatedInfo };
 
-            this.alertService.showAlert(successAlert);
+            this.alertService.showTranslatedAlert({ alertType: 'success' });
 
             this.datatableConfig = {
               ...this.datatableConfig,
@@ -261,7 +253,7 @@ export class ShrimpFarmInformationComponent
           },
           error: (error) => {
             errorAlert.text = 'No se pudo actualizar la camaronera.';
-            this.alertService.showAlert(errorAlert);
+            this.alertService.showTranslatedAlert({ alertType: 'error' });
             this.isLoading = false;
           },
           complete: completeFn,
@@ -272,12 +264,12 @@ export class ShrimpFarmInformationComponent
       const createPayload: ICreateShrimpFarmModel = { ...this.shrimpFarmInfo };
       this.shrimpFarmService.createShrimpFarm(createPayload).subscribe({
         next: () => {
-          this.alertService.showAlert(successAlert);
+          this.alertService.showTranslatedAlert({ alertType: 'success' });
           this.loadShrimpFarmInfos();
         },
         error: (error) => {
           errorAlert.text = 'No se pudo crear la camaronera.';
-          this.alertService.showAlert(errorAlert);
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
           this.isLoading = false;
         },
         complete: completeFn,

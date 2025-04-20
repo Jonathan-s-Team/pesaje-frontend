@@ -132,7 +132,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error fetching logistics:', error);
-            this.alertService.showErrorAlert({});
+            this.alertService.showTranslatedAlert({ alertType: 'error' });
           },
         });
 
@@ -157,14 +157,11 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     }
 
     this.companySaleItemsListingComponent.emitCurrentValidItems();
-    console.log(this.companySaleModel);
 
     // Check if both lists are empty
     if (!this.companySaleItems || this.companySaleItems.length === 0) {
-      this.alertService.showAlert({
-        icon: 'warning',
-        title: 'Detalle faltante',
-        text: 'Ingrese detalle de venta',
+      this.alertService.showTranslatedAlert({
+        alertType: 'info',
       });
       return;
     }
@@ -221,11 +218,11 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
           next: (response) => {
             this.saleId = response.id; // ✅ Store the new ID for future updates
             this.cdr.detectChanges();
-            this.alertService.showSuccessAlert({});
+            this.alertService.showTranslatedAlert({ alertType: 'success' });
           },
           error: (error) => {
             console.error('Error creating company sale:', error);
-            this.alertService.showErrorAlert({});
+            this.alertService.showTranslatedAlert({ alertType: 'error' });
           },
         });
     }
@@ -247,11 +244,12 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (purchases: IReducedDetailedPurchaseModel[]) => {
           if (purchases.length === 0) {
-            this.alertService.showAlert({
-              icon: 'warning',
-              title: 'Sin resultados',
-              text: 'No se encontró ninguna compra con ese número de control.',
+            this.alertService.showTranslatedAlert({
+              alertType: 'info',
+              messageKey: 'MESSAGES.PURCHASE_NOT_FOUND',
+              customIcon: 'info',
             });
+
             this.initializeModels();
             return;
           }
@@ -261,7 +259,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error fetching purchases:', error);
-          this.alertService.showErrorAlert({});
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
         },
       });
 

@@ -101,18 +101,36 @@ export const locale = {
         },
       },
     },
-    GENERAL_MESSAGES: {
+    MESSAGES: {
       CONFIRM_DELETE: 'Are you sure to delete?',
       CONFIRM_DELETE_BODY: 'This cannot be undone',
       DELETE_SUCCESFULL: 'Delete successfully!',
+      PURCHASE_NOT_FOUND: 'Purchase not found.',
+      LOGISTICS_LIMIT_REACHED:
+        '{{isLocal, select, true{Two logistics records have already been created for local purchases.} other{A logistics record already exists for this purchase.}}}',
     },
-    ERROR_MESSAGES: {
-      GENERAL: 'An unexpected error occurred',
+    SUCCESS: {
+      TITLE: 'Success!',
+      MESSAGE: 'The operation was completed successfully.',
+    },
+    ERROR: {
+      TITLE: 'Error',
+      MESSAGE: 'An unexpected error occurred. Please try again later.',
       PURCHASE_TOTAL_AGREED_EXCEEDED:
         'Total payments cannot exceed the total agreed amount of ${{total}}',
     },
+    INFO: {
+      TITLE: 'Information',
+      MESSAGE:
+        'Please review the information and complete the required fields.',
+    },
+    WARNING: {
+      TITLE: 'Warning',
+      MESSAGE: 'Please review the information before proceeding.',
+    },
     BUTTONS: {
       OK: 'Ok',
+      CONFIRM: 'Ok',
       CANCEL: 'Cancel',
     },
   },

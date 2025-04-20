@@ -187,11 +187,7 @@ export class BrokerListingComponent
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.alertService.showAlert({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo cargar la información de brokers.',
-        });
+        this.alertService.showTranslatedAlert({ alertType: 'error' });
       },
     });
 
@@ -205,11 +201,7 @@ export class BrokerListingComponent
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.alertService.showAlert({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo eliminar el broker.',
-        });
+        this.alertService.showTranslatedAlert({ alertType: 'error' });
       },
     });
     this.unsubscribe.push(deleteSub);
@@ -246,18 +238,6 @@ export class BrokerListingComponent
     this.createBrokerModel.person.birthDate =
       convertedDate === '' ? null : convertedDate;
 
-    const successAlert: SweetAlertOptions = {
-      icon: 'success',
-      title: '¡Éxito!',
-      text: '¡Bróker creado exitosamente!',
-    };
-
-    const errorAlert: SweetAlertOptions = {
-      icon: 'error',
-      title: '¡Error!',
-      text: 'Hubo un problema al guardar los cambios.',
-    };
-
     const completeFn = () => {
       this.isLoading = false;
       this.selectedBuyer = [];
@@ -266,12 +246,11 @@ export class BrokerListingComponent
     const createFn = () => {
       this.brokerService.createBroker(this.createBrokerModel).subscribe({
         next: () => {
-          this.alertService.showAlert(successAlert);
+          this.alertService.showTranslatedAlert({ alertType: 'success' });
           this.loadBrokers();
         },
         error: (error) => {
-          errorAlert.text = 'No se pudo crear el bròker.';
-          this.alertService.showAlert(errorAlert);
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
           this.isLoading = false;
         },
         complete: completeFn,

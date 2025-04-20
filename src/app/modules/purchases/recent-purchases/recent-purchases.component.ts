@@ -271,7 +271,7 @@ export class RecentPurchasesComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: () => {
-        this.alertService.showErrorAlert({});
+        this.alertService.showTranslatedAlert({ alertType: 'error' });
       },
     });
     this.unsubscribe.push(deleteSub);

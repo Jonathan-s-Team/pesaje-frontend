@@ -101,18 +101,37 @@ export const locale = {
         },
       },
     },
-    GENERAL_MESSAGES: {
+    MESSAGES: {
       CONFIRM_DELETE: '¿Está seguro de eliminar el registro?',
       CONFIRM_DELETE_BODY: 'Esta acción no es reversible',
       DELETE_SUCCESFULL: '!Eliminación exitosa!',
+      PURCHASE_NOT_FOUND: 'No se encontró la compra.',
+      LOGISTICS_LIMIT_REACHED:
+        '{{isLocal, select, true{Ya se han creado los 2 registros logísticos permitidos para compras locales.} other{Ya existe un registro logístico para esta compra.}}}',
     },
-    ERROR_MESSAGES: {
-      GENERAL: 'Ocurrió un error inesperado',
+    SUCCESS: {
+      TITLE: '¡Éxito!',
+      MESSAGE: 'La operación se completó correctamente.',
+    },
+    ERROR: {
+      TITLE: 'Error',
+      MESSAGE:
+        'Ocurrió un error inesperado. Por favor, intenta nuevamente más tarde.',
       PURCHASE_TOTAL_AGREED_EXCEEDED:
         'Los pagos no pueden exceder el monto total acordado de ${{total}}',
     },
+    INFO: {
+      TITLE: 'Información',
+      MESSAGE:
+        'Por favor revise la información e ingrese los campos requeridos.',
+    },
+    WARNING: {
+      TITLE: 'Advertencia',
+      MESSAGE: 'Por favor, revisa la información antes de continuar.',
+    },
     BUTTONS: {
       OK: 'Entendido',
+      CONFIRM: 'Aceptar',
       CANCEL: 'Cancelar',
     },
   },

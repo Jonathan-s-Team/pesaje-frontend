@@ -272,19 +272,11 @@ export class SizePriceComponent implements OnInit, OnDestroy {
         .updatePaymentInfo(this.selectedPeriod, periodPayload)
         .subscribe({
           next: () => {
-            this.alertService.showAlert({
-              icon: 'success',
-              title: '¡Éxito!',
-              text: 'Periodo actualizado exitosamente!',
-            });
+            this.alertService.showTranslatedAlert({ alertType: 'success' });
             this.toggleEditPeriod();
           },
           error: () => {
-            this.alertService.showAlert({
-              icon: 'error',
-              title: '¡Error!',
-              text: 'No se pudo actualizar el periodo.',
-            });
+            this.alertService.showTranslatedAlert({ alertType: 'error' });
           },
         });
 
@@ -299,19 +291,11 @@ export class SizePriceComponent implements OnInit, OnDestroy {
         })
         .subscribe({
           next: () => {
-            this.alertService.showAlert({
-              icon: 'success',
-              title: '¡Éxito!',
-              text: 'Periodo creado exitosamente!',
-            });
+            this.alertService.showTranslatedAlert({ alertType: 'success' });
             this.toggleAddPeriod();
           },
           error: () => {
-            this.alertService.showAlert({
-              icon: 'error',
-              title: '¡Error!',
-              text: 'No se pudo crear el periodo.',
-            });
+            this.alertService.showTranslatedAlert({ alertType: 'error' });
           },
         });
 

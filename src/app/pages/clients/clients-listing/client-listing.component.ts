@@ -171,11 +171,7 @@ export class ClientListingComponent
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.alertService.showAlert({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo cargar la información de clientes.',
-        });
+        this.alertService.showTranslatedAlert({ alertType: 'error' });
       },
     });
 
@@ -189,11 +185,7 @@ export class ClientListingComponent
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.alertService.showAlert({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo eliminar el cliente.',
-        });
+        this.alertService.showTranslatedAlert({ alertType: 'error' });
       },
     });
     this.unsubscribe.push(deleteSub);
@@ -253,12 +245,12 @@ export class ClientListingComponent
     const createFn = () => {
       this.clientService.createClient(this.createClientModel).subscribe({
         next: () => {
-          this.alertService.showAlert(successAlert);
+          this.alertService.showTranslatedAlert({ alertType: 'success' });
           this.loadUsers();
         },
         error: (error) => {
           errorAlert.text = 'No se pudo crear el cliente.';
-          this.alertService.showAlert(errorAlert);
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
           this.isLoading = false;
         },
         complete: completeFn,

@@ -161,11 +161,7 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.alertService.showAlert({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo cargar la información de usuarios.',
-        });
+        this.alertService.showTranslatedAlert({ alertType: 'error' });
       },
     });
 
@@ -203,11 +199,7 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
         this.reloadEvent.emit(true);
       },
       error: () => {
-        this.alertService.showAlert({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo eliminar el broker.',
-        });
+        this.alertService.showTranslatedAlert({ alertType: 'error' });
       },
     });
     this.unsubscribe.push(deleteSub);
@@ -257,12 +249,12 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.userService.createUser(userPayload as any).subscribe({
       next: () => {
-        this.alertService.showAlert(successAlert);
+        this.alertService.showTranslatedAlert({ alertType: 'success' });
         this.loadUsers();
       },
       error: (error) => {
         errorAlert.text = 'No se pudo crear el usuario.';
-        this.alertService.showAlert(errorAlert);
+        this.alertService.showTranslatedAlert({ alertType: 'error' });
         this.isLoading = false;
       },
       complete: () => {
