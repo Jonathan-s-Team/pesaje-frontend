@@ -21,6 +21,7 @@ export class AlertService {
       showCancelButton: true,
       confirmButtonText: 'Aceptar',
       cancelButtonText: 'Cancelar',
+      buttonsStyling: false,
       focusCancel: true,
       customClass: {
         confirmButton: 'btn btn-primary',

@@ -108,6 +108,7 @@ export const locale = {
       PURCHASE_NOT_FOUND: 'No se encontró la compra.',
       LOGISTICS_LIMIT_REACHED:
         'Ya se ha(n) creado {{count}} registro(s) logístico(s) permitido(s) para esta compra.',
+      NO_SALE_DETAILS_ENTERED: 'No se han ingresado detalles de la venta.',
     },
     SUCCESS: {
       TITLE: '¡Éxito!',

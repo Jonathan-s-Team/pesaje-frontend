@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { SaleService } from '../../services/sale.service';
 import { ISaleModel, SaleTypeEnum } from '../../interfaces/sale.interface';
+import { AlertService } from 'src/app/utils/alert.service';
 
 @Component({
   selector: 'app-recent-sales',
@@ -56,6 +57,10 @@ export class RecentSalesComponent implements OnInit {
 
           return 'Venta Local';
         },
+      },
+      {
+        title: 'Compañía',
+        data: 'company.name',
       },
       {
         title: 'Fecha de Venta',
@@ -106,6 +111,7 @@ export class RecentSalesComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private saleService: SaleService,
+    private alertService: AlertService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -148,10 +154,28 @@ export class RecentSalesComponent implements OnInit {
     this.salesModel = foundItem ? { ...foundItem } : ({} as ISaleModel);
 
     if (this.salesModel.type === SaleTypeEnum.COMPANY) {
-      this.router.navigate(['sales', 'company', 'edit', id]);
+      this.router.navigate(['sales', 'company', id]);
     } else {
-      this.router.navigate(['sales', 'local', 'edit', id]);
+      this.router.navigate(['sales', 'local', id]);
     }
+  }
+
+  delete(id: string): void {
+    const deleteSub = this.saleService.deleteSale(id).subscribe({
+      next: () => {
+        this.recentSales = this.recentSales.filter((item) => item.id !== id);
+        this.datatableConfig = {
+          ...this.datatableConfig,
+          data: [...this.recentSales],
+        };
+        this.reloadEvent.emit(true);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.alertService.showTranslatedAlert({ alertType: 'error' });
+      },
+    });
+    this.unsubscribe.push(deleteSub);
   }
 
   clearFilters() {

@@ -9,6 +9,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { Location } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { DateUtilsService } from '../../../../utils/date-utils.service';
@@ -28,7 +29,6 @@ import { ICompanySaleItemModel } from '../../interfaces/company-sale-item.interf
 import { CompanySaleService } from '../../services/company-sale.service';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
-import { CompanySaleItemsListingComponent } from '../../widgets/company-sale-items-listing/company-sale-items-listing.component';
 import { IReducedPeriodModel } from 'src/app/modules/shared/interfaces/period.interface';
 
 @Component({
@@ -37,13 +37,13 @@ import { IReducedPeriodModel } from 'src/app/modules/shared/interfaces/period.in
   styleUrl: './new-company-sale.component.scss',
 })
 export class NewCompanySaleComponent implements OnInit, OnDestroy {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.NEW_COMPANY;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.COMPANY_SALE_FORM;
 
   @ViewChild('saleForm') saleForm!: NgForm;
-  @ViewChild('companySaleItemsListingComponent')
-  companySaleItemsListingComponent: CompanySaleItemsListingComponent;
 
   isOnlyBuyer = false;
+  hasRouteId = false;
+  searchSubmitted = false;
   controlNumber: string;
 
   companySaleModel: ICreateUpdateCompanySaleModel;
@@ -57,6 +57,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   companySaleItems: ICompanySaleItemModel[] = [];
 
   saleId: string | undefined;
+  companySaleId: string | undefined;
 
   private unsubscribe: Subscription[] = [];
 
@@ -70,6 +71,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
     private route: ActivatedRoute,
+    private location: Location,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -95,6 +97,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.saleId = this.route.snapshot.paramMap.get('id') || undefined;
+    this.hasRouteId = !!this.saleId;
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
 
     this.initializeModels();
@@ -105,6 +108,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (companySale: ICompanySaleModel) => {
             const { purchase, ...rest } = companySale;
+            this.companySaleId = rest.id;
             this.companySaleModel = {
               ...rest,
               purchase: purchase.id,
@@ -151,17 +155,22 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     this.purchaseModel.shrimpFarm = {} as IReducedShrimpFarmModel;
   }
 
-  confirmSave(event: Event, form: NgForm) {
-    if (form && form.invalid) {
+  confirmSave() {
+    if (this.saleForm && this.saleForm.invalid) {
+      // Mark all controls as touched to trigger validation messages
+      Object.values(this.saleForm.controls).forEach((control) => {
+        control.markAsTouched();
+        control.markAsDirty();
+      });
+
       return;
     }
-
-    this.companySaleItemsListingComponent.emitCurrentValidItems();
 
     // Check if both lists are empty
     if (!this.companySaleItems || this.companySaleItems.length === 0) {
       this.alertService.showTranslatedAlert({
         alertType: 'info',
+        messageKey: 'MESSAGES.NO_SALE_DETAILS_ENTERED',
       });
       return;
     }
@@ -199,24 +208,24 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
       0
     );
 
-    if (this.saleId) {
-      // this.logisticsService
-      //   .updateLogistics(this.saleId, this.saleModel)
-      //   .subscribe({
-      //     next: (response) => {
-      //       this.alertService.showSuccessAlert({});
-      //     },
-      //     error: (error) => {
-      //       console.error('Error updating logistics:', error);
-      //       this.alertService.showErrorAlert({ error });
-      //     },
-      //   });
+    if (this.companySaleId) {
+      this.companySaleService
+        .updateCompanySale(this.companySaleId, this.companySaleModel)
+        .subscribe({
+          next: (response) => {
+            this.alertService.showTranslatedAlert({ alertType: 'success' });
+          },
+          error: (error) => {
+            console.error('Error updating logistics:', error);
+            this.alertService.showTranslatedAlert({ alertType: 'error' });
+          },
+        });
     } else {
       this.companySaleService
         .createCompanySale(this.companySaleModel)
         .subscribe({
           next: (response) => {
-            this.saleId = response.id; // ✅ Store the new ID for future updates
+            this.companySaleId = response.id; // ✅ Store the new ID for future updates
             this.cdr.detectChanges();
             this.alertService.showTranslatedAlert({ alertType: 'success' });
           },
@@ -234,6 +243,12 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   }
 
   searchPurchase(): void {
+    this.searchSubmitted = true;
+
+    if (!this.controlNumber?.trim()) {
+      return; // don't search if input is empty
+    }
+
     const userId =
       this.isOnlyBuyer && this.authService.currentUserValue?.id
         ? this.authService.currentUserValue.id
@@ -243,7 +258,10 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
       .getPurchaseByParams(false, userId, null, null, null, this.controlNumber)
       .subscribe({
         next: (purchases: IReducedDetailedPurchaseModel[]) => {
-          if (purchases.length === 0) {
+          const noValidPurchase =
+            purchases.length === 0 || purchases[0].company?.name === 'Local';
+
+          if (noValidPurchase) {
             this.alertService.showTranslatedAlert({
               alertType: 'info',
               messageKey: 'MESSAGES.PURCHASE_NOT_FOUND',
@@ -278,6 +296,10 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
       // Otherwise, navigate to /logistics/new
       this.router.navigate(['/sales/company']);
     }
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
   handleCompanySaleItemsChange(items: ICompanySaleItemModel[]) {

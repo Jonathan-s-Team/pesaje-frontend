@@ -45,6 +45,13 @@ export class SaleService {
       );
   }
 
+  deleteSale(id: string): Observable<{ message: string }> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .delete<{ message: string }>(`${API_SALE_URL}/${id}`)
+      .pipe(finalize(() => this.isLoadingSubject.next(false)));
+  }
+
   // getLogisticsById(id: string): Observable<IDetailedReadLogisticsModel> {
   //   this.isLoadingSubject.next(true);
   //   return this.http

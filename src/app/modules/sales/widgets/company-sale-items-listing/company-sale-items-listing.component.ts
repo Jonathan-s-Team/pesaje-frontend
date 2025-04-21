@@ -33,10 +33,12 @@ import { IReadPeriodModel } from 'src/app/modules/shared/interfaces/period.inter
   styleUrl: './company-sale-items-listing.component.scss',
 })
 export class CompanySaleItemsListingComponent implements OnInit {
-  PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.NEW_COMPANY;
+  PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.COMPANY_SALE_FORM;
 
   private _periodId: string;
   private _companySaleItems: ICompanySaleItemModel[] = [];
+
+  private unsubscribe: Subscription[] = [];
 
   @Input()
   set periodId(value: string) {
@@ -54,6 +56,8 @@ export class CompanySaleItemsListingComponent implements OnInit {
       data: [...this._companySaleItems],
     };
 
+    this.calculateTotals();
+
     this.cdr.detectChanges();
     this.reloadEvent.emit(true);
   }
@@ -66,10 +70,12 @@ export class CompanySaleItemsListingComponent implements OnInit {
 
   @ViewChild('myForm') myForm!: NgForm;
 
-  private unsubscribe: Subscription[] = [];
-
   isLoading = false;
   isWhole = false;
+
+  poundsGrandTotal: number = 0;
+  grandTotal: number = 0;
+  percentageTotal: number = 0;
 
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
@@ -296,8 +302,12 @@ export class CompanySaleItemsListingComponent implements OnInit {
         data: [...this.companySaleItems],
       };
 
+      this.calculateTotals();
+
       this.cdr.detectChanges();
       this.reloadEvent.emit(true);
+
+      this.companySaleItemsChange.emit(this.companySaleItems);
       complete();
     };
 
@@ -335,17 +345,47 @@ export class CompanySaleItemsListingComponent implements OnInit {
       data: [...this.companySaleItems],
     };
 
+    this.calculateTotals();
+
     this.cdr.detectChanges();
     this.reloadEvent.emit(true);
+
+    this.companySaleItemsChange.emit(this.companySaleItems);
   }
 
   edit(id: string): void {
     const foundItem = this.companySaleItems.find((item) => item.id === id);
     this.companySaleItem = foundItem ?? ({} as ICompanySaleItemModel);
+
+    this.isWhole = this.companySaleItem.style === CompanySaleStyleEnum.WHOLE;
+    if (this.isWhole) {
+      this.sizeList = this.wholeSizes.map((size) => size.size);
+    } else {
+      if (this.companySaleItem.class) {
+        this.sizeList = this.tailSizes
+          .filter((size) => size.type === this.companySaleItem.class)
+          .map((size) => size.size);
+      }
+    }
+
+    console.log(this.companySaleItem);
   }
 
-  emitCurrentValidItems(): void {
-    this.companySaleItemsChange.emit(this.companySaleItems);
+  calculateTotals(): void {
+    this.poundsGrandTotal = this.companySaleItems.reduce(
+      (sum, item) => sum + Number(item.pounds || 0),
+      0
+    );
+
+    this.grandTotal = this.companySaleItems.reduce(
+      (sum, item) => sum + Number(item.total || 0),
+      0
+    );
+
+    this.percentageTotal = this.companySaleItems.reduce(
+      (sum, item) => sum + Number(item.percentage || 0),
+      0
+    );
   }
 
   validateNumber(event: KeyboardEvent) {

@@ -9,11 +9,11 @@ const routes: Routes = [
     component: NewCompanySaleComponent,
   },
   {
-    path: 'company/edit/:id',
+    path: 'company/:id',
     component: NewCompanySaleComponent,
   },
   {
-    path: 'local/edit/:id',
+    path: 'local/:id',
     component: NewCompanySaleComponent,
   },
   {

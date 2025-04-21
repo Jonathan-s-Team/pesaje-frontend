@@ -15,8 +15,8 @@ export const PERMISSION_ROUTES = {
     RECENT_LOGISTICS: '/logistics/list',
   },
   SALES: {
-    NEW_COMPANY: '/sales/company',
-    NEW_LOCAL: '/sales/local',
+    COMPANY_SALE_FORM: '/sales/company',
+    LOCAL_SALE_FORM: '/sales/local',
     RECENT_SALES: '/sales/list',
   },
   REPORTS: {

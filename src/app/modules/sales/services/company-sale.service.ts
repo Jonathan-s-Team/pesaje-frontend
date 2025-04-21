@@ -33,29 +33,6 @@ export class CompanySaleService {
       );
   }
 
-  // getLogisticsByParams(
-  //   includeDeleted: boolean,
-  //   userId: string | null,
-  //   controlNumber: string | null
-  // ): Observable<IReadLogisticsModel[]> {
-  //   this.isLoadingSubject.next(true);
-
-  //   const params = new URLSearchParams();
-  //   params.append('includeDeleted', includeDeleted.toString());
-  //   if (userId) params.append('userId', userId);
-  //   if (controlNumber !== null)
-  //     params.append('controlNumber', controlNumber.toString());
-
-  //   return this.http
-  //     .get<{ ok: boolean; data: IReadLogisticsModel[] }>(
-  //       `${API_LOGISTICS_URL}/by-params?${params.toString()}`
-  //     )
-  //     .pipe(
-  //       map((response) => response.data || []),
-  //       finalize(() => this.isLoadingSubject.next(false))
-  //     );
-  // }
-
   getCompanySaleBySaleId(id: string): Observable<ICompanySaleModel> {
     this.isLoadingSubject.next(true);
     return this.http
@@ -68,16 +45,19 @@ export class CompanySaleService {
       );
   }
 
-  // updateLogistics(
-  //   id: string,
-  //   payload: ICreateUpdateLogisticsModel
-  // ): Observable<IReadLogisticsModel> {
-  //   this.isLoadingSubject.next(true);
-  //   return this.http
-  //     .put<{ data: IReadLogisticsModel }>(`${API_LOGISTICS_URL}/${id}`, payload)
-  //     .pipe(
-  //       map((response) => response.data),
-  //       finalize(() => this.isLoadingSubject.next(false))
-  //     );
-  // }
+  updateCompanySale(
+    id: string,
+    payload: ICreateUpdateCompanySaleModel
+  ): Observable<ICompanySaleModel> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .put<{ data: ICompanySaleModel }>(
+        `${API_COMPANY_SALE_URL}/${id}`,
+        payload
+      )
+      .pipe(
+        map((response) => response.data),
+        finalize(() => this.isLoadingSubject.next(false))
+      );
+  }
 }

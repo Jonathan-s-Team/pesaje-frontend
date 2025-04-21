@@ -1,5 +1,6 @@
 import { IReducedDetailedPurchaseModel } from '../../purchases/interfaces/purchase.interface';
 import { IReducedUserModel } from '../../settings/interfaces/user.interface';
+import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
 import { ICompanySaleItemModel } from './company-sale-item.interface';
 
 export interface ISaleModel {
@@ -10,6 +11,7 @@ export interface ISaleModel {
   saleDate: string;
   buyer: IReducedUserModel;
   client: IReducedUserModel;
+  company: IReadCompanyModel;
   type: SaleTypeEnum;
   deletedAt?: string;
 }

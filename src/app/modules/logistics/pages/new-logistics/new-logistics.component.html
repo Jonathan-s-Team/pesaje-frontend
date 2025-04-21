@@ -22,7 +22,7 @@
       <div class="d-flex align-items-center gap-4">
         <!-- Control Number Input -->
         <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
-          style="max-width: 180px" [disabled]="!!logisticsId" [(ngModel)]="controlNumber" />
+          placeholder="CO-0" style="max-width: 180px" [disabled]="!!logisticsId" [(ngModel)]="controlNumber" />
 
         <!-- Search Button -->
         <button *ngIf="!logisticsId" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2"
@@ -38,8 +38,6 @@
     </div>
 
   </div>
-
-
 </div>
 <!-- end::First Section: Search Info -->
 

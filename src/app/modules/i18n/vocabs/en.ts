@@ -108,6 +108,7 @@ export const locale = {
       PURCHASE_NOT_FOUND: 'Purchase not found.',
       LOGISTICS_LIMIT_REACHED:
         '{{count}} logistics record(s) have already been created for this purchase.',
+      NO_SALE_DETAILS_ENTERED: 'No sale details have been entered.',
     },
     SUCCESS: {
       TITLE: 'Success!',
