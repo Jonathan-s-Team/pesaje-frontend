@@ -1,4 +1,5 @@
 import {
+  CompanySaleStatusEnum,
   ICompanySaleModel,
   ICreateUpdateCompanySaleModel,
 } from './../../interfaces/sale.interface';
@@ -17,7 +18,11 @@ import { AuthService } from '../../../auth';
 import { IReducedDetailedPurchaseModel } from '../../../purchases/interfaces/purchase.interface';
 import { PurchaseService } from '../../../purchases/services/purchase.service';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '../../../../utils/alert.service';
 import { IReducedUserModel } from '../../../settings/interfaces/user.interface';
 import {
@@ -30,6 +35,7 @@ import { CompanySaleService } from '../../services/company-sale.service';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { IReducedPeriodModel } from 'src/app/modules/shared/interfaces/period.interface';
+import { CompanySalePaymentListingComponent } from '../../widgets/company-sale-payment-listing/company-sale-payment-listing.component';
 
 @Component({
   selector: 'app-new-company-sale',
@@ -38,6 +44,8 @@ import { IReducedPeriodModel } from 'src/app/modules/shared/interfaces/period.in
 })
 export class NewCompanySaleComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.COMPANY_SALE_FORM;
+
+  private modalRef: NgbModalRef | null = null;
 
   @ViewChild('saleForm') saleForm!: NgForm;
 
@@ -68,6 +76,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     private dateUtils: DateUtilsService,
     private purchaseService: PurchaseService,
     private companySaleService: CompanySaleService,
+    private modalService: NgbModal,
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
     private route: ActivatedRoute,
@@ -242,6 +251,16 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     return true;
   }
 
+  canAddPayments(): boolean {
+    if (this.companySaleId) return true;
+
+    if (this.isOnlyBuyer) {
+      return this.companySaleModel.status !== CompanySaleStatusEnum.COMPLETED;
+    }
+
+    return false;
+  }
+
   searchPurchase(): void {
     this.searchSubmitted = true;
 
@@ -311,6 +330,45 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
 
     this.companySaleModel.saleDate =
       this.dateUtils.convertLocalDateToUTC(event);
+  }
+
+  async openPaymentsModal(): Promise<any> {
+    if (this.modalRef) {
+      // console.warn(
+      //   '⚠️ Modal is already open. Ignoring duplicate open request.'
+      // );
+      return;
+    }
+
+    if (!this.companySaleId) {
+      // console.error('❌ purchaseId is missing. Modal cannot be opened.');
+      return;
+    }
+
+    try {
+      this.modalRef = this.modalService.open(
+        CompanySalePaymentListingComponent,
+        {
+          size: 'lg',
+          centered: true,
+          backdrop: 'static',
+          keyboard: false,
+          windowClass: 'payment-listing-modal',
+        }
+      );
+
+      // ✅ Set input safely
+      this.modalRef.componentInstance.companySaleId = this.companySaleId;
+
+      const result = await this.modalRef.result;
+      return result;
+    } catch (error) {
+      // console.warn('⚠️ Modal dismissed or error occurred:', error);
+      return null;
+    } finally {
+      // ✅ Always clear the modal ref
+      this.modalRef = null;
+    }
   }
 
   formatDecimal(controlName: string) {

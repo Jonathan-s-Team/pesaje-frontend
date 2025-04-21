@@ -11,7 +11,11 @@ import { Subscription } from 'rxjs';
 
 import { Router } from '@angular/router';
 import { SaleService } from '../../services/sale.service';
-import { ISaleModel, SaleTypeEnum } from '../../interfaces/sale.interface';
+import {
+  CompanySaleStatusEnum,
+  ISaleModel,
+  SaleTypeEnum,
+} from '../../interfaces/sale.interface';
 import { AlertService } from 'src/app/utils/alert.service';
 
 @Component({
@@ -45,6 +49,22 @@ export class RecentSalesComponent implements OnInit {
         data: 'controlNumber',
         render: function (data) {
           return data ? data : '-';
+        },
+      },
+      {
+        title: 'Estado',
+        data: 'status',
+        render: function (data: CompanySaleStatusEnum) {
+          switch (data) {
+            case CompanySaleStatusEnum.DRAFT:
+              return `<span class="badge bg-secondary">Sin pagos</span>`;
+            case CompanySaleStatusEnum.IN_PROGRESS:
+              return `<span class="badge bg-warning text-dark">En progreso</span>`;
+            case CompanySaleStatusEnum.COMPLETED:
+              return `<span class="badge bg-success">Completado</span>`;
+            default:
+              return `<span class="badge bg-light text-dark">Desconocido</span>`;
+          }
         },
       },
       {

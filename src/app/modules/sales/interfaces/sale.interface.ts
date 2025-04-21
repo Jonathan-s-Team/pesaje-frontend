@@ -36,6 +36,7 @@ export interface ICreateUpdateCompanySaleModel {
   poundsGrandTotal: number;
   grandTotal: number;
   percentageTotal: number;
+  status: CompanySaleStatusEnum;
   items: ICompanySaleItemModel[];
 }
 
@@ -60,10 +61,17 @@ export interface ICompanySaleModel {
   poundsGrandTotal: number;
   grandTotal: number;
   percentageTotal: number;
+  status: CompanySaleStatusEnum;
   items: ICompanySaleItemModel[];
 }
 
 export enum SaleTypeEnum {
   COMPANY = 'COMPANY',
   LOCAL = 'LOCAL',
+}
+
+export enum CompanySaleStatusEnum {
+  DRAFT = 'DRAFT',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
 }

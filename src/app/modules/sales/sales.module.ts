@@ -8,12 +8,14 @@ import { SalesRoutingModule } from './sales-routing.module';
 import { NewCompanySaleComponent } from './pages/new-company-sale/new-company-sale.component';
 import { CompanySaleItemsListingComponent } from './widgets/company-sale-items-listing/company-sale-items-listing.component';
 import { RecentSalesComponent } from './pages/recent-sales/recent-sales.component';
+import { CompanySalePaymentListingComponent } from './widgets/company-sale-payment-listing/company-sale-payment-listing.component';
 
 @NgModule({
   declarations: [
     NewCompanySaleComponent,
     RecentSalesComponent,
     CompanySaleItemsListingComponent,
+    CompanySalePaymentListingComponent,
   ],
   imports: [
     CommonModule,

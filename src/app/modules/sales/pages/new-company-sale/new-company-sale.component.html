@@ -333,6 +333,11 @@
     <button type="button" class="btn btn-primary" [disabled]="canSaveCompanySale()" (click)="confirmSave()">
       Guardar
     </button>
+
+    <!-- Payments List Button -->
+    <button *ngIf="canAddPayments()" type="button" (click)="openPaymentsModal()" class="btn btn-secondary ms-3">
+      Pagos
+    </button>
   </div>
 </div>
 <!-- end::Fourth Section: Company Sale Items -->

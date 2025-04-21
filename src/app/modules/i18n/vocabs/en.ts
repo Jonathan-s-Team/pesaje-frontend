@@ -119,6 +119,8 @@ export const locale = {
       MESSAGE: 'An unexpected error occurred. Please try again later.',
       PURCHASE_TOTAL_AGREED_EXCEEDED:
         'Total payments cannot exceed the total agreed amount of ${{total}}',
+      COMPANY_SALE_TOTAL_AGREED_EXCEEDED:
+        'Total payments cannot exceed the total amount of ${{total}}',
     },
     INFO: {
       TITLE: 'Information',

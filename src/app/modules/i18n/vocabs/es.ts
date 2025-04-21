@@ -120,6 +120,8 @@ export const locale = {
         'Ocurrió un error inesperado. Por favor, intenta nuevamente más tarde.',
       PURCHASE_TOTAL_AGREED_EXCEEDED:
         'Los pagos no pueden exceder el monto total acordado de ${{total}}',
+      COMPANY_SALE_TOTAL_AGREED_EXCEEDED:
+        'Los pagos no pueden exceder el monto total de ${{total}}',
     },
     INFO: {
       TITLE: 'Información',
