@@ -5,16 +5,26 @@
       <span class="card-label fw-bolder fs-3 mb-1">Buscar por número de control</span>
     </h4>
   </div>
-  <div class="card-body py-3">
-    <div class="col-md-6 d-flex align-items-center">
-      <label for="controlNumber" class="fw-semibold fs-6 mb-2 me-3 mb-0" style="min-width: 160px;">
-        Número de control
-      </label>
-      <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end me-3"
-        [(ngModel)]="controlNumber" />
-      <button class="btn btn-primary btn-sm px-4" (click)="loadReportInfo()">Buscar</button>
 
+  <div class="card-body py-3">
+    <div class="d-flex flex-column">
+      <div class="d-flex align-items-center gap-4">
+        <!-- Control Number Input -->
+        <input type="text" id="controlNumber" name="controlNumber" class="form-control form-control-sm text-end"
+          placeholder="CO-0" style="max-width: 180px" [(ngModel)]="controlNumber" />
+
+        <!-- Search Button -->
+        <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2" (click)="loadReportInfo()">
+          <i class="bi bi-search"></i> Buscar
+        </button>
+      </div>
+
+      <!-- Required Message -->
+      <div *ngIf="searchSubmitted && !controlNumber" class="text-danger mt-1 ms-1 small">
+        El número de control es obligatorio.
+      </div>
     </div>
+
   </div>
 
 </div>
@@ -30,136 +40,161 @@
   <!-- Card Body -->
   <div class="card-body pt-0 fs-6">
     <!-- Purchase Info -->
-    <table class="table table-bordered align-middle mb-6">
-      <tbody>
-        <tr>
-          <td><strong>Nombre de cliente</strong></td>
-          <td>{{ economicReportModel.purchase.clientName }}</td>
-          <td><strong>Número de control</strong></td>
-          <td>{{ economicReportModel.purchase.controlNumber }}</td>
-          <td><strong>Fecha de compra</strong></td>
-          <td>{{ economicReportModel.purchase.purchaseDate | date: 'dd/MM/yyyy' }}</td>
-        </tr>
-        <tr>
-          <td><strong>Ubicación de piscina</strong></td>
-          <td>{{ economicReportModel.purchase.shrimpFarmLocation }}</td>
-          <td><strong>Nombre de Compañía</strong></td>
-          <td>{{ economicReportModel.purchase.companyName }}</td>
-          <td><strong>Gramo promedio 1</strong></td>
-          <td>{{ economicReportModel.purchase.averageGram }}</td>
-        </tr>
-        <tr>
-          <td><strong>Nombre de piscina</strong></td>
-          <td>{{ economicReportModel.purchase.shrimpFarm }}</td>
-          <td><strong>Periodo</strong></td>
-          <td>{{ economicReportModel.purchase.period }}</td>
-          <td><strong>Número de factura</strong></td>
-          <td>{{ economicReportModel.purchase.invoiceNumber }}</td>
-        </tr>
-        <tr>
-          <td><strong>Comprador responsable</strong></td>
-          <td>{{ economicReportModel.purchase.responsibleBuyer }}</td>
-          <td><strong>Nombre de broker</strong></td>
-          <td>{{ economicReportModel.purchase.brokerName }}</td>
-          <td><strong>Estado</strong></td>
-          <td>{{ purchaseStatus }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle mb-6">
+        <tbody>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap" style="width: 160px;">Nombre de cliente</td>
+            <td class="text-nowrap" style="width: 180px;">{{ economicReportModel.purchase.clientName }}</td>
+            <td class="bg-light fw-bold text-nowrap" style="width: 160px;">Número de control</td>
+            <td class="text-nowrap" style="width: 180px;">{{ economicReportModel.purchase.controlNumber }}</td>
+            <td class="bg-light fw-bold text-nowrap" style="width: 160px;">Fecha de compra</td>
+            <td class="text-nowrap" style="width: 180px;">{{ economicReportModel.purchase.purchaseDate | date:
+              'dd/MM/yyyy' }}</td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Ubicación de piscina</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.shrimpFarmLocation }}</td>
+            <td class="bg-light fw-bold text-nowrap">Nombre de Compañía</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.companyName }}</td>
+            <td class="bg-light fw-bold text-nowrap">Gramo promedio 1</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.averageGram | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Nombre de piscina</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.shrimpFarm }}</td>
+            <td class="bg-light fw-bold text-nowrap">Periodo</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.period }}</td>
+            <td class="bg-light fw-bold text-nowrap">Número de factura</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.invoiceNumber }}</td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Comprador responsable</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.responsibleBuyer }}</td>
+            <td class="bg-light fw-bold text-nowrap">Nombre de broker</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.brokerName }}</td>
+            <td class="bg-light fw-bold text-nowrap">Estado</td>
+            <td class="text-nowrap">{{ purchaseStatus }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- VENTAS -->
     <h5 class="fw-bold border-bottom border-gray-400 pb-2">VENTAS</h5>
-    <table class="table table-bordered align-middle mb-6">
-      <tbody>
-        <tr>
-          <td><strong>Fecha de venta</strong></td>
-          <td>{{ economicReportModel.sale.saleDate | date: 'dd/MM/yyyy' }}</td>
-          <td><strong>Libras netas recibidas</strong></td>
-          <td>{{ economicReportModel.sale.netPoundsReceived }}</td>
-          <td><strong>Total a recibir ($)</strong></td>
-          <td>{{ economicReportModel.sale.totalToReceive | number:'1.2-2' }}</td>
-        </tr>
-        <tr>
-          <td><strong>Fecha de recepción</strong></td>
-          <td>{{ economicReportModel.sale.receptionDate | date: 'dd/MM/yyyy' }}</td>
-          <td><strong>Libras recibidas cabeza</strong></td>
-          <td>{{ economicReportModel.sale.wholePoundsReceived }}</td>
-        </tr>
-        <tr>
-          <td><strong>Lote</strong></td>
-          <td>{{ economicReportModel.sale.batch }}</td>
-          <td><strong>Libras basura</strong></td>
-          <td>{{ economicReportModel.sale.trashPounds }}</td>
-        </tr>
-        <tr>
-          <td><strong>Documento</strong></td>
-          <td>{{ economicReportModel.sale.document }}</td>
-          <td><strong>Rendimiento</strong></td>
-          <td>{{ economicReportModel.sale.performance }} %</td>
-        </tr>
-        <tr>
-          <td><strong>Gr. Promedio Lote</strong></td>
-          <td>{{ economicReportModel.sale.averageBatchGrams }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle mb-6">
+        <tbody>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Fecha de venta</td>
+            <td class="text-nowrap">{{ economicReportModel.sale.saleDate | date: 'dd/MM/yyyy' }}</td>
+            <td class="bg-light fw-bold text-nowrap">Libras netas recibidas</td>
+            <td class="text-nowrap">{{ economicReportModel.sale.netPoundsReceived | number:'1.2-2' }}</td>
+            <td class="bg-light fw-bold text-nowrap">Total a recibir ($)</td>
+            <td class="text-nowrap">{{ economicReportModel.sale.totalToReceive | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Fecha de recepción</td>
+            <td class="text-nowrap">{{ economicReportModel.sale.receptionDate | date: 'dd/MM/yyyy' }}</td>
+            <td class="bg-light fw-bold text-nowrap">Libras recibidas cabeza</td>
+            <td class="text-nowrap">{{ economicReportModel.sale.wholePoundsReceived | number:'1.2-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Lote</td>
+            <td class="text-nowrap">{{ economicReportModel.sale.batch }}</td>
+            <td class="bg-light fw-bold text-nowrap">Libras basura</td>
+            <td class="text-nowrap">{{ economicReportModel.sale.trashPounds | number:'1.2-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Documento</td>
+            <td class="text-nowrap">{{ economicReportModel.sale.document }}</td>
+            <td class="bg-light fw-bold text-nowrap">Rendimiento</td>
+            <td class="text-nowrap">{{ economicReportModel.sale.performance | number:'1.2-2' }}%</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Gr. Promedio Lote</td>
+            <td class="text-nowrap">{{ economicReportModel.sale.averageBatchGrams | number:'1.2-2' }}</td>
+            <td colspan="4"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- COMPRAS -->
     <h5 class="fw-bold border-bottom border-gray-400 pb-2">COMPRAS</h5>
-    <table class="table table-bordered align-middle mb-6">
-      <tbody>
-        <tr>
-          <td><strong>Gramos promedio 1</strong></td>
-          <td>{{ economicReportModel.purchase.averageGram }}</td>
-          <td><strong>Gramos promedio 2</strong></td>
-          <td>{{ economicReportModel.purchase.averageGrams2 }}</td>
-          <td><strong>Total acordado ($)</strong></td>
-          <td>{{ economicReportModel.purchase.totalAgreed | number:'1.2-2' }}</td>
-        </tr>
-        <tr>
-          <td><strong>Precio 1</strong></td>
-          <td>{{ economicReportModel.purchase.price }}</td>
-          <td><strong>Precio 2</strong></td>
-          <td>{{ economicReportModel.purchase.price2 }}</td>
-        </tr>
-        <tr>
-          <td><strong>Libras compradas 1</strong></td>
-          <td>{{ economicReportModel.purchase.pounds }}</td>
-          <td><strong>Libras compradas 2</strong></td>
-          <td>{{ economicReportModel.purchase.pounds2 }}</td>
-        </tr>
-        <tr>
-          <td><strong>Total libras compradas</strong></td>
-          <td>{{ economicReportModel.purchase.totalPoundsPurchased }}</td>
-          <td><strong>Total a pagar</strong></td>
-          <td>{{ economicReportModel.purchase.totalToPay | number:'1.2-2' }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle mb-6">
+        <tbody>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Gramos promedio 1</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.averageGram | number:'1.2-2' }}</td>
+            <td class="bg-light fw-bold text-nowrap">Gramos promedio 2</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.averageGrams2 | number:'1.2-2' }}</td>
+            <td class="bg-light fw-bold text-nowrap">Total acordado ($)</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.totalAgreed | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Precio 1</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.price | number:'1.2-2' }}</td>
+            <td class="bg-light fw-bold text-nowrap">Precio 2</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.price2 | number:'1.2-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Libras compradas 1</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.pounds | number:'1.2-2' }}</td>
+            <td class="bg-light fw-bold text-nowrap">Libras compradas 2</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.pounds2 | number:'1.2-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Total libras compradas</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.totalPoundsPurchased | number:'1.2-2' }}</td>
+            <td class="bg-light fw-bold text-nowrap">Total a pagar</td>
+            <td class="text-nowrap">{{ economicReportModel.purchase.totalToPay | number:'1.2-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- LOGISTICA -->
     <h5 class="fw-bold border-bottom border-gray-400 pb-2">LOGÍSTICA</h5>
-    <table class="table table-bordered align-middle mb-6">
-      <tbody>
-        <tr>
-          <td><strong>Tipo</strong></td>
-          <td>{{ logisticsType }}</td>
-          <td><strong>Gastos personal</strong></td>
-          <td>{{ economicReportModel.logistics.personnelExpenses | number:'1.2-2' }}</td>
-          <td><strong>Total a pagar ($)</strong></td>
-          <td>{{ economicReportModel.logistics.totalToPay | number:'1.2-2' }}</td>
-        </tr>
-        <tr>
-          <td><strong>Fecha de logística</strong></td>
-          <td>{{ economicReportModel.logistics.logisticsDate | date: 'dd/MM/yyyy'}}</td>
-          <td><strong>Gasto productos e insumos</strong></td>
-          <td>{{ economicReportModel.logistics.productAndSupplyExpenses | number:'1.2-2' }}</td>
-          <td><strong>Precio por Libra ($/lb)</strong></td>
-          <td>{{ economicReportModel.logistics.totalToPay / economicReportModel.purchase.pounds | number:'1.2-2' }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle mb-6">
+        <tbody>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Tipo</td>
+            <td class="text-nowrap">{{ logisticsType }}</td>
+            <td class="bg-light fw-bold text-nowrap">Gastos personal</td>
+            <td class="text-nowrap">{{ economicReportModel.logistics.personnelExpenses | number:'1.2-2' }}</td>
+            <td class="bg-light fw-bold text-nowrap">Total a pagar ($)</td>
+            <td class="text-nowrap">{{ economicReportModel.logistics.totalToPay | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Fecha de logística</td>
+            <td class="text-nowrap">{{ economicReportModel.logistics.logisticsDate | date: 'dd/MM/yyyy' }}</td>
+            <td class="bg-light fw-bold text-nowrap">Gasto productos e insumos</td>
+            <td class="text-nowrap">{{ economicReportModel.logistics.productAndSupplyExpenses | number:'1.2-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <td class="bg-light fw-bold text-nowrap">Precio por Libra ($/lb)</td>
+            <td class="text-nowrap">
+              {{
+              economicReportModel.logistics.totalToPay /
+              economicReportModel.purchase.pounds
+              | number:'1.2-2'
+              }}
+            </td>
+            <td colspan="4"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- UTILIDAD BRUTA -->
     <h5 class="fw-bold text-end mt-4">
@@ -170,5 +205,6 @@
     </h5>
   </div>
 </div>
+
 
 <!-- end::Second Section: Econocmic Report -->

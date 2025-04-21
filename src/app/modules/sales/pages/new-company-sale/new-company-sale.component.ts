@@ -52,6 +52,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   isOnlyBuyer = false;
   hasRouteId = false;
   searchSubmitted = false;
+  isAddingPayment = false;
   controlNumber: string;
 
   companySaleModel: ICreateUpdateCompanySaleModel;
@@ -334,14 +335,10 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
 
   async openPaymentsModal(): Promise<any> {
     if (this.modalRef) {
-      // console.warn(
-      //   '⚠️ Modal is already open. Ignoring duplicate open request.'
-      // );
       return;
     }
 
     if (!this.companySaleId) {
-      // console.error('❌ purchaseId is missing. Modal cannot be opened.');
       return;
     }
 
@@ -363,10 +360,8 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
       const result = await this.modalRef.result;
       return result;
     } catch (error) {
-      // console.warn('⚠️ Modal dismissed or error occurred:', error);
       return null;
     } finally {
-      // ✅ Always clear the modal ref
       this.modalRef = null;
     }
   }

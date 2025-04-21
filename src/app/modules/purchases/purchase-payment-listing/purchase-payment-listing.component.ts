@@ -275,6 +275,13 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
           this.purchasePayments = this.purchasePayments.filter(
             (item) => item.id !== id
           );
+
+          this.datatableConfig = {
+            ...this.datatableConfig,
+            data: [...this.purchasePayments],
+          };
+
+          this.cdr.detectChanges();
           this.reloadEvent.emit(true);
         },
         error: () => {

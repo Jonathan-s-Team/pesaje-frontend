@@ -38,7 +38,7 @@ export class ReportService {
         `${API_REPORT_URL}/economic/by-params?${params.toString()}`
       )
       .pipe(
-        map((response) => response.data || []),
+        map((response) => response.data),
         finalize(() => this.isLoadingSubject.next(false))
       );
   }

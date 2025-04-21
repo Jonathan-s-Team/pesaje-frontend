@@ -89,7 +89,7 @@ export class RecentPurchasesComponent implements OnInit {
         render: function (data) {
           if (!data && data !== 0) return '-';
 
-          const formatted = new Intl.NumberFormat('es-ES', {
+          const formatted = new Intl.NumberFormat('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           }).format(data);
@@ -103,7 +103,7 @@ export class RecentPurchasesComponent implements OnInit {
         render: function (data) {
           if (!data && data !== 0) return '-';
 
-          const formatted = new Intl.NumberFormat('es-ES', {
+          const formatted = new Intl.NumberFormat('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           }).format(data);
@@ -117,7 +117,7 @@ export class RecentPurchasesComponent implements OnInit {
         render: function (data) {
           if (!data || data === 0) return '-';
 
-          const formatted = new Intl.NumberFormat('es-ES', {
+          const formatted = new Intl.NumberFormat('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           }).format(data);

@@ -13,6 +13,7 @@ import {
 } from 'src/app/modules/purchases/interfaces/purchase.interface';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { LogisticsTypeEnum } from 'src/app/modules/logistics/interfaces/logistics.interface';
+import { AlertService } from 'src/app/utils/alert.service';
 
 @Component({
   selector: 'app-economic-report',
@@ -22,6 +23,7 @@ import { LogisticsTypeEnum } from 'src/app/modules/logistics/interfaces/logistic
 export class EconomicReportComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.REPORTS.ECONOMIC;
 
+  searchSubmitted = false;
   controlNumber: string;
 
   economicReportModel: IEconomicReportModel;
@@ -35,16 +37,31 @@ export class EconomicReportComponent implements OnInit, OnDestroy {
     public activeModal: NgbActiveModal,
     private reportService: ReportService,
     private dateUtils: DateUtilsService,
+    private alertService: AlertService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {}
 
   loadReportInfo() {
+    this.searchSubmitted = true;
+
+    if (!this.controlNumber?.trim()) {
+      return; // don't search if input is empty
+    }
+
     const sub = this.reportService
       .getEconomicReportByParams(false, null, null, null, this.controlNumber)
       .subscribe({
         next: (report) => {
+          if (!report) {
+            this.alertService.showTranslatedAlert({
+              alertType: 'info',
+              messageKey: 'MESSAGES.PURCHASE_NOT_FOUND',
+            });
+            return;
+          }
+
           this.economicReportModel = report;
 
           this.economicReportModel.purchase.purchaseDate =

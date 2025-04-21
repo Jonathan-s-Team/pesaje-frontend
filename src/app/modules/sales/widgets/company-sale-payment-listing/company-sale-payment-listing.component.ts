@@ -10,7 +10,11 @@ import {
 import { Config } from 'datatables.net';
 import { NgForm } from '@angular/forms';
 import { distinctUntilChanged, Subscription } from 'rxjs';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from 'src/app/utils/alert.service';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
@@ -30,7 +34,10 @@ import { ICreateUpdateCompanySalePaymentModel } from '../../../shared/interfaces
 export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.COMPANY_SALE_FORM;
 
+  private modalRef: NgbModalRef | null = null;
+
   @Input() companySaleId!: string;
+  @ViewChild('formModal') formModalTemplate!: any;
 
   private unsubscribe: Subscription[] = [];
 
@@ -99,6 +106,7 @@ export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
     public activeModal: NgbActiveModal,
     private alertService: AlertService,
     private dateUtils: DateUtilsService,
+    private modalService: NgbModal,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -234,7 +242,6 @@ export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
             this.loadCompanySalePaymentsById(this.companySaleId);
 
             this.paymentForm.resetForm();
-            this.create();
           },
           error: (error) => {
             const rawMessage = error?.error?.message ?? '';
@@ -262,10 +269,12 @@ export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
     }
   }
 
-  create() {
+  async create() {
     this.companySalePaymentModel = {} as ICompanySalePaymentModel;
     this.companySalePaymentModel.companySale = this.companySaleId;
     this.companySalePaymentModel.paymentMethod = {} as IPaymentMethodModel;
+
+    await this.openPaymentModal();
   }
 
   delete(id: string): void {
@@ -276,6 +285,13 @@ export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
           this.companySalePayments = this.companySalePayments.filter(
             (item) => item.id !== id
           );
+
+          this.datatableConfig = {
+            ...this.datatableConfig,
+            data: [...this.companySalePayments],
+          };
+
+          this.cdr.detectChanges();
           this.reloadEvent.emit(true);
         },
         error: () => {
@@ -285,7 +301,7 @@ export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
     this.unsubscribe.push(deleteSub);
   }
 
-  edit(id: string): void {
+  async edit(id: string) {
     const foundItem = this.companySalePayments.find((item) => item.id === id);
     this.companySalePaymentModel =
       foundItem ?? ({} as ICompanySalePaymentModel);
@@ -294,6 +310,28 @@ export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
       this.dateUtils.formatISOToDateInput(
         this.companySalePaymentModel.paymentDate
       );
+
+    await this.openPaymentModal();
+  }
+
+  async openPaymentModal(): Promise<any> {
+    if (this.modalRef) return;
+
+    try {
+      this.modalRef = this.modalService.open(this.formModalTemplate, {
+        size: 'md',
+        centered: true,
+        backdrop: true,
+        keyboard: true,
+      });
+
+      const result = await this.modalRef.result;
+      return result;
+    } catch (error) {
+      return null;
+    } finally {
+      this.modalRef = null;
+    }
   }
 
   formatDecimal(controlName: string) {

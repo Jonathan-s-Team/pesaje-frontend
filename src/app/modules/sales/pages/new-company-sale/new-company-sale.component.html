@@ -325,8 +325,9 @@
 
 <!-- Fourth Section: Company Sale Items -->
 <div>
-  <app-company-sale-items-listing [periodId]="purchaseModel.period.id" [companySaleItems]="companySaleItems"
-    [canAddItems]="!!purchaseModel.period.id" (companySaleItemsChange)="handleCompanySaleItemsChange($event)" />
+  <app-company-sale-items-listing *ngIf="!isAddingPayment" [periodId]="purchaseModel.period.id"
+    [companySaleItems]="companySaleItems" [canAddItems]="!!purchaseModel.period.id"
+    (companySaleItemsChange)="handleCompanySaleItemsChange($event)" />
 
   <!-- Submit Button inside card footer -->
   <div class="card-footer d-flex justify-content-end py-6 px-9">

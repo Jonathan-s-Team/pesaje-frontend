@@ -367,8 +367,6 @@ export class CompanySaleItemsListingComponent implements OnInit {
           .map((size) => size.size);
       }
     }
-
-    console.log(this.companySaleItem);
   }
 
   calculateTotals(): void {

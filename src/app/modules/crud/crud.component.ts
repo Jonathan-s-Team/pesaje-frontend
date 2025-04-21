@@ -37,7 +37,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() permissionRoute: string = '/';
 
-  @Input() existsOutModalRef: boolean = false;
+  @Input() isExternalModal: boolean = false;
 
   // Reload emitter inside datatable
   @Input() reload: EventEmitter<boolean>;
@@ -114,7 +114,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.reload) {
       this.reload.subscribe((data) => {
-        if (!this.existsOutModalRef) this.modalService.dismissAll();
+        if (!this.isExternalModal) this.modalService.dismissAll();
 
         this.datatableElement.dtInstance?.then((dtInstance: Api) => {
           if (this.datatableConfig.serverSide) {
@@ -137,8 +137,13 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
       sortable: false,
       title: 'Acciones',
       render: (data: any, type: any, full: any) => {
-        const editButton = `
+        const editButton = !this.isExternalModal
+          ? `
           <button class="btn btn-icon btn-active-light-primary w-30px h-30px me-3" data-action="edit" data-id="${full.id}">
+            <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
+          </button>`
+          : `
+          <button class="btn btn-icon btn-active-light-primary w-30px h-30px me-3" data-action="edit-out" data-id="${full.id}">
             <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
           </button>`;
 
@@ -197,10 +202,16 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
           case 'edit':
             this.editEvent.emit(this.idInAction);
-            this.modalRef = this.modalService.open(
-              this.modal,
-              this.modalConfig
-            );
+            if (!this.isExternalModal) {
+              this.modalRef = this.modalService.open(
+                this.modal,
+                this.modalConfig
+              );
+            }
+            break;
+
+          case 'edit-out':
+            this.editEvent.emit(this.idInAction);
             break;
 
           case 'delete':

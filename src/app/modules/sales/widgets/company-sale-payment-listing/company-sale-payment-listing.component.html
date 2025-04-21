@@ -26,7 +26,7 @@
           <!--begin::Toolbar-->
           <div class="d-flex justify-content-end">
             <!--begin::Add payment-->
-            <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary" data-action="create">
+            <button *appCanCreate="PERMISSION_ROUTE" type="button" class="btn btn-primary" (click)="create()">
               Agregar Pago
             </button>
             <!--end::Add payment-->
@@ -38,8 +38,8 @@
 
       <div class="card-body pt-0 w-100">
         <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="PERMISSION_ROUTE"
-          (deleteEvent)="delete($event.toString())" (editEvent)="edit($event.toString())" (createEvent)="create()"
-          [reload]="reloadEvent" [modal]="formModal" [existsOutModalRef]="true"></app-crud>
+          (deleteEvent)="delete($event.toString())" (editEvent)="edit($event.toString())" [reload]="reloadEvent"
+          [modal]="formModal" [isExternalModal]="true"></app-crud>
       </div>
     </div>
     <!--end::Payment information form-->

@@ -39,7 +39,7 @@
       <div class="card-body pt-0 w-100">
         <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="PERMISSION_ROUTE"
           (deleteEvent)="delete($event.toString())" (editEvent)="edit($event.toString())" (createEvent)="create()"
-          [reload]="reloadEvent" [modal]="formModal" [existsOutModalRef]="true"></app-crud>
+          [reload]="reloadEvent" [modal]="formModal" [isExternalModal]="true"></app-crud>
       </div>
     </div>
     <!--end::Payment information form-->

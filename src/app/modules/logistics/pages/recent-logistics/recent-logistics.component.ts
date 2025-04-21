@@ -66,7 +66,7 @@ export class RecentLogisticsComponent implements OnInit {
         render: function (data) {
           if (!data && data !== 0) return '-';
 
-          const formatted = new Intl.NumberFormat('es-ES', {
+          const formatted = new Intl.NumberFormat('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           }).format(data);
@@ -80,7 +80,7 @@ export class RecentLogisticsComponent implements OnInit {
         render: function (data) {
           if (!data && data !== 0) return '-';
 
-          const formatted = new Intl.NumberFormat('es-ES', {
+          const formatted = new Intl.NumberFormat('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           }).format(data);
@@ -94,7 +94,7 @@ export class RecentLogisticsComponent implements OnInit {
         render: function (data, type, full) {
           if (!data && data !== 0) return '-';
 
-          const formatted = new Intl.NumberFormat('es-ES', {
+          const formatted = new Intl.NumberFormat('en-US', {
             minimumFractionDigits: 4,
             maximumFractionDigits: 4,
           }).format(data / full.totalPounds);
