@@ -9,6 +9,7 @@ import { NewCompanySaleComponent } from './pages/new-company-sale/new-company-sa
 import { CompanySaleItemsListingComponent } from './widgets/company-sale-items-listing/company-sale-items-listing.component';
 import { RecentSalesComponent } from './pages/recent-sales/recent-sales.component';
 import { CompanySalePaymentListingComponent } from './widgets/company-sale-payment-listing/company-sale-payment-listing.component';
+import { NewLocalSaleComponent } from './pages/new-local-sale/new-local-sale.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { CompanySalePaymentListingComponent } from './widgets/company-sale-payme
     RecentSalesComponent,
     CompanySaleItemsListingComponent,
     CompanySalePaymentListingComponent,
+    NewLocalSaleComponent,
   ],
   imports: [
     CommonModule,

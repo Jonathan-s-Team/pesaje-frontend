@@ -1,6 +1,8 @@
+import { SaleStyleEnum } from './sale.interface';
+
 export interface ICompanySaleItemModel {
   id?: string;
-  style: CompanySaleStyleEnum;
+  style: SaleStyleEnum;
   class: string;
   size: string;
   pounds: number;
@@ -8,9 +10,4 @@ export interface ICompanySaleItemModel {
   referencePrice?: number;
   total: number;
   percentage: number;
-}
-
-export enum CompanySaleStyleEnum {
-  WHOLE = 'WHOLE',
-  TAIL = 'TAIL',
 }

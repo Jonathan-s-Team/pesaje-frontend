@@ -87,6 +87,7 @@ export interface IReducedDetailedPurchaseModel extends IBasePurchaseModel {
   client: IReducedUserModel;
   shrimpFarm: IReducedShrimpFarmModel;
   totalPayed?: number;
+  totalPounds: number;
   id: string;
 }
 

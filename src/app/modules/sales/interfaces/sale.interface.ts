@@ -2,6 +2,7 @@ import { IReducedDetailedPurchaseModel } from '../../purchases/interfaces/purcha
 import { IReducedUserModel } from '../../settings/interfaces/user.interface';
 import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
 import { ICompanySaleItemModel } from './company-sale-item.interface';
+import { ILocalSaleDetailModel } from './local-sale-detail.interface';
 
 export interface ISaleModel {
   id?: string;
@@ -65,9 +66,41 @@ export interface ICompanySaleModel {
   items: ICompanySaleItemModel[];
 }
 
+export interface ICreateUpdateLocalSaleModel {
+  id?: string;
+  purchase: string;
+  saleDate: string;
+  wholeTotalPounds: number;
+  tailTotalPounds: number;
+  wholeRejectedPounds: number;
+  trashPounds: number;
+  totalProcessedPounds: number;
+  seller: string;
+  details: ILocalSaleDetailModel[];
+}
+
+export interface ILocalSaleModel {
+  id: string;
+  purchase: IReducedDetailedPurchaseModel;
+  sale: string;
+  saleDate: string;
+  wholeTotalPounds: number;
+  tailTotalPounds: number;
+  wholeRejectedPounds: number;
+  trashPounds: number;
+  totalProcessedPounds: number;
+  seller: string;
+  details: ILocalSaleDetailModel[];
+}
+
 export enum SaleTypeEnum {
   COMPANY = 'COMPANY',
   LOCAL = 'LOCAL',
+}
+
+export enum SaleStyleEnum {
+  WHOLE = 'WHOLE',
+  TAIL = 'TAIL',
 }
 
 export enum CompanySaleStatusEnum {

@@ -2,6 +2,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { RecentSalesComponent } from './pages/recent-sales/recent-sales.component';
 import { NewCompanySaleComponent } from './pages/new-company-sale/new-company-sale.component';
+import { NewLocalSaleComponent } from './pages/new-local-sale/new-local-sale.component';
 
 const routes: Routes = [
   {
@@ -13,8 +14,12 @@ const routes: Routes = [
     component: NewCompanySaleComponent,
   },
   {
+    path: 'local',
+    component: NewLocalSaleComponent,
+  },
+  {
     path: 'local/:id',
-    component: NewCompanySaleComponent,
+    component: NewLocalSaleComponent,
   },
   {
     path: 'list',

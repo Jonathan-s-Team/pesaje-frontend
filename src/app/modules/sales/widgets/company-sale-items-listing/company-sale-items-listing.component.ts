@@ -13,10 +13,7 @@ import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { ILogisticsItemModel } from 'src/app/modules/logistics/interfaces/logistics-item.interface';
 import { Config } from 'datatables.net';
-import {
-  CompanySaleStyleEnum,
-  ICompanySaleItemModel,
-} from '../../interfaces/company-sale-item.interface';
+import { ICompanySaleItemModel } from '../../interfaces/company-sale-item.interface';
 import { Subscription, map } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { SizeService } from 'src/app/modules/shared/services/size.service';
@@ -26,6 +23,7 @@ import {
 } from 'src/app/modules/shared/interfaces/size.interface';
 import { PeriodService } from 'src/app/modules/shared/services/period.service';
 import { IReadPeriodModel } from 'src/app/modules/shared/interfaces/period.interface';
+import { SaleStyleEnum } from '../../interfaces/sale.interface';
 
 @Component({
   selector: 'app-company-sale-items-listing',
@@ -81,8 +79,8 @@ export class CompanySaleItemsListingComponent implements OnInit {
 
   companySaleItem: ICompanySaleItemModel = {} as ICompanySaleItemModel;
 
-  companySaleStyles: CompanySaleStyleEnum[];
-  companySaleStylesLabels: { [key in CompanySaleStyleEnum]?: string } = {};
+  companySaleStyles: SaleStyleEnum[];
+  companySaleStylesLabels: { [key in SaleStyleEnum]?: string } = {};
 
   wholeSizes: IReadSizeModel[];
   tailSizes: IReadSizeModel[];
@@ -102,7 +100,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
         render: function (data) {
           if (!data && data !== 0) return '-';
 
-          if (data === CompanySaleStyleEnum.WHOLE) return 'Entero';
+          if (data === SaleStyleEnum.WHOLE) return 'Entero';
 
           return 'Cola';
         },
@@ -113,7 +111,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
         render: function (data, type, full) {
           if (!data && data !== 0) return '-';
 
-          if (full.style === CompanySaleStyleEnum.WHOLE) {
+          if (full.style === SaleStyleEnum.WHOLE) {
             return data;
           }
 
@@ -222,10 +220,10 @@ export class CompanySaleItemsListingComponent implements OnInit {
   ngOnInit(): void {
     this.loadSizes();
     this.companySaleStylesLabels = {
-      [CompanySaleStyleEnum.WHOLE]: 'Entero',
-      [CompanySaleStyleEnum.TAIL]: 'Cola',
+      [SaleStyleEnum.WHOLE]: 'Entero',
+      [SaleStyleEnum.TAIL]: 'Cola',
     };
-    this.companySaleStyles = Object.values(CompanySaleStyleEnum);
+    this.companySaleStyles = Object.values(SaleStyleEnum);
   }
 
   loadSizes(): void {
@@ -357,7 +355,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
     const foundItem = this.companySaleItems.find((item) => item.id === id);
     this.companySaleItem = foundItem ?? ({} as ICompanySaleItemModel);
 
-    this.isWhole = this.companySaleItem.style === CompanySaleStyleEnum.WHOLE;
+    this.isWhole = this.companySaleItem.style === SaleStyleEnum.WHOLE;
     if (this.isWhole) {
       this.sizeList = this.wholeSizes.map((size) => size.size);
     } else {
@@ -409,7 +407,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
     this.companySaleItem.size = '';
     this.companySaleItem.referencePrice = undefined;
 
-    this.isWhole = style === CompanySaleStyleEnum.WHOLE;
+    this.isWhole = style === SaleStyleEnum.WHOLE;
 
     if (this.isWhole) {
       this.sizeList = this.wholeSizes.map((size) => size.size);
@@ -432,7 +430,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
   }
 
   onSizeChange(size: string): void {
-    if (this.companySaleItem.style === CompanySaleStyleEnum.WHOLE) {
+    if (this.companySaleItem.style === SaleStyleEnum.WHOLE) {
       this.companySaleItem.referencePrice = this.periodModel.sizePrices?.filter(
         (x) => x.size.size === size && x.size.type === SizeTypeEnum.WHOLE
       )[0].price;
