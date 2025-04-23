@@ -75,6 +75,7 @@ export interface ICreateUpdateLocalSaleModel {
   wholeRejectedPounds: number;
   trashPounds: number;
   totalProcessedPounds: number;
+  grandTotal: number;
   seller: string;
   details: ILocalSaleDetailModel[];
 }
@@ -89,6 +90,7 @@ export interface ILocalSaleModel {
   wholeRejectedPounds: number;
   trashPounds: number;
   totalProcessedPounds: number;
+  grandTotal: number;
   seller: string;
   details: ILocalSaleDetailModel[];
 }

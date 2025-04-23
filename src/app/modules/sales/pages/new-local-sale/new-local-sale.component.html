@@ -91,13 +91,6 @@
           [(ngModel)]="purchaseModel.shrimpFarm.place" disabled />
       </div>
 
-      <!-- Transportation Method-->
-      <div class="col-md-6">
-        <label for="transportationMethod" class="fw-semibold fs-6 mb-2">Medio de Transporte</label>
-        <input type="text" id="transportationMethod" name="transportationMethod" class="form-control form-control-sm"
-          [(ngModel)]="transportationMethod" disabled />
-      </div>
-
       <!-- Total pounds -->
       <div class="col-md-6">
         <label for="transportationMethod" class="fw-semibold fs-6 mb-2">Total Lb. compradas</label>
@@ -154,7 +147,8 @@
           <label for="wholeRejectedPounds" class="required fw-semibold fs-6 mb-2">Lb. rechazo (Cabeza)</label>
           <input type="text" id="wholeRejectedPounds" name="wholeRejectedPounds"
             [(ngModel)]="localSaleModel.wholeRejectedPounds" #wholeRejectedPounds="ngModel"
-            class="form-control form-control-sm" required (keypress)="validateNumber($event)" />
+            class="form-control form-control-sm" required (keypress)="validateNumber($event)"
+            (blur)="formatDecimal('wholeRejectedPounds')" />
           <div
             *ngIf="(saleForm.submitted || wholeRejectedPounds.dirty || wholeRejectedPounds.touched) && wholeRejectedPounds.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -166,7 +160,8 @@
         <div class="col-md-6">
           <label for="trashPounds" class="required fw-semibold fs-6 mb-2">Lb. basura</label>
           <input type="text" id="trashPounds" name="trashPounds" [(ngModel)]="localSaleModel.trashPounds"
-            #trashPounds="ngModel" class="form-control form-control-sm" required (keypress)="validateNumber($event)" />
+            #trashPounds="ngModel" class="form-control form-control-sm" required (keypress)="validateNumber($event)"
+            (blur)="formatDecimal('trashPounds')" />
           <div
             *ngIf="(saleForm.submitted || trashPounds.dirty || trashPounds.touched) && trashPounds.errors?.['required']"
             class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
@@ -192,8 +187,7 @@
         <div class="col-md-6">
           <label for="totalProcessedPounds" class="fw-semibold fs-6 mb-2">Total Lb. Procesadas</label>
           <input type="text" id="totalProcessedPounds" name="totalProcessedPounds"
-            class="form-control form-control-sm text-end"
-            [value]="localSaleModel.totalProcessedPounds | number: '1.2-2'" disabled />
+            class="form-control form-control-sm text-end" [value]="totalProcessedPounds | number: '1.2-2'" disabled />
         </div>
 
         <!-- processedRatio -->
@@ -202,25 +196,104 @@
             (%) Lb. compradas / Lb. procesadas
           </label>
           <input type="text" id="processedRatio" name="processedRatio" class="form-control form-control-sm text-end"
-            [value]="((purchaseModel.totalPounds / localSaleModel.totalProcessedPounds) * 100) | number: '1.2-2' + ' %'"
-            disabled />
+            [value]="processedRatioDisplay" disabled />
         </div>
+
 
       </div>
     </div>
   </div>
   <!-- end::Third Section: Sale Info -->
 </form>
+
 <!-- end::Sale Form -->
 
-<!-- Fourth Section: Company Sale Items -->
-<div>
+<!-- Fourth Section: Local Sale Details -->
+<div class="row mt-2 gx-4 gy-4">
+  <!-- WHOLE -->
+  <div class="col-12 col-lg-6">
+    <app-local-sale-details [style]="SaleStyleEnum.WHOLE" [localSaleDetails]="localSaleWholeDetails"
+      (localSaleDetailsChange)="handleLocalSaleWholeDetailsChange($event)" />
+  </div>
 
-  <!-- Submit Button inside card footer -->
+  <!-- TAIL -->
+  <div class="col-12 col-lg-6">
+    <app-local-sale-details [style]="SaleStyleEnum.TAIL" [localSaleDetails]="localSaleTailDetails"
+      (localSaleDetailsChange)="handleLocalSaleTailDetailsChange($event)" />
+  </div>
+</div>
+
+<!-- end::Fourth Section: Local Sale Details -->
+
+<!-- Fifth Section: Summary -->
+<div class="card card-xl-stretch mb-xl-8 mt-2">
+
+  <div class="card-body py-3 text-end fw-bold fs-4">
+    <div class="table-responsive mb-6">
+      <table class="table table-bordered align-middle">
+        <thead class="bg-light text-muted fw-bold">
+          <tr>
+            <th class="text-start">Talla</th>
+            <th class="text-end">Total libras</th>
+            <th class="text-end">Total ($)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Section: Con Cabeza -->
+          <ng-container *ngIf="groupedWhole.length > 0; else emptyWhole">
+            <tr *ngFor="let item of groupedWhole">
+              <td>{{ item.size }}</td>
+              <td class="text-end">{{ item.pounds | number: '1.2-2' }}</td>
+              <td class="text-end">{{ item.total | number: '1.2-2' }}</td>
+            </tr>
+          </ng-container>
+          <ng-template #emptyWhole>
+            <tr>
+              <td colspan="3" class="text-center text-muted">Sin registros Cabeza</td>
+            </tr>
+          </ng-template>
+          <tr class="fw-bold bg-light">
+            <td>Subtotal Cabeza</td>
+            <td class="text-end">{{ totalWholePounds | number: '1.2-2' }}</td>
+            <td class="text-end">{{ totalWholeAmount | number: '1.2-2' }}</td>
+          </tr>
+
+          <!-- Section: Sin Cabeza -->
+          <ng-container *ngIf="groupedTail.length > 0; else emptyTail">
+            <tr *ngFor="let item of groupedTail">
+              <td>{{ item.size }}</td>
+              <td class="text-end">{{ item.pounds | number: '1.2-2' }}</td>
+              <td class="text-end">{{ item.total | number: '1.2-2' }}</td>
+            </tr>
+          </ng-container>
+          <ng-template #emptyTail>
+            <tr>
+              <td colspan="3" class="text-center text-muted">Sin registros sin Cabeza</td>
+            </tr>
+          </ng-template>
+          <tr class="fw-bold bg-light">
+            <td>Subtotal sin Cabeza</td>
+            <td class="text-end">{{ totalTailPounds | number: '1.2-2' }}</td>
+            <td class="text-end">{{ totalTailAmount | number: '1.2-2' }}</td>
+          </tr>
+
+          <!-- Total General -->
+          <tr class="fw-bold bg-light">
+            <td>Total General</td>
+            <td class="text-end">{{ (totalWholePounds + totalTailPounds) | number: '1.2-2' }}</td>
+            <td class="text-end">{{ (totalWholeAmount + totalTailAmount) | number: '1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
   <div class="card-footer d-flex justify-content-end py-6 px-9">
+    <!-- Submit Button -->
     <button type="button" class="btn btn-primary" [disabled]="canSaveLocalSale()" (click)="confirmSave()">
       Guardar
     </button>
   </div>
 </div>
-<!-- end::Fourth Section: Company Sale Items -->
+<!-- end::Fifth Section: Summary -->

@@ -3,7 +3,7 @@ import { SaleStyleEnum } from './sale.interface';
 
 export interface ILocalSaleDetailModel {
   id?: string;
-  style: SaleStyleEnum;
+  style?: SaleStyleEnum;
   merchat: string;
   grandTotal: number;
   poundsGrandTotal: number;

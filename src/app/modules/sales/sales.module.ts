@@ -10,6 +10,7 @@ import { CompanySaleItemsListingComponent } from './widgets/company-sale-items-l
 import { RecentSalesComponent } from './pages/recent-sales/recent-sales.component';
 import { CompanySalePaymentListingComponent } from './widgets/company-sale-payment-listing/company-sale-payment-listing.component';
 import { NewLocalSaleComponent } from './pages/new-local-sale/new-local-sale.component';
+import { LocalSaleDetailsComponent } from './widgets/local-sale-details/local-sale-details.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { NewLocalSaleComponent } from './pages/new-local-sale/new-local-sale.com
     CompanySaleItemsListingComponent,
     CompanySalePaymentListingComponent,
     NewLocalSaleComponent,
+    LocalSaleDetailsComponent,
   ],
   imports: [
     CommonModule,

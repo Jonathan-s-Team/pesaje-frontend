@@ -5,8 +5,6 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { ICompanySaleItemModel } from '../interfaces/company-sale-item.interface';
 import {
-  ICompanySaleModel,
-  ICreateUpdateCompanySaleModel,
   ICreateUpdateLocalSaleModel,
   ILocalSaleModel,
 } from '../interfaces/sale.interface';
@@ -47,13 +45,13 @@ export class LocalSaleService {
       );
   }
 
-  updateCompanySale(
+  updateLocalSale(
     id: string,
-    payload: ICreateUpdateCompanySaleModel
-  ): Observable<ICompanySaleModel> {
+    payload: ICreateUpdateLocalSaleModel
+  ): Observable<ILocalSaleModel> {
     this.isLoadingSubject.next(true);
     return this.http
-      .put<{ data: ICompanySaleModel }>(`${API_LOCAL_SALE_URL}/${id}`, payload)
+      .put<{ data: ILocalSaleModel }>(`${API_LOCAL_SALE_URL}/${id}`, payload)
       .pipe(
         map((response) => response.data),
         finalize(() => this.isLoadingSubject.next(false))

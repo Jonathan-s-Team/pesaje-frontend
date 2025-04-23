@@ -1,7 +1,4 @@
 import {
-  CompanySaleStatusEnum,
-  ICompanySaleModel,
-  ICreateUpdateCompanySaleModel,
   ICreateUpdateLocalSaleModel,
   ILocalSaleModel,
 } from './../../interfaces/sale.interface';
@@ -27,18 +24,15 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '../../../../utils/alert.service';
 import { IReducedUserModel } from '../../../settings/interfaces/user.interface';
-import {
-  IReducedShrimpFarmModel,
-  TransportationMethodEnum,
-} from '../../../shared/interfaces/shrimp-farm.interface';
+import { IReducedShrimpFarmModel } from '../../../shared/interfaces/shrimp-farm.interface';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ICompanySaleItemModel } from '../../interfaces/company-sale-item.interface';
-import { CompanySaleService } from '../../services/company-sale.service';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { IReducedPeriodModel } from 'src/app/modules/shared/interfaces/period.interface';
 import { CompanySalePaymentListingComponent } from '../../widgets/company-sale-payment-listing/company-sale-payment-listing.component';
 import { LocalSaleService } from '../../services/local-sale.service';
+import { ILocalSaleDetailModel } from '../../interfaces/local-sale-detail.interface';
+import { SaleStyleEnum } from '../../interfaces/sale.interface';
 
 @Component({
   selector: 'app-new-local-sale',
@@ -47,6 +41,7 @@ import { LocalSaleService } from '../../services/local-sale.service';
 })
 export class NewLocalSaleComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.SALES.LOCAL_SALE_FORM;
+  SaleStyleEnum = SaleStyleEnum;
 
   private modalRef: NgbModalRef | null = null;
 
@@ -55,13 +50,21 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   isOnlyBuyer = false;
   hasRouteId = false;
   searchSubmitted = false;
-  isAddingPayment = false;
   controlNumber: string;
 
   localSaleModel: ICreateUpdateLocalSaleModel;
   purchaseModel: IReducedDetailedPurchaseModel;
 
-  companySaleItems: ICompanySaleItemModel[] = [];
+  localSaleWholeDetails: ILocalSaleDetailModel[] = [];
+  localSaleTailDetails: ILocalSaleDetailModel[] = [];
+
+  groupedWhole: { size: string; pounds: number; total: number }[] = [];
+  groupedTail: { size: string; pounds: number; total: number }[] = [];
+
+  totalWholePounds = 0;
+  totalWholeAmount = 0;
+  totalTailPounds = 0;
+  totalTailAmount = 0;
 
   saleId: string | undefined;
   localSaleId: string | undefined;
@@ -92,15 +95,29 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     return this.dateUtils.formatISOToDateInput(this.purchaseModel.purchaseDate);
   }
 
-  get transportationMethod(): string {
-    switch (this.purchaseModel.shrimpFarm.transportationMethod) {
-      case TransportationMethodEnum.CAR:
-        return 'Carro';
-      case TransportationMethodEnum.CARBOAT:
-        return 'Carro y Bote';
-      default:
-        return 'No especificado';
-    }
+  get totalProcessedPounds(): number {
+    const {
+      wholeTotalPounds = 0,
+      tailTotalPounds = 0,
+      wholeRejectedPounds = 0,
+      trashPounds = 0,
+    } = this.localSaleModel;
+    return (
+      Number(wholeTotalPounds) +
+      Number(tailTotalPounds) +
+      Number(wholeRejectedPounds) +
+      Number(trashPounds)
+    );
+  }
+
+  get processedRatioDisplay(): string {
+    const total = this.totalProcessedPounds;
+    const purchased = this.purchaseModel.totalPounds;
+
+    if (!total || !purchased || total === 0) return '';
+
+    const percentage = (purchased / total) * 100;
+    return `${percentage.toFixed(2)} %`;
   }
 
   ngOnInit(): void {
@@ -111,7 +128,7 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     this.initializeModels();
 
     if (this.saleId) {
-      const companySaleSub = this.localSaleService
+      const localSaleSub = this.localSaleService
         .getLocalSaleBySaleId(this.saleId)
         .subscribe({
           next: (localSale: ILocalSaleModel) => {
@@ -121,25 +138,37 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
               ...rest,
               purchase: purchase.id,
             };
+
+            this.localSaleWholeDetails = this.localSaleModel.details.filter(
+              (det) => det.style === SaleStyleEnum.WHOLE
+            );
+            this.localSaleTailDetails = this.localSaleModel.details.filter(
+              (det) => det.style === SaleStyleEnum.TAIL
+            );
+            this.updateGroupedDetails(
+              this.localSaleWholeDetails,
+              this.localSaleTailDetails
+            );
+
             this.controlNumber = localSale.purchase.controlNumber!;
             this.purchaseModel = localSale.purchase;
-
-            // this.companySaleItems = localSale.items;
 
             this.cdr.detectChanges();
           },
           error: (error) => {
-            console.error('Error fetching logistics:', error);
+            console.error('Error fetching local sale:', error);
             this.alertService.showTranslatedAlert({ alertType: 'error' });
           },
         });
 
-      this.unsubscribe.push(companySaleSub);
+      this.unsubscribe.push(localSaleSub);
     }
   }
 
   initializeModels() {
     this.localSaleModel = {} as ICreateUpdateLocalSaleModel;
+    this.localSaleModel.wholeTotalPounds = 0;
+    this.localSaleModel.tailTotalPounds = 0;
 
     this.purchaseModel = {} as IReducedDetailedPurchaseModel;
     this.purchaseModel.period = {} as IReducedPeriodModel;
@@ -161,7 +190,14 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     }
 
     // Check if both lists are empty
-    if (!this.companySaleItems || this.companySaleItems.length === 0) {
+    const hasWholeDetails =
+      Array.isArray(this.localSaleWholeDetails) &&
+      this.localSaleWholeDetails.length > 0;
+    const hasTailDetails =
+      Array.isArray(this.localSaleTailDetails) &&
+      this.localSaleTailDetails.length > 0;
+
+    if (!hasWholeDetails && !hasTailDetails) {
       this.alertService.showTranslatedAlert({
         alertType: 'info',
         messageKey: 'MESSAGES.NO_SALE_DETAILS_ENTERED',
@@ -178,35 +214,27 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
 
   submitLocalSaleForm() {
     this.localSaleModel.purchase = this.purchaseModel.id;
-
-    // this.localSaleModel.items = this.companySaleItems.map(
-    //   ({ id, ...rest }) => rest
-    // );
-    // this.localSaleModel.poundsGrandTotal = this.companySaleItems.reduce(
-    //   (sum, item) => sum + Number(item.pounds || 0),
-    //   0
-    // );
-    // this.localSaleModel.grandTotal = this.companySaleItems.reduce(
-    //   (sum, item) => sum + Number(item.total || 0),
-    //   0
-    // );
-    // this.localSaleModel.percentageTotal = this.companySaleItems.reduce(
-    //   (sum, item) => sum + Number(item.percentage || 0),
-    //   0
-    // );
+    this.localSaleModel.totalProcessedPounds = this.totalProcessedPounds;
+    this.localSaleModel.grandTotal = Number(
+      (this.totalWholeAmount + this.totalTailAmount).toFixed(2)
+    );
+    this.localSaleModel.details = [
+      ...this.localSaleWholeDetails,
+      ...this.localSaleTailDetails,
+    ];
 
     if (this.localSaleId) {
-      // this.localSaleService
-      //   .updateCompanySale(this.localSaleId, this.localSaleModel)
-      //   .subscribe({
-      //     next: (response) => {
-      //       this.alertService.showTranslatedAlert({ alertType: 'success' });
-      //     },
-      //     error: (error) => {
-      //       console.error('Error updating logistics:', error);
-      //       this.alertService.showTranslatedAlert({ alertType: 'error' });
-      //     },
-      //   });
+      this.localSaleService
+        .updateLocalSale(this.localSaleId, this.localSaleModel)
+        .subscribe({
+          next: (response) => {
+            this.alertService.showTranslatedAlert({ alertType: 'success' });
+          },
+          error: (error) => {
+            console.error('Error updating local sale:', error);
+            this.alertService.showTranslatedAlert({ alertType: 'error' });
+          },
+        });
     } else {
       this.localSaleService.createLocalSale(this.localSaleModel).subscribe({
         next: (response) => {
@@ -215,7 +243,7 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
           this.alertService.showTranslatedAlert({ alertType: 'success' });
         },
         error: (error) => {
-          console.error('Error creating company sale:', error);
+          console.error('Error creating local sale:', error);
           this.alertService.showTranslatedAlert({ alertType: 'error' });
         },
       });
@@ -287,8 +315,93 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     this.location.back();
   }
 
-  handleCompanySaleItemsChange(items: ICompanySaleItemModel[]) {
-    this.companySaleItems = items;
+  handleLocalSaleWholeDetailsChange(details: ILocalSaleDetailModel[]) {
+    this.localSaleWholeDetails = details;
+    this.calculateWholeTotalPounds();
+    this.updateGroupedDetails(
+      this.localSaleWholeDetails,
+      this.localSaleTailDetails
+    );
+  }
+
+  handleLocalSaleTailDetailsChange(details: ILocalSaleDetailModel[]) {
+    this.localSaleTailDetails = details;
+    this.calculateTailTotalPounds();
+    this.updateGroupedDetails(
+      this.localSaleWholeDetails,
+      this.localSaleTailDetails
+    );
+  }
+
+  calculateWholeTotalPounds(): void {
+    let total = 0;
+
+    this.localSaleWholeDetails.forEach((detail) => {
+      detail.items.forEach((item) => {
+        total += item.pounds || 0;
+      });
+    });
+
+    this.localSaleModel.wholeTotalPounds = Number(total.toFixed(2));
+  }
+
+  calculateTailTotalPounds(): void {
+    let total = 0;
+
+    this.localSaleTailDetails.forEach((detail) => {
+      detail.items.forEach((item) => {
+        total += item.pounds || 0;
+      });
+    });
+
+    this.localSaleModel.tailTotalPounds = Number(total.toFixed(2));
+  }
+
+  updateGroupedDetails(
+    wholeDetails: ILocalSaleDetailModel[],
+    tailDetails: ILocalSaleDetailModel[]
+  ): void {
+    const groupBySize = (details: ILocalSaleDetailModel[]) => {
+      const groupMap: { [size: string]: { pounds: number; total: number } } =
+        {};
+
+      details.forEach((detail) => {
+        detail.items.forEach((item) => {
+          if (!groupMap[item.size]) {
+            groupMap[item.size] = { pounds: 0, total: 0 };
+          }
+          groupMap[item.size].pounds += item.pounds || 0;
+          groupMap[item.size].total += item.total || 0;
+        });
+      });
+
+      return Object.entries(groupMap).map(([size, data]) => ({
+        size,
+        pounds: data.pounds,
+        total: data.total,
+      }));
+    };
+
+    this.groupedWhole = groupBySize(wholeDetails);
+    this.groupedTail = groupBySize(tailDetails);
+
+    this.totalWholePounds = this.groupedWhole.reduce(
+      (sum, g) => sum + g.pounds,
+      0
+    );
+    this.totalWholeAmount = this.groupedWhole.reduce(
+      (sum, g) => sum + g.total,
+      0
+    );
+
+    this.totalTailPounds = this.groupedTail.reduce(
+      (sum, g) => sum + g.pounds,
+      0
+    );
+    this.totalTailAmount = this.groupedTail.reduce(
+      (sum, g) => sum + g.total,
+      0
+    );
   }
 
   onDateChange(event: any): void {
@@ -331,7 +444,7 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
   }
 
   formatDecimal(controlName: string) {
-    const control = this.saleForm.controls[controlName];
+    const control = this.saleForm?.form?.get(controlName);
     if (control) {
       this.formUtils.formatControlToDecimal(control);
     }

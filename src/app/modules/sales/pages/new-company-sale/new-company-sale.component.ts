@@ -226,7 +226,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
             this.alertService.showTranslatedAlert({ alertType: 'success' });
           },
           error: (error) => {
-            console.error('Error updating logistics:', error);
+            console.error('Error updating company sale:', error);
             this.alertService.showTranslatedAlert({ alertType: 'error' });
           },
         });
