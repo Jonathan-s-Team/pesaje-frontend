@@ -1,6 +1,8 @@
 import {
   ICreateUpdateLocalSaleModel,
   ILocalSaleModel,
+  ISaleModel,
+  SaleTypeEnum,
 } from './../../interfaces/sale.interface';
 import {
   ChangeDetectorRef,
@@ -33,6 +35,7 @@ import { CompanySalePaymentListingComponent } from '../../widgets/company-sale-p
 import { LocalSaleService } from '../../services/local-sale.service';
 import { ILocalSaleDetailModel } from '../../interfaces/local-sale-detail.interface';
 import { SaleStyleEnum } from '../../interfaces/sale.interface';
+import { SaleService } from '../../services/sale.service';
 
 @Component({
   selector: 'app-new-local-sale',
@@ -78,6 +81,7 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
     private dateUtils: DateUtilsService,
     private purchaseService: PurchaseService,
     private localSaleService: LocalSaleService,
+    private saleService: SaleService,
     private modalService: NgbModal,
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
@@ -285,8 +289,34 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
             return;
           }
 
-          this.purchaseModel = purchases[0];
-          this.cdr.detectChanges();
+          const purchase = purchases[0];
+
+          // Fetch sales before assigning
+          const localSaleSub = this.saleService
+            .getSalesByParams(false, userId, this.controlNumber)
+            .subscribe({
+              next: (sales: ISaleModel[]) => {
+                if (sales.some((s) => s.type === SaleTypeEnum.LOCAL)) {
+                  this.alertService.showTranslatedAlert({
+                    alertType: 'warning',
+                    messageKey: 'MESSAGES.SALE_LIMIT_REACHED',
+                  });
+
+                  this.initializeModels();
+                  this.cdr.detectChanges();
+                  return;
+                }
+
+                this.purchaseModel = purchase;
+                this.cdr.detectChanges();
+              },
+              error: (error) => {
+                console.error('Error fetching sales:', error);
+                this.alertService.showTranslatedAlert({ alertType: 'error' });
+              },
+            });
+
+          this.unsubscribe.push(localSaleSub);
         },
         error: (error) => {
           console.error('Error fetching purchases:', error);

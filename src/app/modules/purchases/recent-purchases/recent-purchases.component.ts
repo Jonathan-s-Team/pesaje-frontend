@@ -45,164 +45,7 @@ export class RecentPurchasesComponent implements OnInit {
   selectedClient = '';
   controlNumber = '';
 
-  datatableConfig: Config = {
-    serverSide: false,
-    paging: true,
-    pageLength: 10,
-    data: [],
-    columns: [
-      {
-        title: 'Numero de Control',
-        data: 'controlNumber',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Estado',
-        data: 'status',
-        render: function (data: PurchaseStatusEnum) {
-          switch (data) {
-            case PurchaseStatusEnum.DRAFT:
-              return `<span class="badge bg-secondary">Sin pagos</span>`;
-            case PurchaseStatusEnum.IN_PROGRESS:
-              return `<span class="badge bg-warning text-dark">En progreso</span>`;
-            case PurchaseStatusEnum.COMPLETED:
-              return `<span class="badge bg-success">Completado</span>`;
-            default:
-              return `<span class="badge bg-light text-dark">Desconocido</span>`;
-          }
-        },
-      },
-      {
-        title: 'Fecha de Compra',
-        data: 'purchaseDate',
-        render: function (data) {
-          if (!data) return '-';
-          const date = new Date(data);
-          return date.toLocaleDateString('es-ES');
-        },
-      },
-      {
-        title: 'Total',
-        data: 'grandTotal',
-        render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-      {
-        title: 'Total Acordado',
-        data: 'totalAgreedToPay',
-        render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-      {
-        title: 'Total Abonado',
-        data: 'totalPaid',
-        render: function (data) {
-          if (!data || data === 0) return '-';
-
-          const formatted = new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-      {
-        title: 'Comprador',
-        data: 'buyer.fullName',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Cliente',
-        data: 'client.fullName',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Compañía',
-        data: 'company.name',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Período',
-        data: 'period.name',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Tiene Factura?',
-        data: 'hasInvoice',
-        render: function (data) {
-          return data ? 'Si' : 'No';
-        },
-      },
-      {
-        title: 'Número Factura',
-        data: 'invoice',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      // {
-      //   title: 'Subtotal',
-      //   data: 'subtotal',
-      //   render: function (data) {
-      //     if (!data && data !== 0) return '-';
-
-      //     const formatted = new Intl.NumberFormat('es-ES', {
-      //       minimumFractionDigits: 2,
-      //       maximumFractionDigits: 2,
-      //     }).format(data);
-
-      //     return `$${formatted}`;
-      //   },
-      // },
-      // {
-      //   title: 'Subtotal 2',
-      //   data: 'subtotal2',
-      //   render: function (data) {
-      //     if (!data && data !== 0) return '-';
-
-      //     const formatted = new Intl.NumberFormat('es-ES', {
-      //       minimumFractionDigits: 2,
-      //       maximumFractionDigits: 2,
-      //     }).format(data);
-
-      //     return `$${formatted}`;
-      //   },
-      // },
-    ],
-    language: {
-      url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
-    },
-    createdRow: function (row, data, dataIndex) {
-      $('td:eq(0)', row).addClass('d-flex align-items-center');
-    },
-  };
+  datatableConfig: Config;
 
   constructor(
     private authService: AuthService,
@@ -216,10 +59,186 @@ export class RecentPurchasesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initiliazeDatatable();
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
     this.loadCompanies();
     this.loadClients();
     this.loadRecentPurchases();
+  }
+
+  initiliazeDatatable() {
+    this.datatableConfig = {
+      serverSide: false,
+      paging: true,
+      pageLength: 10,
+      data: [],
+      order: [[1, 'asc']],
+      columns: [
+        {
+          title: 'Numero de Control',
+          data: 'controlNumber',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+        {
+          title: 'Estado',
+          data: 'status',
+          render: function (data: PurchaseStatusEnum, type: any) {
+            if (type === 'sort') {
+              switch (data) {
+                case PurchaseStatusEnum.DRAFT:
+                  return 1;
+                case PurchaseStatusEnum.IN_PROGRESS:
+                  return 2;
+                case PurchaseStatusEnum.COMPLETED:
+                  return 3;
+                default:
+                  return 4;
+              }
+            } else {
+              switch (data) {
+                case PurchaseStatusEnum.DRAFT:
+                  return `<span class="badge bg-secondary">Sin pagos</span>`;
+                case PurchaseStatusEnum.IN_PROGRESS:
+                  return `<span class="badge bg-warning text-dark">En progreso</span>`;
+                case PurchaseStatusEnum.COMPLETED:
+                  return `<span class="badge bg-success">Completado</span>`;
+                default:
+                  return `<span class="badge bg-light text-dark">Desconocido</span>`;
+              }
+            }
+          },
+        },
+        {
+          title: 'Fecha de Compra',
+          data: 'purchaseDate',
+          render: function (data) {
+            if (!data) return '-';
+            const date = new Date(data);
+            return date.toLocaleDateString('es-ES');
+          },
+        },
+        {
+          title: 'Total',
+          data: 'grandTotal',
+          render: function (data) {
+            if (!data && data !== 0) return '-';
+
+            const formatted = new Intl.NumberFormat('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(data);
+
+            return `$${formatted}`;
+          },
+        },
+        {
+          title: 'Total Acordado',
+          data: 'totalAgreedToPay',
+          render: function (data) {
+            if (!data && data !== 0) return '-';
+
+            const formatted = new Intl.NumberFormat('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(data);
+
+            return `$${formatted}`;
+          },
+        },
+        {
+          title: 'Total Abonado',
+          data: 'totalPaid',
+          render: function (data) {
+            if (!data || data === 0) return '-';
+
+            const formatted = new Intl.NumberFormat('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(data);
+
+            return `$${formatted}`;
+          },
+        },
+        {
+          title: 'Comprador',
+          data: 'buyer.fullName',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+        {
+          title: 'Cliente',
+          data: 'client.fullName',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+        {
+          title: 'Compañía',
+          data: 'company.name',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+        {
+          title: 'Período',
+          data: 'period.name',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+        {
+          title: 'Tiene Factura?',
+          data: 'hasInvoice',
+          render: function (data) {
+            return data ? 'Si' : 'No';
+          },
+        },
+        {
+          title: 'Número Factura',
+          data: 'invoice',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+        // {
+        //   title: 'Subtotal',
+        //   data: 'subtotal',
+        //   render: function (data) {
+        //     if (!data && data !== 0) return '-';
+
+        //     const formatted = new Intl.NumberFormat('es-ES', {
+        //       minimumFractionDigits: 2,
+        //       maximumFractionDigits: 2,
+        //     }).format(data);
+
+        //     return `$${formatted}`;
+        //   },
+        // },
+        // {
+        //   title: 'Subtotal 2',
+        //   data: 'subtotal2',
+        //   render: function (data) {
+        //     if (!data && data !== 0) return '-';
+
+        //     const formatted = new Intl.NumberFormat('es-ES', {
+        //       minimumFractionDigits: 2,
+        //       maximumFractionDigits: 2,
+        //     }).format(data);
+
+        //     return `$${formatted}`;
+        //   },
+        // },
+      ],
+      language: {
+        url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
+      },
+      createdRow: function (row, data, dataIndex) {
+        $('td:eq(0)', row).addClass('d-flex align-items-center');
+      },
+    };
   }
 
   loadRecentPurchases() {

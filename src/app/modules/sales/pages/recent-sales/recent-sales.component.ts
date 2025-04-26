@@ -38,109 +38,7 @@ export class RecentSalesComponent implements OnInit {
 
   controlNumber = '';
 
-  datatableConfig: Config = {
-    serverSide: false,
-    paging: true,
-    pageLength: 10,
-    data: [],
-    columns: [
-      {
-        title: 'Numero de Control',
-        data: 'controlNumber',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Estado',
-        data: 'status',
-        render: function (data: CompanySaleStatusEnum) {
-          switch (data) {
-            case CompanySaleStatusEnum.DRAFT:
-              return `<span class="badge bg-secondary">Sin pagos</span>`;
-            case CompanySaleStatusEnum.IN_PROGRESS:
-              return `<span class="badge bg-warning text-dark">En progreso</span>`;
-            case CompanySaleStatusEnum.COMPLETED:
-              return `<span class="badge bg-success">Completado</span>`;
-            default:
-              return `<span class="badge bg-light text-dark">Desconocido</span>`;
-          }
-        },
-      },
-      {
-        title: 'Tipo',
-        data: 'type',
-        render: function (data) {
-          if (!data) return '-';
-
-          if (data === SaleTypeEnum.COMPANY) return 'Venta a Compañía';
-
-          return 'Venta Local';
-        },
-      },
-      {
-        title: 'Compañía',
-        data: 'company.name',
-      },
-      {
-        title: 'Fecha de Venta',
-        data: 'saleDate',
-        render: function (data) {
-          if (!data) return '-';
-          const date = new Date(data);
-          return date.toLocaleDateString('es-ES');
-        },
-      },
-      {
-        title: 'Total',
-        data: 'total',
-        render: function (data) {
-          if (!data && data !== 0) return '-';
-
-          const formatted = new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-      {
-        title: 'Total Abonado',
-        data: 'totalPaid',
-        render: function (data) {
-          if (!data || data === 0) return '-';
-
-          const formatted = new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(data);
-
-          return `$${formatted}`;
-        },
-      },
-      {
-        title: 'Comprador',
-        data: 'buyer.fullName',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-      {
-        title: 'Cliente',
-        data: 'client.fullName',
-        render: function (data) {
-          return data ? data : '-';
-        },
-      },
-    ],
-    language: {
-      url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
-    },
-    createdRow: function (row, data, dataIndex) {
-      $('td:eq(0)', row).addClass('d-flex align-items-center');
-    },
-  };
+  datatableConfig: Config;
 
   constructor(
     private authService: AuthService,
@@ -151,8 +49,146 @@ export class RecentSalesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initiliazeDatatable();
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
     this.loadRecentSales();
+  }
+
+  initiliazeDatatable() {
+    this.datatableConfig = {
+      serverSide: false,
+      paging: true,
+      pageLength: 10,
+      data: [],
+      order: [[1, 'asc']],
+      columns: [
+        {
+          title: 'Numero de Control',
+          data: 'controlNumber',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+        {
+          title: 'Estado',
+          data: 'status',
+          render: function (data, type: any, full: any) {
+            if (type === 'sort') {
+              if (data === CompanySaleStatusEnum.DRAFT) return 1; // Sin pagos
+              if (data === null) return 2; // Empty / No status
+              if (data === CompanySaleStatusEnum.IN_PROGRESS) return 3; // En progreso
+              if (data === CompanySaleStatusEnum.COMPLETED) return 4; // Completado
+              return 5; // Desconocido
+            } else {
+              switch (data) {
+                case CompanySaleStatusEnum.DRAFT:
+                  return `<span class="badge bg-secondary">Sin pagos</span>`;
+                case CompanySaleStatusEnum.IN_PROGRESS:
+                  return `<span class="badge bg-warning text-dark">En progreso</span>`;
+                case CompanySaleStatusEnum.COMPLETED:
+                  return `<span class="badge bg-success">Completado</span>`;
+                default:
+                  if (full.type === SaleTypeEnum.COMPANY) {
+                    return `<span class="badge bg-light text-dark">Desconocido</span>`;
+                  }
+              }
+              return '-';
+            }
+          },
+        },
+        {
+          title: 'Tipo',
+          data: 'type',
+          render: function (data) {
+            if (!data) return '-';
+
+            if (data === SaleTypeEnum.COMPANY) return 'Venta a Compañía';
+
+            return 'Venta Local';
+          },
+        },
+        {
+          title: 'Compañía',
+          data: 'company.name',
+          render: function (data) {
+            if (!data || data === 'Local') return '-';
+            return data;
+          },
+        },
+        {
+          title: 'Fecha de Venta',
+          data: 'saleDate',
+          render: function (data) {
+            if (!data) return '-';
+            const date = new Date(data);
+            return date.toLocaleDateString('es-ES');
+          },
+        },
+        {
+          title: 'Total',
+          data: 'total',
+          render: function (data) {
+            if (!data && data !== 0) return '-';
+
+            const formatted = new Intl.NumberFormat('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(data);
+
+            return `$${formatted}`;
+          },
+        },
+        {
+          title: 'Total Abonado',
+          data: 'totalPaid',
+          render: function (data) {
+            if (!data || data === 0) return '-';
+
+            const formatted = new Intl.NumberFormat('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(data);
+
+            return `$${formatted}`;
+          },
+        },
+        {
+          title: '% Abonado',
+          data: 'paidPercentage',
+          render: function (data, type, full) {
+            if (!data || data === 0 || full.type === SaleTypeEnum.LOCAL)
+              return '-';
+
+            const formatted = new Intl.NumberFormat('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(data);
+
+            return `${formatted}%`;
+          },
+        },
+        {
+          title: 'Comprador',
+          data: 'buyer.fullName',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+        {
+          title: 'Cliente',
+          data: 'client.fullName',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+      ],
+      language: {
+        url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
+      },
+      createdRow: function (row, data, dataIndex) {
+        $('td:eq(0)', row).addClass('d-flex align-items-center');
+      },
+    };
   }
 
   loadRecentSales() {

@@ -9,11 +9,14 @@ export interface ISaleModel {
   purchase: string;
   controlNumber: string;
   total: number;
+  totalPaid: number;
+  paidPercentage: number;
   saleDate: string;
   buyer: IReducedUserModel;
   client: IReducedUserModel;
   company: IReadCompanyModel;
   type: SaleTypeEnum;
+  status: CompanySaleStatusEnum;
   deletedAt?: string;
 }
 

@@ -224,7 +224,16 @@ export class CompanySalePaymentListingComponent implements OnInit, OnDestroy {
             this.reloadEvent.emit(true);
           },
           error: (error) => {
-            this.alertService.showTranslatedAlert({ alertType: 'error' });
+            const rawMessage = error?.error?.message ?? '';
+            const matched = rawMessage.match(/amount of (\d+(\.\d+)?)/); // Extract number
+            const total = matched ? matched[1] : '---';
+
+            this.alertService.showTranslatedAlert({
+              alertType: 'error',
+              messageKey: 'ERROR.COMPANY_SALE_TOTAL_AGREED_EXCEEDED',
+              params: { total: total },
+            });
+
             this.isLoading = false;
           },
           complete: completeFn,

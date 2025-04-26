@@ -34,8 +34,8 @@
           <tbody>
             <tr *ngFor="let item of detail.items; let itemIndex = index">
               <td>
-                <input type="text" [(ngModel)]="item.size" placeholder="20/30" class="form-control form-control-sm"
-                  (keypress)="validateSizeFormat($event)" />
+                <input type="text" [(ngModel)]="item.size" [placeholder]="sizePlaceholder"
+                  class="form-control form-control-sm" (keypress)="validateSizeFormat($event)" />
               </td>
 
               <td>

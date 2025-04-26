@@ -2,6 +2,8 @@ import {
   CompanySaleStatusEnum,
   ICompanySaleModel,
   ICreateUpdateCompanySaleModel,
+  ISaleModel,
+  SaleTypeEnum,
 } from './../../interfaces/sale.interface';
 import {
   ChangeDetectorRef,
@@ -36,6 +38,7 @@ import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { IReducedPeriodModel } from 'src/app/modules/shared/interfaces/period.interface';
 import { CompanySalePaymentListingComponent } from '../../widgets/company-sale-payment-listing/company-sale-payment-listing.component';
+import { SaleService } from '../../services/sale.service';
 
 @Component({
   selector: 'app-new-company-sale',
@@ -77,6 +80,7 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
     private dateUtils: DateUtilsService,
     private purchaseService: PurchaseService,
     private companySaleService: CompanySaleService,
+    private saleService: SaleService,
     private modalService: NgbModal,
     private formUtils: FormUtilsService,
     private inputUtils: InputUtilsService,
@@ -292,8 +296,34 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
             return;
           }
 
-          this.purchaseModel = purchases[0];
-          this.cdr.detectChanges();
+          const purchase = purchases[0];
+
+          // Fetch sales before assigning
+          const companySaleSub = this.saleService
+            .getSalesByParams(false, userId, this.controlNumber)
+            .subscribe({
+              next: (sales: ISaleModel[]) => {
+                if (sales.some((s) => s.type === SaleTypeEnum.COMPANY)) {
+                  this.alertService.showTranslatedAlert({
+                    alertType: 'warning',
+                    messageKey: 'MESSAGES.SALE_LIMIT_REACHED',
+                  });
+
+                  this.initializeModels();
+                  this.cdr.detectChanges();
+                  return;
+                }
+
+                this.purchaseModel = purchase;
+                this.cdr.detectChanges();
+              },
+              error: (error) => {
+                console.error('Error fetching sales:', error);
+                this.alertService.showTranslatedAlert({ alertType: 'error' });
+              },
+            });
+
+          this.unsubscribe.push(companySaleSub);
         },
         error: (error) => {
           console.error('Error fetching purchases:', error);

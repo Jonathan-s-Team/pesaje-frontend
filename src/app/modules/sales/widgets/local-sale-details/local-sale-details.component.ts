@@ -17,12 +17,18 @@ export class LocalSaleDetailsComponent implements OnInit {
   >();
 
   title = '';
+  sizePlaceholder = '';
 
   constructor(private inputUtils: InputUtilsService) {}
 
   ngOnInit(): void {
-    if (this.style === SaleStyleEnum.WHOLE) this.title = 'Con Cabeza';
-    else this.title = 'Sin Cabeza';
+    if (this.style === SaleStyleEnum.WHOLE) {
+      this.title = 'Con Cabeza';
+      this.sizePlaceholder = '20/30';
+    } else {
+      this.title = 'Sin Cabeza';
+      this.sizePlaceholder = '36/41';
+    }
 
     this.recalculateAll();
   }

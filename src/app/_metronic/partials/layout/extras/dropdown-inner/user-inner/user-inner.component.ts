@@ -62,11 +62,11 @@ interface LanguageFlag {
 }
 
 const languages = [
-  {
-    lang: 'en',
-    name: 'English',
-    flag: './assets/media/flags/united-states.svg',
-  },
+  // {
+  //   lang: 'en',
+  //   name: 'English',
+  //   flag: './assets/media/flags/united-states.svg',
+  // },
   // {
   //   lang: 'zh',
   //   name: 'Mandarin',

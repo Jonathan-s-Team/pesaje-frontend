@@ -19,7 +19,11 @@ import {
 import { FormUtilsService } from '../../../utils/form-utils.service';
 import { InputUtilsService } from '../../../utils/input-utils.service';
 import { distinctUntilChanged, Subscription } from 'rxjs';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from 'src/app/utils/alert.service';
 import { IPaymentMethodModel } from '../../shared/interfaces/payment-method.interface';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
@@ -32,9 +36,12 @@ import { DateUtilsService } from 'src/app/utils/date-utils.service';
 export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PURCHASES.PURCHASE_FORM;
 
+  private modalRef: NgbModalRef | null = null;
+  private unsubscribe: Subscription[] = [];
+
   @Input() purchaseId!: string;
 
-  private unsubscribe: Subscription[] = [];
+  @ViewChild('formModal') formModalTemplate!: any;
 
   isLoading = false;
 
@@ -100,6 +107,7 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
     public activeModal: NgbActiveModal,
     private alertService: AlertService,
     private dateUtils: DateUtilsService,
+    private modalService: NgbModal,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -215,7 +223,16 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
             this.reloadEvent.emit(true);
           },
           error: (error) => {
-            this.alertService.showTranslatedAlert({ alertType: 'error' });
+            const rawMessage = error?.error?.message ?? '';
+            const matched = rawMessage.match(/amount of (\d+(\.\d+)?)/); // Extract number
+            const totalAgreed = matched ? matched[1] : '---';
+
+            this.alertService.showTranslatedAlert({
+              alertType: 'error',
+              messageKey: 'ERROR.PURCHASE_TOTAL_AGREED_EXCEEDED',
+              params: { total: totalAgreed },
+            });
+
             this.isLoading = false;
           },
           complete: completeFn,
@@ -291,13 +308,36 @@ export class PurchasePaymentListingComponent implements OnInit, OnDestroy {
     this.unsubscribe.push(deleteSub);
   }
 
-  edit(id: string): void {
+  async edit(id: string) {
+    console.log(id);
     const foundItem = this.purchasePayments.find((item) => item.id === id);
     this.purchasePaymentModel = foundItem ?? ({} as IPurchasePaymentModel);
 
     this.purchasePaymentModel.paymentDate = this.dateUtils.formatISOToDateInput(
       this.purchasePaymentModel.paymentDate
     );
+
+    await this.openPaymentModal();
+  }
+
+  async openPaymentModal(): Promise<any> {
+    if (this.modalRef) return;
+
+    try {
+      this.modalRef = this.modalService.open(this.formModalTemplate, {
+        size: 'md',
+        centered: true,
+        backdrop: true,
+        keyboard: true,
+      });
+
+      const result = await this.modalRef.result;
+      return result;
+    } catch (error) {
+      return null;
+    } finally {
+      this.modalRef = null;
+    }
   }
 
   formatDecimal(controlName: string) {

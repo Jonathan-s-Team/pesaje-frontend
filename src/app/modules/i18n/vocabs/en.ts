@@ -109,6 +109,7 @@ export const locale = {
       LOGISTICS_LIMIT_REACHED:
         '{{count}} logistics record(s) have already been created for this purchase.',
       NO_SALE_DETAILS_ENTERED: 'No sale details have been entered.',
+      SALE_LIMIT_REACHED: 'A sale has already been created for this purchase.',
     },
     SUCCESS: {
       TITLE: 'Success!',
