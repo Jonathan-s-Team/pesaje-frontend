@@ -21,6 +21,7 @@ export const PERMISSION_ROUTES = {
   },
   REPORTS: {
     ECONOMIC: '/reports/economic',
+    TOTAL: '/reports/total',
   },
   SETTINGS: {
     USERS: '/settings/users',

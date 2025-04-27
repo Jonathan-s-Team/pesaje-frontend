@@ -6,9 +6,10 @@ import { SharedModule } from '../shared/shared.module';
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { EconomicReportComponent } from './pages/economic-report/economic-report.component';
 import { ReportRoutingModule } from './report-routing.module';
+import { TotalReportComponent } from './pages/total-report/total-report.component';
 
 @NgModule({
-  declarations: [EconomicReportComponent],
+  declarations: [EconomicReportComponent, TotalReportComponent],
   imports: [
     CommonModule,
     ReportRoutingModule,
