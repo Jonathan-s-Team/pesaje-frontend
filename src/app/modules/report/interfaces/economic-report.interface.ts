@@ -5,7 +5,8 @@ export interface IEconomicReportModel {
   grossProfit: number;
   purchase: IPurchaseDetailsModel;
   sale: ISaleDetailsModel;
-  logistics: ILogisticsDetailsModel;
+  isCompanySale: boolean;
+  logistics: ILogisticsDetailsModel | ILogisticsDetailsModel[];
 }
 
 export interface IPurchaseDetailsModel {
@@ -42,6 +43,10 @@ export interface ISaleDetailsModel {
   trashPounds: number;
   performance: number;
   totalToReceive: number;
+  wholeTotalPounds: number;
+  tailTotalPounds: number;
+  totalProcessedPounds: number;
+  wholeRejectedPounds: number;
 }
 
 export interface ILogisticsDetailsModel {
