@@ -78,7 +78,8 @@ export class RecentSalesComponent implements OnInit {
               if (data === null) return 2; // Empty / No status
               if (data === CompanySaleStatusEnum.IN_PROGRESS) return 3; // En progreso
               if (data === CompanySaleStatusEnum.COMPLETED) return 4; // Completado
-              return 5; // Desconocido
+              if (data === CompanySaleStatusEnum.CLOSED) return 5; // Completado
+              return 6; // Desconocido
             } else {
               switch (data) {
                 case CompanySaleStatusEnum.DRAFT:
@@ -87,6 +88,8 @@ export class RecentSalesComponent implements OnInit {
                   return `<span class="badge bg-warning text-dark">En progreso</span>`;
                 case CompanySaleStatusEnum.COMPLETED:
                   return `<span class="badge bg-success">Completado</span>`;
+                case CompanySaleStatusEnum.CLOSED:
+                  return `<span class="badge bg-danger">Cerrado</span>`;
                 default:
                   if (full.type === SaleTypeEnum.COMPANY) {
                     return `<span class="badge bg-light text-dark">Desconocido</span>`;

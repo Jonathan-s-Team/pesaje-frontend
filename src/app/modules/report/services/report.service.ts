@@ -80,9 +80,30 @@ export class ReportService {
     this.isLoadingSubject.next(true);
 
     return this.http
-      .post<{ data: ICreateUpdateTotalReport }>(`${API_REPORT_URL}/total`, payload)
+      .post<{ data: ICreateUpdateTotalReport }>(
+        `${API_REPORT_URL}/total`,
+        payload
+      )
       .pipe(
         map((res) => res.data),
+        finalize(() => this.isLoadingSubject.next(false))
+      );
+  }
+
+  getRecordedTotalReportByControlNumber(
+    controlNumber: string
+  ): Observable<ICreateUpdateTotalReport | null> {
+    this.isLoadingSubject.next(true);
+
+    const params = new URLSearchParams();
+    params.append('controlNumber', controlNumber);
+
+    return this.http
+      .get<{ ok: boolean; data: ICreateUpdateTotalReport | null }>(
+        `${API_REPORT_URL}/total/recorded?${params.toString()}`
+      )
+      .pipe(
+        map((response) => response.data),
         finalize(() => this.isLoadingSubject.next(false))
       );
   }

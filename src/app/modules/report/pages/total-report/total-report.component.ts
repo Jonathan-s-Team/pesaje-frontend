@@ -8,6 +8,9 @@ import { AlertService } from 'src/app/utils/alert.service';
 import { AuthService } from 'src/app/modules/auth';
 import {
   ICreateUpdateTotalReport,
+  ILogisticsDetailsModel,
+  IPurchaseDetailsModel,
+  ISaleDetailsModel,
   ITotalReportModel,
 } from '../../interfaces/total-report.interface';
 
@@ -21,8 +24,9 @@ export class TotalReportComponent implements OnInit, OnDestroy {
 
   isOnlyBuyer = false;
   searchSubmitted = false;
+  reportId: string;
   controlNumber: string;
-  canSave: boolean = true;
+  isHistory: boolean = false;
 
   totalReportModel?: ITotalReportModel;
 
@@ -79,7 +83,7 @@ export class TotalReportComponent implements OnInit, OnDestroy {
     this.isOnlyBuyer = this.authService.isOnlyBuyer;
   }
 
-  loadReportInfo() {
+  searchControlNumber() {
     this.searchSubmitted = true;
 
     if (!this.controlNumber?.trim()) {
@@ -87,6 +91,31 @@ export class TotalReportComponent implements OnInit, OnDestroy {
       return; // don't search if input is empty
     }
 
+    const sub = this.reportService
+      .getRecordedTotalReportByControlNumber(this.controlNumber)
+      .subscribe({
+        next: (report) => {
+          if (!report) {
+            this.loadReportInfo();
+            return;
+          }
+
+          this.isHistory = true;
+
+          this.populateFromPayload(report!);
+
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching recorded total report:', error);
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
+        },
+      });
+
+    this.unsubscribe.push(sub);
+  }
+
+  loadReportInfo() {
     const userId: string | null = this.isOnlyBuyer
       ? this.authService.currentUserValue?.id ?? null
       : null;
@@ -103,7 +132,7 @@ export class TotalReportComponent implements OnInit, OnDestroy {
           if (noValidPurchase) {
             this.alertService.showTranslatedAlert({
               alertType: 'info',
-              messageKey: 'MESSAGES.PURCHASE_NOT_FOUND',
+              messageKey: 'MESSAGES.INCOMPLETE_TOTAL_REPORT_INFO',
               customIcon: 'info',
             });
 
@@ -127,12 +156,19 @@ export class TotalReportComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         },
         error: (error) => {
-          console.error('Error fetching economic report:', error);
+          console.error('Error fetching total report:', error);
           this.alertService.showTranslatedAlert({ alertType: 'error' });
         },
       });
 
     this.unsubscribe.push(sub);
+  }
+
+  clearFilters() {
+    this.controlNumber = '';
+    this.searchSubmitted = false;
+
+    this.totalReportModel = undefined;
   }
 
   calculateDiffPounds() {
@@ -287,11 +323,10 @@ export class TotalReportComponent implements OnInit, OnDestroy {
 
   saveTotalReport() {
     const payload = this.mapPayload();
-    console.log(payload);
 
     const sub = this.reportService.createTotalReport(payload).subscribe({
       next: (response) => {
-        this.canSave = false;
+        this.isHistory = true;
         this.alertService.showTranslatedAlert({ alertType: 'success' });
         this.cdr.detectChanges();
       },
@@ -308,6 +343,7 @@ export class TotalReportComponent implements OnInit, OnDestroy {
     return {
       // Purchase info
       purchaseId: this.totalReportModel!.purchase.id,
+      controlNumber: this.totalReportModel!.purchase.controlNumber,
       responsibleBuyer: this.totalReportModel!.purchase.responsibleBuyer,
       brokerName: this.totalReportModel!.purchase.brokerName,
       purchaseDate: this.totalReportModel!.purchase.purchaseDate,
@@ -369,6 +405,78 @@ export class TotalReportComponent implements OnInit, OnDestroy {
       // Final Total Factors
       totalFactors: this.totalFactors,
     };
+  }
+
+  populateFromPayload(payload: ICreateUpdateTotalReport): void {
+    this.totalReportModel = {} as ITotalReportModel;
+    this.totalReportModel.purchase = {} as IPurchaseDetailsModel;
+    this.totalReportModel.logistics = {} as ILogisticsDetailsModel;
+    this.totalReportModel.sale = {} as ISaleDetailsModel;
+    // Purchase info
+    this.totalReportModel!.purchase.id = payload.purchaseId;
+    this.totalReportModel!.purchase.controlNumber = payload.controlNumber;
+    this.totalReportModel!.purchase.responsibleBuyer = payload.responsibleBuyer;
+    this.totalReportModel!.purchase.brokerName = payload.brokerName;
+    this.totalReportModel!.purchase.purchaseDate = payload.purchaseDate;
+    this.totalReportModel!.purchase.clientName = payload.clientName;
+    this.totalReportModel!.purchase.averageGram = payload.averageGramPurchase;
+    this.totalReportModel!.purchase.price = payload.pricePurchase;
+    this.totalReportModel!.purchase.pounds = payload.poundsPurchase;
+    this.totalReportModel!.purchase.totalToPay = payload.totalToPayPurchase;
+
+    // Sale info
+    this.totalReportModel!.sale.averageBatchGrams =
+      payload.averageBatchGramsSale;
+    this.tempPrice = payload.salePrice;
+    this.totalReportModel!.sale.wholePoundsReceived =
+      payload.wholePoundsReceived;
+    this.diffPounds = payload.diffPounds;
+    this.totalReportModel!.sale.totalToReceive = payload.totalToReceiveSale;
+    this.balanceNet = payload.balanceNet;
+
+    // Logistics & retention
+    this.totalReportModel!.logistics.totalToPay = payload.logisticsTotalToPay;
+    this.retention = payload.retention;
+    this.retentionFactorInput = payload.retentionFactorInput;
+
+    // Subtotal Gross Profit
+    this.subtotalGrossProfit = payload.subtotalGrossProfit;
+
+    // Pay Broker & Qualifier
+    this.totalToPayBroker = payload.totalToPayBroker;
+    this.payBrokerFactorInput = payload.payBrokerFactorInput;
+
+    this.totalToPayQualifier = payload.totalToPayQualifier;
+    this.payQualifierFactorInput = payload.payQualifierFactorInput;
+
+    this.taxes = payload.taxes;
+    this.taxesFactorInput = payload.taxesFactorInput;
+
+    // Total Gross Profit
+    this.totalGrossProfit = payload.totalGrossProfit;
+
+    // Distribution
+    this.responsibleBuyerProfit = payload.responsibleBuyerProfit;
+    this.buyerProfitFactorInput = payload.buyerProfitFactorInput;
+
+    this.secretaryProfit = payload.secretaryProfit;
+    this.secretaryProfitFactorInput = payload.secretaryProfitFactorInput;
+
+    this.ceoProfit = payload.ceoProfit;
+    this.ceoProfitFactorInput = payload.ceoProfitFactorInput;
+
+    this.techLegalProfit = payload.techLegalProfit;
+    this.techLegalProfitFactorInput = payload.techLegalProfitFactorInput;
+
+    this.investCapitalProfit = payload.investCapitalProfit;
+    this.investCapitalProfitFactorInput =
+      payload.investCapitalProfitFactorInput;
+
+    this.profit = payload.profit;
+    this.profitFactorInput = payload.profitFactorInput;
+
+    // Final Total Factors
+    this.totalFactors = payload.totalFactors;
   }
 
   ngOnDestroy(): void {

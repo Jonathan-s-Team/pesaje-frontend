@@ -18,9 +18,16 @@
           <span class="card-label fw-bolder fs-3 mb-1">Información General</span>
         </h4>
 
-        <button *ngIf="hasRouteId" type="button" class="btn btn-light btn-sm" (click)="goBack()">
-          <i class="bi bi-arrow-left me-2"></i> Volver
-        </button>
+        <div class="d-flex gap-2">
+          <button *ngIf="hasRouteId" type="button" class="btn btn-light btn-sm" (click)="goBack()">
+            <i class="bi bi-arrow-left me-2"></i> Volver
+          </button>
+
+          <!-- New Button -->
+          <button *ngIf="purchaseId" type="button" class="btn btn-outline-success btn-sm" (click)="handleNewSale()">
+            <i class="bi bi-plus-circle me-1"></i> Nuevo
+          </button>
+        </div>
       </div>
       <!-- end::Header -->
 

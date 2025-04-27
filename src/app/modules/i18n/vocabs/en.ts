@@ -110,6 +110,8 @@ export const locale = {
         '{{count}} logistics record(s) have already been created for this purchase.',
       NO_SALE_DETAILS_ENTERED: 'No sale details have been entered.',
       SALE_LIMIT_REACHED: 'A sale has already been created for this purchase.',
+      INCOMPLETE_TOTAL_REPORT_INFO:
+        'The information for the report is incomplete. Please check the purchase, sale, or logistics information.',
     },
     SUCCESS: {
       TITLE: 'Success!',

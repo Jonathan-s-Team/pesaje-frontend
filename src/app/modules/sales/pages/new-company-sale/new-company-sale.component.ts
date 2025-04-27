@@ -252,17 +252,31 @@ export class NewCompanySaleComponent implements OnInit, OnDestroy {
   }
 
   canSaveCompanySale(): boolean {
-    if (this.purchaseModel.id) return false;
-    return true;
+    if (this.saleId) {
+      if (this.isOnlyBuyer) {
+        return (
+          this.companySaleModel.status !== CompanySaleStatusEnum.COMPLETED &&
+          this.companySaleModel.status !== CompanySaleStatusEnum.CLOSED
+        );
+      } else {
+        return this.companySaleModel.status !== CompanySaleStatusEnum.CLOSED;
+      }
+    } else {
+      return !!this.purchaseModel.id;
+    }
   }
 
   canAddPayments(): boolean {
-    if (this.companySaleId) return true;
-
-    if (this.isOnlyBuyer) {
-      return this.companySaleModel.status !== CompanySaleStatusEnum.COMPLETED;
+    if (this.saleId) {
+      if (this.isOnlyBuyer) {
+        return (
+          this.companySaleModel.status !== CompanySaleStatusEnum.COMPLETED &&
+          this.companySaleModel.status !== CompanySaleStatusEnum.CLOSED
+        );
+      } else {
+        return this.companySaleModel.status !== CompanySaleStatusEnum.CLOSED;
+      }
     }
-
     return false;
   }
 

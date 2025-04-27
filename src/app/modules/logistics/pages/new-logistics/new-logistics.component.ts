@@ -18,6 +18,7 @@ import {
   ICreateUpdateLogisticsModel,
   IDetailedReadLogisticsModel,
   IReadLogisticsModel,
+  LogisticsStatusEnum,
   LogisticsTypeEnum,
 } from '../../interfaces/logistics.interface';
 import { LogisticsService } from '../../services/logistics.service';
@@ -115,6 +116,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
               purchase: logistics.purchase?.id,
               type: logistics.type,
               logisticsDate: logistics.logisticsDate,
+              status: logistics.status,
               grandTotal: logistics.grandTotal,
               items: [],
             };
@@ -261,7 +263,11 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
   }
 
   canSaveLogistics(): boolean {
-    if (this.purchaseModel.id) return false;
+    if (this.logisticsId) {
+      return this.logisticsModel.status !== LogisticsStatusEnum.CLOSED;
+    } else {
+      return !!this.purchaseModel.id;
+    }
     return true;
   }
 

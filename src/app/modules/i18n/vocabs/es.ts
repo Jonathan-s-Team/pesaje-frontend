@@ -110,6 +110,8 @@ export const locale = {
         'Ya se ha(n) creado {{count}} registro(s) logístico(s) permitido(s) para esta compra.',
       NO_SALE_DETAILS_ENTERED: 'No se han ingresado detalles de la venta.',
       SALE_LIMIT_REACHED: 'Ya existe una venta creada para esta compra.',
+      INCOMPLETE_TOTAL_REPORT_INFO:
+        'La información para el reporte está incompleta. Verifique la información de compra, venta o logística.',
     },
     SUCCESS: {
       TITLE: '¡Éxito!',

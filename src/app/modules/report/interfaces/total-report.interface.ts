@@ -48,6 +48,7 @@ export interface ILogisticsDetailsModel {
 export interface ICreateUpdateTotalReport {
   // Purchase info
   purchaseId: string;
+  controlNumber: string;
   responsibleBuyer: string;
   brokerName: string;
   purchaseDate: string; // ISO string or Date

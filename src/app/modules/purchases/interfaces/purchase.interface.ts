@@ -111,4 +111,5 @@ export enum PurchaseStatusEnum {
   DRAFT = 'DRAFT',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
+  CLOSED = 'CLOSED',
 }

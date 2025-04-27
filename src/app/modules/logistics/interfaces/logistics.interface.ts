@@ -12,6 +12,7 @@ export interface ICreateUpdateLogisticsModel {
   type: LogisticsTypeEnum;
   logisticsDate: string;
   grandTotal: number;
+  status: LogisticsStatusEnum | null;
   items: ICreateUpdateLogisticsItemModel[];
 }
 
@@ -23,6 +24,7 @@ export interface IDetailedReadLogisticsModel {
   logisticsDate: string;
   grandTotal: number;
   description: string;
+  status: LogisticsStatusEnum | null;
   deletedAt: string | null;
   id: string;
 }
@@ -37,6 +39,7 @@ export interface IReadLogisticsModel {
   description: string;
   buyer: IReducedUserModel;
   client: IReducedUserModel;
+  status: LogisticsStatusEnum | null;
   deletedAt: string | null;
   id: string;
 }
@@ -44,4 +47,11 @@ export interface IReadLogisticsModel {
 export enum LogisticsTypeEnum {
   SHIPMENT = 'SHIPMENT',
   LOCAL_PROCESSING = 'LOCAL_PROCESSING',
+}
+
+export enum LogisticsStatusEnum {
+  DRAFT = 'DRAFT',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CLOSED = 'CLOSED',
 }

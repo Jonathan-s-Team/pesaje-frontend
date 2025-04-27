@@ -109,6 +109,7 @@ export class EconomicReportComponent implements OnInit, OnDestroy {
             [PurchaseStatusEnum.DRAFT]: 'Sin pagos',
             [PurchaseStatusEnum.IN_PROGRESS]: 'En progreso',
             [PurchaseStatusEnum.COMPLETED]: 'Completado',
+            [PurchaseStatusEnum.CLOSED]: 'Cerrado',
           };
           this.purchaseStatus =
             statusMap[this.economicReportModel.purchase?.status] || '-';

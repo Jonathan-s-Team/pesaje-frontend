@@ -377,22 +377,30 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   canSavePurchase(): boolean {
-    if (!this.purchaseId) return true;
-
-    if (this.isOnlyBuyer) {
-      return this.createPurchaseModel.status !== PurchaseStatusEnum.COMPLETED;
+    if (this.purchaseId) {
+      if (this.isOnlyBuyer) {
+        return (
+          this.createPurchaseModel.status !== PurchaseStatusEnum.COMPLETED &&
+          this.createPurchaseModel.status !== PurchaseStatusEnum.CLOSED
+        );
+      } else {
+        return this.createPurchaseModel.status !== PurchaseStatusEnum.CLOSED;
+      }
     }
-
     return true;
   }
 
   canAddPayments(): boolean {
-    if (this.purchaseId) return true;
-
-    if (this.isOnlyBuyer) {
-      return this.createPurchaseModel.status !== PurchaseStatusEnum.COMPLETED;
+    if (this.purchaseId) {
+      if (this.isOnlyBuyer) {
+        return (
+          this.createPurchaseModel.status !== PurchaseStatusEnum.COMPLETED &&
+          this.createPurchaseModel.status !== PurchaseStatusEnum.CLOSED
+        );
+      } else {
+        return this.createPurchaseModel.status !== PurchaseStatusEnum.CLOSED;
+      }
     }
-
     return false;
   }
 
@@ -403,6 +411,20 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
 
   goBack(): void {
     this.location.back();
+  }
+
+  handleNewSale(): void {
+    const currentUrl = this.router.url;
+
+    if (currentUrl === '/purchases/form') {
+      // If already on /purchases/form, reload the route (force component reset)
+      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        this.router.navigate(['/purchases/form']);
+      });
+    } else {
+      // Otherwise, navigate to /logistics/new
+      this.router.navigate(['/purchases/form']);
+    }
   }
 
   onInputChange(): void {

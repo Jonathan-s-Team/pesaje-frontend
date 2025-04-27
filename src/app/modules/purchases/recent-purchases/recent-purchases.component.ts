@@ -93,8 +93,10 @@ export class RecentPurchasesComponent implements OnInit {
                   return 2;
                 case PurchaseStatusEnum.COMPLETED:
                   return 3;
-                default:
+                case PurchaseStatusEnum.CLOSED:
                   return 4;
+                default:
+                  return 5;
               }
             } else {
               switch (data) {
@@ -104,6 +106,8 @@ export class RecentPurchasesComponent implements OnInit {
                   return `<span class="badge bg-warning text-dark">En progreso</span>`;
                 case PurchaseStatusEnum.COMPLETED:
                   return `<span class="badge bg-success">Completado</span>`;
+                case PurchaseStatusEnum.CLOSED:
+                  return `<span class="badge bg-danger">Cerrado</span>`;
                 default:
                   return `<span class="badge bg-light text-dark">Desconocido</span>`;
               }
