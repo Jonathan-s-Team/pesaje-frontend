@@ -1,0 +1,45 @@
+name: Build and Deploy Angular App
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Angular App
+        run: npm run build --configuration production
+
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
+
+      - name: Deploy to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_QA_SITE_ID: ${{ secrets.NETLIFY_QA_SITE_ID }}
+          NETLIFY_PROD_SITE_ID: ${{ secrets.NETLIFY_PROD_SITE_ID }}
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/develop" ]; then
+            echo "Deploying to QA..."
+            netlify deploy --dir=dist/your-app-name --site=$NETLIFY_QA_SITE_ID --prod
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "Deploying to Production..."
+            netlify deploy --dir=dist/your-app-name --site=$NETLIFY_PROD_SITE_ID --prod
+          else
+            echo "Branch not handled. Skipping deploy."
+          fi
