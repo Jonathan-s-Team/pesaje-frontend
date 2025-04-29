@@ -36,10 +36,10 @@ jobs:
         run: |
           if [ "${{ github.ref }}" == "refs/heads/develop" ]; then
             echo "Deploying to QA..."
-            netlify deploy --dir=dist/your-app-name --site=$NETLIFY_QA_SITE_ID --prod
+            netlify deploy --dir=dist/chamanguitech --site=$NETLIFY_QA_SITE_ID --prod
           elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
             echo "Deploying to Production..."
-            netlify deploy --dir=dist/your-app-name --site=$NETLIFY_PROD_SITE_ID --prod
+            netlify deploy --dir=dist/chamanguitech --site=$NETLIFY_PROD_SITE_ID --prod
           else
             echo "Branch not handled. Skipping deploy."
           fi
