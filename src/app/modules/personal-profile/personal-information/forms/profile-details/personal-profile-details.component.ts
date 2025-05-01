@@ -3,9 +3,9 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import { UserModel } from 'src/app/modules/auth';
 import { ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { UserService } from 'src/app/modules/settings/services/user.service';
 import { IUpdateUserModel } from 'src/app/modules/settings/interfaces/user.interface';
+import { AlertService } from 'src/app/utils/alert.service';
 
 @Component({
   selector: 'app-personal-profile-details',
@@ -19,8 +19,9 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
   private unsubscribe: Subscription[] = [];
 
   constructor(
-    private cdr: ChangeDetectorRef,
-    private userService: UserService
+    private userService: UserService,
+    private alertService: AlertService,
+    private cdr: ChangeDetectorRef
   ) {
     const loadingSubscr = this.isLoading$
       .asObservable()
@@ -63,61 +64,19 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
       },
     };
 
-    setTimeout(() => {
-      this.isLoading$.next(false);
-      this.cdr.detectChanges();
-    }, 1500);
-
     this.userService.updateUser(this.user.id, payload).subscribe({
       next: (response) => {
         this.isLoading$.next(false);
-        console.log('Usuario actualizado:', response);
         this.cdr.detectChanges();
-        this.showSuccessAlert();
+        this.alertService.showTranslatedAlert({ alertType: 'success' });
       },
       error: (error) => {
         this.isLoading$.next(false);
         console.error('Error actualizando usuario:', error);
         this.cdr.detectChanges();
-        this.showErrorAlert(error);
+        this.alertService.showTranslatedAlert({ alertType: 'error' });
       },
     });
-  }
-
-  private getErrorMessage(error: any) {
-    return (
-      error.error?.message ||
-      error.message ||
-      'Ocurrió  un error inesperado. Por favor verifique los datos e intente nuevamente.'
-    );
-  }
-
-  private showSuccessAlert() {
-    const options: SweetAlertOptions = {
-      title: '¡Éxito!',
-      text: 'Los cambios se guardaron correctamente',
-      icon: 'success',
-      confirmButtonText: 'Aceptar',
-      confirmButtonColor: '#3085d6',
-      timer: 5000,
-      timerProgressBar: true,
-    };
-    Swal.fire(options);
-  }
-
-  private showErrorAlert(error: any) {
-    const errorMessage = this.getErrorMessage(error);
-
-    const options: SweetAlertOptions = {
-      title: 'Error',
-      html: `<strong>${errorMessage}</strong>`,
-      icon: 'error',
-      confirmButtonText: 'Entendido',
-      confirmButtonColor: '#d33',
-      showCloseButton: true,
-      focusConfirm: false,
-    };
-    Swal.fire(options);
   }
 
   ngOnDestroy() {
