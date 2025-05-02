@@ -1,10 +1,10 @@
 {
-  "name": "demo1",
-  "version": "8.2.7",
+  "name": "chamanguitech",
+  "version": "0.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "rtl": "webpack --config=rtl.config.js",
     "test": "ng test",

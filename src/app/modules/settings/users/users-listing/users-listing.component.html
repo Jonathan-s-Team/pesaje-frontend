@@ -131,7 +131,7 @@
           <div class="mb-3">
             <label for="phone" class="fw-semibold fs-6 mb-2">Teléfono Fijo</label>
             <input type="text" class="form-control" id="phone" name="phone" [(ngModel)]="userModel.person!.phone"
-              required #phone="ngModel">
+              #phone="ngModel">
           </div>
 
           <div class="mb-3">
@@ -141,7 +141,7 @@
             <div
               *ngIf="(myForm.submitted || mobilePhone.dirty || mobilePhone.touched) && mobilePhone.errors?.['required']"
               class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
-              <div>El teléfono celular es obligatorio.</div>
+              <div>El teléfono celular es obligatorio.</div>s
             </div>
           </div>
 
