@@ -1,0 +1,36 @@
+name: Deploy Angular App to QA
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Angular App
+        run: npm run build
+
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
+
+      - name: Deploy to Netlify QA
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_QA_SITE_ID: ${{ secrets.NETLIFY_QA_SITE_ID }}
+        run: |
+          COMMIT_MESSAGE=$(git log -1 --pretty=format:%s)
+          netlify deploy --dir=dist/chamanguitech --site=$NETLIFY_QA_SITE_ID --prod --message "$COMMIT_MESSAGE"
