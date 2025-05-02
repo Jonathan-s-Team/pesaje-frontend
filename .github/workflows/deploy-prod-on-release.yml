@@ -1,0 +1,36 @@
+name: Deploy Angular App to Production on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Angular App
+        run: npm run build
+
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
+
+      - name: Deploy to Netlify Production
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_PROD_SITE_ID: ${{ secrets.NETLIFY_PROD_SITE_ID }}
+        run: |
+          RELEASE_TAG=${{ github.event.release.tag_name }}
+          RELEASE_NAME=${{ github.event.release.name }}
+          netlify deploy --dir=dist/chamanguitech --site=$NETLIFY_PROD_SITE_ID --prod --message "Release: $RELEASE_NAME ($RELEASE_TAG)"
