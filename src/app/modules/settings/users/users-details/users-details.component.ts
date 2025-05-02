@@ -35,6 +35,8 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading$: Observable<boolean>;
   activeTab: Tabs = 'Details';
 
+  showChangePasswordForm: boolean = false;
+
   userData: IReadUserModel = {} as IReadUserModel;
   personId: string;
   formattedBirthDate: string = '';
@@ -162,6 +164,32 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onChangeEmail(value: string): void {
     this.userData.person.email = value.trim() === '' ? null : value;
+  }
+
+  togglePasswordForm(show: boolean) {
+    this.showChangePasswordForm = show;
+  }
+
+  savePassword() {
+    if (!this.userData.password) {
+      return;
+    }
+
+    const updateSub = this.userService
+      .updatePassword(this.userData.id, this.userData.password!)
+      .subscribe({
+        next: () => {
+          this.showChangePasswordForm = false;
+          this.changeDetectorRef.detectChanges();
+
+          this.alertService.showTranslatedAlert({ alertType: 'success' });
+        },
+        error: (error) => {
+          console.error('Error updating user', error);
+          this.alertService.showTranslatedAlert({ alertType: 'error' });
+        },
+      });
+    this.unsubscribe.push(updateSub);
   }
 
   goBack(): void {

@@ -22,6 +22,7 @@ export interface IReadUserModel {
   person: IPersonModel;
   roles: IRoleModel[];
   username: string;
+  password?: string;
 }
 
 export interface IReducedUserModel {
