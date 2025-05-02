@@ -31,6 +31,7 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_PROD_SITE_ID: ${{ secrets.NETLIFY_PROD_SITE_ID }}
         run: |
-          RELEASE_TAG=${{ github.event.release.tag_name }}
-          RELEASE_NAME=${{ github.event.release.name }}
-          netlify deploy --dir=dist/chamanguitech --site=$NETLIFY_PROD_SITE_ID --prod --message "Release: $RELEASE_NAME ($RELEASE_TAG)"
+          RELEASE_TAG="${{ github.event.release.tag_name }}"
+          RELEASE_NAME="${{ github.event.release.name }}"
+          echo "Deploying: $RELEASE_NAME ($RELEASE_TAG)"
+          netlify deploy --dir=dist/chamanguitech --site="$NETLIFY_PROD_SITE_ID" --prod --message "Release: $RELEASE_NAME ($RELEASE_TAG)"
