@@ -115,7 +115,7 @@ The project includes a `_redirects` file to support:
 
 This project uses the Netlify `_redirects` file to handle **SPA routing** and **API proxying**.
 
-Because your backend is deployed to **two different environments (QA and Production)**, the `_redirects` file is swapped during build depending on the environment.
+Because your backend is deployed to **two different environments (QA and Production)**, the `_redirects` file is swapped manually during build depending on the environment.
 
 ### ✅ `_redirects` for QA
 
@@ -135,54 +135,31 @@ Alternate file: `src/public/environments/_redirects.prod`
 /api/*  https://your-prod-backend.onrender.com/api/:splat  200
 ```
 
-### 🔧 File Replacement in `angular.json`
+### 📆 File Swapping in GitHub Actions
 
-In the `angular.json` production build config, this replacement is defined:
+Angular does not allow `fileReplacements` for non-code files like `_redirects`, so swapping is done manually in your GitHub Actions workflow:
 
-```json
-"fileReplacements": [
-  {
-    "replace": "src/environments/environment.ts",
-    "with": "src/environments/environment.prod.ts"
-  },
-  {
-    "replace": "src/public/_redirects",
-    "with": "src/public/environments/_redirects.prod"
-  }
-]
+```yaml
+- name: Replace _redirects for production
+  run: cp src/public/environments/_redirects.prod src/public/_redirects
 ```
 
-### 📆 Asset Copying
-
-The `src/public/_redirects` file is included in the `angular.json` "assets" section so it is copied to the build output:
-
-```json
-"assets": [
-  "src/favicon.ico",
-  "src/assets",
-  {
-    "glob": "**/*",
-    "input": "src/public",
-    "output": "./"
-  }
-]
-```
+Run this step **before** the production build step.
 
 ### 🚀 How It Works
 
-* **QA builds** use `src/public/_redirects` by default
+* **QA builds** use `src/public/_redirects` by default:
 
   ```bash
   ng build
   ```
 
-* **Production builds** use `src/public/environments/_redirects.prod` via replacement
+* **Production builds** manually copy the prod version before building:
 
   ```bash
+  cp src/public/environments/_redirects.prod src/public/_redirects
   ng build --configuration production
   ```
-
-This ensures that each build automatically targets the correct backend environment via proxy without manual editing.
 
 ## 🛠️ Build
 
@@ -238,10 +215,16 @@ Or visit the [Angular CLI Documentation](https://angular.io/cli).
 👍 After this setup:
 
 * Pushing to the `develop` branch **automatically deploys** to the **Netlify QA site**.
+
 * Publishing a **GitHub release** from the `main` branch:
 
   * **Pre-releases** (e.g., `v1.0.0-rc.1`) deploy to the **Netlify QA site**.
   * **Full releases** (e.g., `v1.0.0`) deploy to the **Netlify Production site**.
+
+* For production builds, `_redirects` is swapped via GitHub Actions before running `ng build --configuration production`.
+
 * No manual uploads or build triggers are needed — deployment is fully automated via GitHub Actions.
+
 * Each deploy carries the **last commit message** (for `develop`) or **release name and tag** (for `main`) as the deploy label in Netlify.
+
 * Your workflow is clean, maintainable, and built for a **release-driven production process**.
