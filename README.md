@@ -7,7 +7,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 1. **Clone the repository**
 
    ```bash
-   git clone [https://github.com/Jonathan-s-Team/pesaje-frontend.git](https://github.com/Jonathan-s-Team/pesaje-frontend.git)
+   git clone https://github.com/Jonathan-s-Team/pesaje-frontend.git
    cd pesaje-frontend
    ```
 
@@ -34,7 +34,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
    http://localhost:8080
    ```
 
-   This is configured in `src/environments/environment.ts`.
+   The frontend is configured to use `http://localhost:8080/api` for API calls in development (`src/environments/environment.ts`).
 
 ## 🔧 Environments
 
@@ -43,18 +43,16 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 - **Production (deployed on Netlify)** uses:  
   `apiUrl: /api`  
-  _(Handled via reverse proxy in Netlify)_
+  _(Handled via reverse proxy on Netlify)_
 
 ## 🚀 Deployment Strategy
 
 - **QA (Staging)**  
-  Every push to the `develop` branch automatically deploys to the **Netlify QA site** via GitHub Actions.
+  - Every push to the `develop` branch automatically deploys to the **Netlify QA site** via GitHub Actions.
+  - Publishing a **pre-release** (e.g., `v1.0.0-rc.1`) from the `main` branch will also deploy to **QA**.
 
 - **Production**  
-  A deploy is triggered when a **GitHub release is published** from the `main` branch.
-
-  - **Pre-releases** (e.g., `v1.0.0-rc.1`) are deployed to **QA**
-  - **Full releases** (e.g., `v1.0.0`) are deployed to **production**
+  - A **full release** (e.g., `v1.0.0`) published from the `main` branch triggers a deploy to the **Netlify Production site**.
 
 ## 🔄 GitHub Workflows
 
@@ -66,10 +64,15 @@ This project uses two GitHub Actions workflows for CI/CD:
 
 - **`deploy-prod-on-release.yml`**
   - Triggered when a GitHub release is published on the `main` branch
-  - If the release is a **pre-release**, it deploys to QA
-  - If it's a **full release**, it deploys to production
+  - Deploys to:
+    - **QA** if it’s a pre-release
+    - **Production** if it’s a full release
 
-Secrets like `NETLIFY_AUTH_TOKEN`, `NETLIFY_QA_SITE_ID`, and `NETLIFY_PROD_SITE_ID` are stored in GitHub Secrets.
+GitHub secrets required:
+
+- `NETLIFY_AUTH_TOKEN`
+- `NETLIFY_QA_SITE_ID`
+- `NETLIFY_PROD_SITE_ID`
 
 ## 🌐 Netlify `_redirects` File
 
@@ -80,14 +83,14 @@ The project includes a `_redirects` file to support:
   /*    /index.html   200
   ```
 
-- **API proxying (for production deployments):**
+- **API proxying for production deployments:**
   ```
   /api/*   http://localhost:8080/api/:splat   200
   ```
 
 📁 Place `_redirects` in the `src/` directory.
 
-📦 Then update `angular.json` under the `assets` section to ensure it's copied into the `dist/` folder during build:
+📦 Update `angular.json` under the `assets` section to ensure `_redirects` is copied during build:
 
 ```json
 "assets": [
@@ -99,37 +102,37 @@ The project includes a `_redirects` file to support:
 
 ## 🛠 Build
 
-To build the project for production, run:
+To build the project for production:
 
 ```bash
 ng build
 ```
 
-The build artifacts will be stored in the `dist/` directory.
+The output will be stored in the `dist/` directory.
 
 ## ✅ Running Unit Tests
 
-To run unit tests:
+To execute unit tests:
 
 ```bash
 ng test
 ```
 
-This uses [Karma](https://karma-runner.github.io) as the test runner.
+Uses [Karma](https://karma-runner.github.io) as the test runner.
 
 ## 🔍 Running End-to-End Tests
 
-To run end-to-end tests (after configuring a framework like Cypress or Protractor):
+To run end-to-end tests (after configuring Cypress or Protractor):
 
 ```bash
 ng e2e
 ```
 
-> Note: You may need to install and configure an appropriate e2e test framework.
+> You may need to install and configure an appropriate e2e test framework.
 
 ## 💡 Code Generation
 
-Use Angular CLI to generate components, services, modules, etc.:
+Generate components, services, and more using Angular CLI:
 
 ```bash
 ng generate component my-component
@@ -138,7 +141,7 @@ ng generate service my-service
 
 ## ℹ️ Further Help
 
-To explore more Angular CLI commands, run:
+To explore more Angular CLI commands:
 
 ```bash
 ng help
