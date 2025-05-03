@@ -3,7 +3,7 @@ name: Deploy Angular App to QA
 on:
   push:
     branches:
-      - main
+      - develop
 
 jobs:
   deploy:
