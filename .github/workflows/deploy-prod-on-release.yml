@@ -1,4 +1,4 @@
-name: Deploy Angular App to Production on Release
+name: Deploy Angular App on Release
 
 on:
   release:
@@ -20,18 +20,32 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Replace _redirects for production
+        run: cp src/public/environments/_redirects.prod src/public/_redirects
+
       - name: Build Angular App
-        run: npm run build
+        run: npm run build:prod
 
       - name: Install Netlify CLI
         run: npm install -g netlify-cli
 
-      - name: Deploy to Netlify Production
+      - name: Deploy to Netlify (QA or Production)
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_PROD_SITE_ID: ${{ secrets.NETLIFY_PROD_SITE_ID }}
+          NETLIFY_QA_SITE_ID: ${{ secrets.NETLIFY_QA_SITE_ID }}
         run: |
           RELEASE_TAG="${{ github.event.release.tag_name }}"
           RELEASE_NAME="${{ github.event.release.name }}"
-          echo "Deploying: $RELEASE_NAME ($RELEASE_TAG)"
-          netlify deploy --dir=dist/chamanguitech --site="$NETLIFY_PROD_SITE_ID" --prod --message "Release: $RELEASE_NAME ($RELEASE_TAG)"
+          IS_PRERELEASE=${{ github.event.release.prerelease }}
+
+          echo "Release: $RELEASE_NAME ($RELEASE_TAG)"
+          echo "Pre-release: $IS_PRERELEASE"
+
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            echo "Deploying pre-release to QA..."
+            netlify deploy --dir=dist/chamanguitech --site="$NETLIFY_QA_SITE_ID" --prod --message "Pre-release: $RELEASE_NAME ($RELEASE_TAG)"
+          else
+            echo "Deploying full release to Production..."
+            netlify deploy --dir=dist/chamanguitech --site="$NETLIFY_PROD_SITE_ID" --prod --message "Release: $RELEASE_NAME ($RELEASE_TAG)"
+          fi
