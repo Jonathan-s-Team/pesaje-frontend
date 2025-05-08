@@ -1,38 +1,61 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { AuthService, UserModel } from '../auth';
 import { UserService } from '../settings/services/user.service';
+import { style } from '@angular/animations';
 
 @Component({
   selector: 'app-my-profile',
   templateUrl: './my-profile.component.html',
+  styleUrls: ['./my-profile.component.scss'],
 })
 export class MyProfileComponent implements OnInit, OnDestroy {
   user: UserModel | undefined;
   isLoading$: Observable<boolean>;
+
+  photoUrl: string = '/assets/media/avatars/blank.png'; // Default photo URL
+
   private unsubscribe: Subscription[] = [];
 
   constructor(
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {
     this.isLoading$ = this.userService.isLoading$;
   }
 
   ngOnInit(): void {
-    const userId = this.authService.currentUserValue!.id;
-
-    // Subscribe to userSubject for live updates
+    // Subscribe to the user observable
     const userSub = this.userService.user$.subscribe((user) => {
-      this.user = user;
+      this.user = user; // Update the user data
+      this.cdr.detectChanges(); // Trigger Angular's change detection
     });
-    this.unsubscribe.push(userSub); // Store the subscription
+    this.unsubscribe.push(userSub);
 
-    // Fetch user only if not already loaded
-    if (!this.userService.user) {
-      const apiSub = this.userService.getUserById(userId).subscribe();
-      this.unsubscribe.push(apiSub);
-    }
+    // Subscribe to the image observable for dynamic updates
+    const imageSub = this.userService.image$.subscribe((imageUrl) => {
+      this.photoUrl = imageUrl || '/assets/media/avatars/blank.png'; // Default avatar
+      this.cdr.detectChanges(); // Trigger Angular's change detection
+    });
+    this.unsubscribe.push(imageSub);
+  }
+
+  onPhotoSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file || !this.user) return;
+
+    const formData = new FormData();
+    formData.append('photo', file);
+
+    this.userService.uploadPhoto(this.user.id, formData).subscribe({
+      next: (updatedPhotoPath: string) => {
+        this.user!.person.photo = updatedPhotoPath; // Update the user's photo path
+      },
+      error: (err) => {
+        console.error('Upload failed', err);
+      },
+    });
   }
 
   ngOnDestroy(): void {
