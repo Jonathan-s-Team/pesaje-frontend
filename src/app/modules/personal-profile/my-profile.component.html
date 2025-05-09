@@ -11,26 +11,25 @@
     <div class="card-body pt-9 pb-0">
       <div class="d-flex flex-wrap flex-sm-nowrap mb-3">
         <div class="me-7 mb-4">
-          <div class="
-            symbol symbol-100px symbol-lg-160px symbol-fixed
-            position-relative
-          ">
-            <img *ngIf="user?.person?.photo" [src]="user?.person?.photo" alt="Foto de perfil" />
-            <img *ngIf="!user?.person?.photo" src="./assets/media/avatars/300-1.jpg" alt="Foto por defecto" />
-            <div class="
-              position-absolute
-              translate-middle
-              bottom-0
-              start-100
-              mb-6
-              bg-success
-              rounded-circle
-              border border-4 border-white
-              h-20px
-              w-20px
-            "></div>
+          <div class="symbol symbol-100px symbol-lg-160px symbol-fixed position-relative">
+            <img [src]="photoUrl" alt="Foto de perfil" class="rounded profile-image" />
+
+            <!-- ✅ Upload Button -->
+            <label
+              class="position-absolute bottom-0 end-0 mb-6 me-1 btn btn-sm btn-icon btn-active-color-primary bg-white shadow"
+              title="Cambiar foto de perfil">
+              <i class="bi bi-pencil-fill fs-7"></i>
+              <input type="file" hidden (change)="onPhotoSelected($event)" accept="image/*" />
+            </label>
+
+            <!-- Status Dot -->
+            <!-- <div
+              class="position-absolute translate-middle bottom-0 start-100 mb-6 bg-success rounded-circle border border-4 border-white h-20px w-20px">
+            </div> -->
           </div>
         </div>
+
+
 
         <div class="flex-grow-1">
           <div class="

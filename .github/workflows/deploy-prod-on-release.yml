@@ -20,8 +20,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Replace _redirects for production
-        run: cp src/public/environments/_redirects.prod src/public/_redirects
+      - name: Replace _redirects for production (only for full releases)
+        run: |
+          IS_PRERELEASE=${{ github.event.release.prerelease }}
+          if [ "$IS_PRERELEASE" = "false" ]; then
+            echo "This is a full release. Replacing _redirects for production..."
+            cp src/public/environments/_redirects.prod src/public/_redirects
+          else
+            echo "This is a pre-release. Skipping _redirects replacement."
+          fi
 
       - name: Build Angular App
         run: npm run build:prod
@@ -31,7 +38,8 @@ jobs:
 
       - name: Deploy to Netlify (QA or Production)
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_AUTH_TOKEN_QA: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_AUTH_TOKEN_PROD: ${{ secrets.NETLIFY_AUTH_TOKEN_PROD }}
           NETLIFY_PROD_SITE_ID: ${{ secrets.NETLIFY_PROD_SITE_ID }}
           NETLIFY_QA_SITE_ID: ${{ secrets.NETLIFY_QA_SITE_ID }}
         run: |
@@ -44,8 +52,10 @@ jobs:
 
           if [ "$IS_PRERELEASE" = "true" ]; then
             echo "Deploying pre-release to QA..."
+            export NETLIFY_AUTH_TOKEN="$NETLIFY_AUTH_TOKEN_QA"
             netlify deploy --dir=dist/chamanguitech --site="$NETLIFY_QA_SITE_ID" --prod --message "Pre-release: $RELEASE_NAME ($RELEASE_TAG)"
           else
             echo "Deploying full release to Production..."
+            export NETLIFY_AUTH_TOKEN="$NETLIFY_AUTH_TOKEN_PROD"
             netlify deploy --dir=dist/chamanguitech --site="$NETLIFY_PROD_SITE_ID" --prod --message "Release: $RELEASE_NAME ($RELEASE_TAG)"
           fi
