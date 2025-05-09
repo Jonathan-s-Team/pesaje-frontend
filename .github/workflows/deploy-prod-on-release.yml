@@ -20,8 +20,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Replace _redirects for production
-        run: cp src/public/environments/_redirects.prod src/public/_redirects
+      - name: Replace _redirects for production (only for full releases)
+        run: |
+          IS_PRERELEASE=${{ github.event.release.prerelease }}
+          if [ "$IS_PRERELEASE" = "false" ]; then
+            echo "This is a full release. Replacing _redirects for production..."
+            cp src/public/environments/_redirects.prod src/public/_redirects
+          else
+            echo "This is a pre-release. Skipping _redirects replacement."
+          fi
 
       - name: Build Angular App
         run: npm run build:prod
