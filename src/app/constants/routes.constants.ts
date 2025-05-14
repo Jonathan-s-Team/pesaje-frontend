@@ -1,5 +1,5 @@
 export const PERMISSION_ROUTES = {
-  HOME: '/home',
+  // HOME: '/home',
   PERSONAL_PROFILE: {
     MY_PROFILE: '/personal-profile/my-profile',
     BROKERS: '/personal-profile/brokers',

@@ -107,7 +107,7 @@ const Routing: Routes = [
   },
   {
     path: '',
-    redirectTo: '/dashboard',
+    redirectTo: '/personal-profile/my-profile',
     pathMatch: 'full',
   },
   {
