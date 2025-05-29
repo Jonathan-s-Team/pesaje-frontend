@@ -28,12 +28,12 @@
           Detalles
         </a>
       </li>
-      <!-- <li class="nav-item">
+      <li class="nav-item">
         <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Payment Info' }"
           (click)="setActiveTab('Payment Info')" role="tab">
           Informaciòn de pago
         </a>
-      </li> -->
+      </li>
     </ul>
   </div>
   <!-- end::Header -->
@@ -246,10 +246,10 @@
       <!-- end::Details -->
 
       <!-- begin::Payment Info -->
-      <!-- <div class="tab-pane fade" [ngClass]="{'show active': activeTab === 'Payment Info'}"
+      <div class="tab-pane fade" [ngClass]="{'show active': activeTab === 'Payment Info'}"
         *ngIf="activeTab === 'Payment Info'">
         <app-payment-information [permissionRoute]="PERMISSION_ROUTE" [personId]="personId" />
-      </div> -->
+      </div>
       <!-- end::Payment Info -->
 
     </div>

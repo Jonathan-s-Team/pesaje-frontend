@@ -193,7 +193,7 @@
         <!-- processedRatio -->
         <div class="col-md-6">
           <label for="processedRatio" class="fw-semibold fs-6 mb-2">
-            (%) Lb. compradas / Lb. procesadas
+            (%) lb. Procesadas/lb compradas
           </label>
           <input type="text" id="processedRatio" name="processedRatio" class="form-control form-control-sm text-end"
             [value]="processedRatioDisplay" disabled />
@@ -211,13 +211,13 @@
 <!-- Fourth Section: Local Sale Details -->
 <div class="row mt-2 gx-4 gy-4">
   <!-- WHOLE -->
-  <div class="col-12 col-lg-6">
+  <div class="col-12">
     <app-local-sale-details [style]="SaleStyleEnum.WHOLE" [localSaleDetails]="localSaleWholeDetails"
       (localSaleDetailsChange)="handleLocalSaleWholeDetailsChange($event)" />
   </div>
 
   <!-- TAIL -->
-  <div class="col-12 col-lg-6">
+  <div class="col-12">
     <app-local-sale-details [style]="SaleStyleEnum.TAIL" [localSaleDetails]="localSaleTailDetails"
       (localSaleDetailsChange)="handleLocalSaleTailDetailsChange($event)" />
   </div>

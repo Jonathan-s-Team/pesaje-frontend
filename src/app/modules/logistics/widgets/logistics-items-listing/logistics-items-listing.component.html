@@ -41,7 +41,7 @@
               <td class="text-end" style="width: 150px;">
                 <div class="input-group input-group-sm">
                   <span class="input-group-text">$</span>
-                  <input type="number" class="form-control text-end no-spinner" formControlName="cost"
+                  <input type="text" class="form-control text-end no-spinner" formControlName="cost"
                     (input)="calculateTotal(i)" (blur)="onCostBlur(i, group.get('cost'))"
                     (keypress)="validateNumber($event)" placeholder="0.00" />
                 </div>

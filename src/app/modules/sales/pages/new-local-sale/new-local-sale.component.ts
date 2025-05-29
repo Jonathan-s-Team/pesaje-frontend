@@ -120,7 +120,7 @@ export class NewLocalSaleComponent implements OnInit, OnDestroy {
 
     if (!total || !purchased || total === 0) return '';
 
-    const percentage = (purchased / total) * 100;
+    const percentage = (total / purchased) * 100;
     return `${percentage.toFixed(2)} %`;
   }
 
