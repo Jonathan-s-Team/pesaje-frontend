@@ -6,6 +6,7 @@ export interface IUpdateUserModel {
   username?: string;
   password?: string;
   roles: string[];
+  deletedAt?: Date;
   person: IPersonModel;
 }
 

@@ -195,8 +195,7 @@ export class UsersListingComponent implements OnInit, AfterViewInit, OnDestroy {
   delete(id: string): void {
     const deleteSub = this.userService.deleteUser(id).subscribe({
       next: () => {
-        this.users = this.users.filter((item) => item.id !== id);
-        this.reloadEvent.emit(true);
+        this.loadUsers();
       },
       error: () => {
         this.alertService.showTranslatedAlert({ alertType: 'error' });

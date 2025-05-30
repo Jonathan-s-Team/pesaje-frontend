@@ -44,6 +44,8 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   availableRoles: IRoleModel[] = [];
   selectedRoles: string[] = [];
 
+  isActive: boolean;
+
   private unsubscribe: Subscription[] = [];
 
   constructor(
@@ -81,6 +83,8 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
           deletedAt: user.deletedAt,
         };
         this.personId = user.person?.id ?? '';
+
+        this.isActive = !user.deletedAt;
 
         if (this.userData.person?.birthDate) {
           this.formattedBirthDate = new Date(this.userData.person.birthDate)
@@ -128,7 +132,9 @@ export class UsersDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
       username: this.userData.username,
       person: this.userData.person,
       roles: this.selectedRoles,
+      deletedAt: this.isActive ? undefined : new Date(),
     };
+    console.log(payload);
 
     const updateSub = this.userService
       .updateUser(this.userData.id, payload)
