@@ -195,7 +195,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   }
 
   loadBuyers(): void {
-    const userSub = this.userService.getAllUsers(true, 'Comprador').subscribe({
+    const userSub = this.userService.getAllUsers(false, 'Comprador').subscribe({
       next: (users: IReadUserModel[]) => {
         this.buyersList = users;
         this.changeDetectorRef.detectChanges();
