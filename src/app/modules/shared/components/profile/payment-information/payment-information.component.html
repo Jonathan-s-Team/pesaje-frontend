@@ -29,7 +29,8 @@
 
   <div class="card-body pt-0">
     <app-crud [datatableConfig]="datatableConfig" [permissionRoute]="permissionRoute"
-      (editEvent)="edit($event.toString())" (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal">
+      (editEvent)="edit($event.toString())" (deleteEvent)="delete($event.toString())" (createEvent)="create()"
+      [reload]="reloadEvent" [modal]="formModal">
     </app-crud>
   </div>
 </div>
