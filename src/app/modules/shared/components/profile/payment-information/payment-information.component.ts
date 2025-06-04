@@ -82,6 +82,7 @@ export class PaymentInformationComponent
     if (!this.permissionRoute) {
       this.permissionRoute = PERMISSION_ROUTES.PERSONAL_PROFILE.MY_PROFILE;
     }
+
     // If personId is not provided as an input, get it from route resolver
     if (!this.personId) {
       this.route.data.subscribe((data) => {
@@ -136,6 +137,12 @@ export class PaymentInformationComponent
     const deleteSub = this.paymentInfoService.deletePaymentInfo(id).subscribe({
       next: () => {
         this.paymentData = this.paymentData.filter((item) => item.id !== id);
+        this.datatableConfig = {
+          ...this.datatableConfig,
+          data: [...this.paymentData],
+        };
+
+        this.cdr.detectChanges();
         this.reloadEvent.emit(true);
       },
       error: () => {
