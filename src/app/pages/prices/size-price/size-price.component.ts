@@ -7,8 +7,6 @@ import {
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
-import { IReadCompanyModel } from 'src/app/modules/shared/interfaces/company.interface';
-import { CompanyService } from 'src/app/modules/shared/services/company.service';
 import { WholeTableComponent } from 'src/app/modules/shared/components/prices/whole-table/whole-table.component';
 import { HeadlessTableComponent } from 'src/app/modules/shared/components/prices/headless-table/headless-table.component';
 import {
@@ -29,6 +27,8 @@ import {
 import { AlertService } from 'src/app/utils/alert.service';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
 import { DateUtilsService } from 'src/app/utils/date-utils.service';
+import { ICompany } from 'src/app/modules/settings/interfaces/company.interfaces';
+import { CompanyService } from 'src/app/modules/settings/services/company.service';
 
 @Component({
   selector: 'app-size-price',
@@ -42,7 +42,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   headlessTableComponent!: HeadlessTableComponent;
 
   years: number[] = [];
-  companies: IReadCompanyModel[] = [];
+  companies: ICompany[] = [];
   existingPeriods: IReadPeriodModel[] = [];
 
   selectedPeriod = '';

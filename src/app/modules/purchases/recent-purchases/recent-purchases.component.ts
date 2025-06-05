@@ -15,12 +15,12 @@ import {
 } from '../interfaces/purchase.interface';
 import { Router } from '@angular/router';
 import { PeriodService } from '../../shared/services/period.service';
-import { CompanyService } from '../../shared/services/company.service';
-import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
 import { IReadPeriodModel } from '../../shared/interfaces/period.interface';
 import { IReadClientModel } from '../../shared/interfaces/client.interface';
 import { ClientService } from '../../shared/services/client.service';
 import { AlertService } from 'src/app/utils/alert.service';
+import { ICompany } from '../../settings/interfaces/company.interfaces';
+import { CompanyService } from '../../settings/services/company.service';
 
 @Component({
   selector: 'app-recent-purchases',
@@ -37,7 +37,7 @@ export class RecentPurchasesComponent implements OnInit {
   isOnlyBuyer = false;
   recentPurchases: IReducedDetailedPurchaseModel[] = [];
 
-  companies: IReadCompanyModel[] = [];
+  companies: ICompany[] = [];
   existingPeriods: IReadPeriodModel[] = [];
   clients: IReadClientModel[] = [];
   selectedPeriod = '';
