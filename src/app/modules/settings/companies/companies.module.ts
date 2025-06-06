@@ -14,9 +14,10 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { SharedModule } from '../../shared/shared.module';
 import { CompaniesComponent } from './companies.component';
 import { NewCompanyComponent } from './new-company/new-company.component';
+import { CompanyListDetailsComponent } from './company-list-details/company-list-details.component';
 
 @NgModule({
-  declarations: [CompaniesComponent, NewCompanyComponent],
+  declarations: [CompaniesComponent, NewCompanyComponent, CompanyListDetailsComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -30,10 +31,10 @@ import { NewCompanyComponent } from './new-company/new-company.component';
             path: 'new-company',
             component: NewCompanyComponent,
           },
-          // {
-          //   path: 'payment-information',
-          //   component: UsersListingComponent,
-          // },
+          {
+            path: 'company-list',
+            component: CompanyListDetailsComponent,
+          },
           { path: '', redirectTo: 'new-company', pathMatch: 'full' },
         ],
       },
