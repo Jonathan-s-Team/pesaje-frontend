@@ -33,4 +33,14 @@ export class CompanyService {
         finalize(() => this.isLoadingSubject.next(false))
       );
   }
+
+  updateCompany(company: ICompany): Observable<ICompany> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .put<{ data: ICompany }>(`${API_COMPANY_URL}/${company.id}`, company)
+      .pipe(
+        map((response) => response.data),
+        finalize(() => this.isLoadingSubject.next(false))
+      );
+  }
 }
