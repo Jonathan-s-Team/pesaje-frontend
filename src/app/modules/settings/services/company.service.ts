@@ -5,7 +5,7 @@ import { finalize, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { ICompany } from '../interfaces/company.interfaces';
 
-const API_PAYMENT_INFO_URL = `${environment.apiUrl}/company`;
+const API_COMPANY_URL = `${environment.apiUrl}/company`;
 
 @Injectable({
   providedIn: 'root',
@@ -18,9 +18,19 @@ export class CompanyService {
   getCompanies(): Observable<ICompany[]> {
     this.isLoadingSubject.next(true);
 
-    return this.http.get<{ data: ICompany[] }>(`${API_PAYMENT_INFO_URL}`).pipe(
+    return this.http.get<{ data: ICompany[] }>(`${API_COMPANY_URL}`).pipe(
       map((response) => response.data || []),
       finalize(() => this.isLoadingSubject.next(false))
     );
+  }
+
+  createCompany(company: ICompany): Observable<ICompany> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .post<{ data: ICompany }>(`${API_COMPANY_URL}`, company)
+      .pipe(
+        map((response) => response.data),
+        finalize(() => this.isLoadingSubject.next(false))
+      );
   }
 }
