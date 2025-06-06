@@ -12,10 +12,8 @@ import { NgForm } from '@angular/forms';
 import { distinctUntilChanged, Observable, Subscription } from 'rxjs';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 import { PurchaseService } from '../services/purchase.service';
-import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
 import { IRoleModel } from '../../auth/interfaces/role.interface';
 import { AuthService } from '../../auth';
-import { CompanyService } from '../../shared/services/company.service';
 import { BrokerService } from '../../personal-profile/services/broker.service';
 import { IReadBrokerModel } from '../../personal-profile/interfaces/broker.interface';
 import { ClientService } from '../../shared/services/client.service';
@@ -37,6 +35,8 @@ import { IReadUserModel } from '../../settings/interfaces/user.interface';
 import { UserService } from '../../settings/services/user.service';
 import { IReadPeriodModel } from '../../shared/interfaces/period.interface';
 import { PeriodService } from '../../shared/services/period.service';
+import { ICompany } from '../../settings/interfaces/company.interfaces';
+import { CompanyService } from '../../settings/services/company.service';
 
 type Tabs = 'Details' | 'Payment Info';
 
@@ -59,7 +59,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
   brokersList: IReadBrokerModel[];
   clientsList: IReadClientModel[];
   shrimpFarmsList: IReadShrimpFarmModel[];
-  companiesList: IReadCompanyModel[];
+  companiesList: ICompany[];
   existingPeriods: IReadPeriodModel[] = [];
 
   roles: IRoleModel[];
@@ -175,7 +175,7 @@ export class NewPurchaseComponent implements OnInit, OnDestroy {
     this.unsubscribe.push(companiesSub);
   }
 
-  loadCompanies(): Observable<IReadCompanyModel[]> {
+  loadCompanies(): Observable<ICompany[]> {
     return this.companyService.getCompanies().pipe(distinctUntilChanged());
   }
 

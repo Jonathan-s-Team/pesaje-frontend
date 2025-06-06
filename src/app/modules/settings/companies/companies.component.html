@@ -1,0 +1,39 @@
+<!-- Loading Spinner -->
+<div *ngIf="isLoading$ | async" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<!-- User Profile -->
+<div *ngIf="!(isLoading$ | async)">
+  <div class="card mb-5 mb-xl-10">
+    <div class="card-body pt-1 pb-0">
+
+      <div class="d-flex overflow-auto h-55px">
+        <ul class="
+          nav nav-stretch nav-line-tabs nav-line-tabs-2x
+          border-transparent
+          fs-5
+          fw-bolder
+          flex-nowrap
+        ">
+          <li class="nav-item">
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" routerLink="/settings/companies/new-company"
+              routerLinkActive="active">
+              Compañías
+            </a>
+            <a class="nav-link text-active-primary me-6" routerLink="/settings/companies/new-company"
+              routerLinkActive="active">
+              Nueva Companía
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <router-outlet></router-outlet>
+</div>

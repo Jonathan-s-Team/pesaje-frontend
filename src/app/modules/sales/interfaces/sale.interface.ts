@@ -1,6 +1,6 @@
 import { IReducedDetailedPurchaseModel } from '../../purchases/interfaces/purchase.interface';
+import { ICompany } from '../../settings/interfaces/company.interfaces';
 import { IReducedUserModel } from '../../settings/interfaces/user.interface';
-import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
 import { ICompanySaleItemModel } from './company-sale-item.interface';
 import { ILocalSaleDetailModel } from './local-sale-detail.interface';
 
@@ -14,7 +14,7 @@ export interface ISaleModel {
   saleDate: string;
   buyer: IReducedUserModel;
   client: IReducedUserModel;
-  company: IReadCompanyModel;
+  company: ICompany;
   type: SaleTypeEnum;
   status: CompanySaleStatusEnum;
   deletedAt?: string;

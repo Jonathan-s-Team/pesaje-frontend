@@ -9,10 +9,10 @@ const routes: Routes = [
     path: '',
     component: AccountComponent,
     children: [
-      {
-        path: 'overview',
-        component: OverviewComponent,
-      },
+      // {
+      //   path: 'overview',
+      //   component: OverviewComponent,
+      // },
       {
         path: 'settings',
         component: SettingsComponent,
