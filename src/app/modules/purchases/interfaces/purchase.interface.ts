@@ -1,10 +1,10 @@
 import { IReadBrokerModel } from '../../personal-profile/interfaces/broker.interface';
+import { ICompany } from '../../settings/interfaces/company.interfaces';
 import {
   IReadUserModel,
   IReducedUserModel,
 } from '../../settings/interfaces/user.interface';
 import { IReadClientModel } from '../../shared/interfaces/client.interface';
-import { IReadCompanyModel } from '../../shared/interfaces/company.interface';
 import {
   IReadPeriodModel,
   IReducedPeriodModel,
@@ -62,7 +62,7 @@ export interface IBasePurchaseModel {
 
 export interface IDetailedPurchaseModel extends IBasePurchaseModel {
   buyer: IReadUserModel;
-  company: IReadCompanyModel;
+  company: ICompany;
   period: IReadPeriodModel;
   broker: IReadBrokerModel;
   client: IReadClientModel;
@@ -81,7 +81,7 @@ export interface IListPurchaseModel extends IBasePurchaseModel {
 
 export interface IReducedDetailedPurchaseModel extends IBasePurchaseModel {
   buyer: IReducedUserModel;
-  company: IReadCompanyModel;
+  company: ICompany;
   period: IReducedPeriodModel;
   broker: IReducedUserModel;
   client: IReducedUserModel;
