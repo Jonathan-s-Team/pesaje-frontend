@@ -17,7 +17,11 @@ import { NewCompanyComponent } from './new-company/new-company.component';
 import { CompanyListDetailsComponent } from './company-list-details/company-list-details.component';
 
 @NgModule({
-  declarations: [CompaniesComponent, NewCompanyComponent, CompanyListDetailsComponent],
+  declarations: [
+    CompaniesComponent,
+    NewCompanyComponent,
+    CompanyListDetailsComponent,
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -35,7 +39,7 @@ import { CompanyListDetailsComponent } from './company-list-details/company-list
             path: 'company-list',
             component: CompanyListDetailsComponent,
           },
-          { path: '', redirectTo: 'new-company', pathMatch: 'full' },
+          { path: '', redirectTo: 'company-list', pathMatch: 'full' },
         ],
       },
     ]),
