@@ -7,6 +7,7 @@ import { AuthHTTPService } from './auth-http';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { TokenStorageService } from './token-storage.service';
+import { UserService } from '../../settings/services/user.service';
 
 export type UserType = UserModel | undefined;
 
@@ -44,14 +45,16 @@ export class AuthService implements OnDestroy {
   constructor(
     private authHttpService: AuthHTTPService,
     private router: Router,
-    private tokenStorageService: TokenStorageService
+    private tokenStorageService: TokenStorageService,
+    private userService: UserService // <-- inject UserService
   ) {
     this.isLoadingSubject = new BehaviorSubject<boolean>(false);
     this.currentUserSubject = new BehaviorSubject<UserType>(undefined);
     this.currentUser$ = this.currentUserSubject.asObservable();
     this.isLoading$ = this.isLoadingSubject.asObservable();
-    const subscr = this.getUserByToken().subscribe();
-    this.unsubscribe.push(subscr);
+    // Remove this line to avoid double call:
+    // const subscr = this.getUserByToken().subscribe();
+    // this.unsubscribe.push(subscr);
   }
 
   // public methods
@@ -92,6 +95,7 @@ export class AuthService implements OnDestroy {
       map((user: UserType) => {
         if (user) {
           this.currentUserSubject.next(user);
+          this.userService.user = user; // <-- update UserService's userSubject
         } else {
           this.logout();
         }

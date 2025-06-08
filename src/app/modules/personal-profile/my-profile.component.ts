@@ -1,8 +1,7 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { AuthService, UserModel } from '../auth';
+import { UserModel } from '../auth';
 import { UserService } from '../settings/services/user.service';
-import { style } from '@angular/animations';
 
 @Component({
   selector: 'app-my-profile',
@@ -19,7 +18,6 @@ export class MyProfileComponent implements OnInit, OnDestroy {
 
   constructor(
     private userService: UserService,
-    private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {
     this.isLoading$ = this.userService.isLoading$;
@@ -29,16 +27,11 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     // Subscribe to the user observable
     const userSub = this.userService.user$.subscribe((user) => {
       this.user = user; // Update the user data
+      this.photoUrl =
+        this.user?.person.photo || '/assets/media/avatars/blank.png';
       this.cdr.detectChanges(); // Trigger Angular's change detection
     });
     this.unsubscribe.push(userSub);
-
-    // Subscribe to the image observable for dynamic updates
-    const imageSub = this.userService.image$.subscribe((imageUrl) => {
-      this.photoUrl = imageUrl || '/assets/media/avatars/blank.png'; // Default avatar
-      this.cdr.detectChanges(); // Trigger Angular's change detection
-    });
-    this.unsubscribe.push(imageSub);
   }
 
   onPhotoSelected(event: Event) {
@@ -48,9 +41,9 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     formData.append('photo', file);
 
-    this.userService.uploadPhoto(this.user.id, formData).subscribe({
-      next: (updatedPhotoPath: string) => {
-        this.user!.person.photo = updatedPhotoPath; // Update the user's photo path
+    this.userService.uploadMyProfilePhoto(this.user.id, formData).subscribe({
+      next: () => {
+        // No need to update photoUrl here; subscription to user$ will handle it
       },
       error: (err) => {
         console.error('Upload failed', err);
