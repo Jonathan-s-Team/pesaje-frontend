@@ -107,7 +107,7 @@ export const locale = {
       DELETE_SUCCESS: '¡El elemento fue eliminado exitosamente!',
       PURCHASE_NOT_FOUND: 'No se encontró la compra.',
       LOGISTICS_LIMIT_REACHED:
-        'Ya se ha(n) creado {{count}} registro(s) logístico(s) permitido(s) para esta compra.',
+        'Ya se ha(n) creado {{count}} registro(s) logístico(s) permitido(s) para esta compra: {{record}}.',
       NO_SALE_DETAILS_ENTERED: 'No se han ingresado detalles de la venta.',
       SALE_LIMIT_REACHED: 'Ya existe una venta creada para esta compra.',
       INCOMPLETE_TOTAL_REPORT_INFO:

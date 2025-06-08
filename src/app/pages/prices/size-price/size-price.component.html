@@ -203,14 +203,18 @@
   <!-- begin::Row -->
   <div class="row g-5 g-xl-8 mt-1">
     <!-- begin::Col -->
+    <div class="col-xl-12">
+      <app-headless-table class="card card-xl-stretch mb-xl-8" [sizePrices]="headlessSizePrices"></app-headless-table>
+    </div>
+    <!-- end::Col -->
+    <!-- begin::Col -->
     <div class="col-xl-6">
       <app-whole-table class="card card-xl-stretch mb-xl-8" [sizePrices]="wholeSizePrices"></app-whole-table>
     </div>
     <!-- end::Col -->
-
     <!-- begin::Col -->
     <div class="col-xl-6">
-      <app-headless-table class="card card-xl-stretch mb-xl-8" [sizePrices]="headlessSizePrices"></app-headless-table>
+      <app-residual-table class="card card-xl-stretch mb-xl-8" [sizePrices]="residualSizePrices"></app-residual-table>
     </div>
     <!-- end::Col -->
   </div>

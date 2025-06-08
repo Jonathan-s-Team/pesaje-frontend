@@ -72,7 +72,7 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     private location: Location,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get logisticsDateFormatted(): string | null {
     return this.dateUtils.formatISOToDateInput(
@@ -225,13 +225,13 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
     this.logisticsModel.purchase = this.purchaseModel.id;
     this.logisticsModel.items = this.logisticsItems.map(
       (x) =>
-        ({
-          logisticsCategory: x.logisticsCategory.id,
-          unit: x.unit,
-          cost: x.cost,
-          total: x.total,
-          description: x.description,
-        } as ICreateUpdateLogisticsItemModel)
+      ({
+        logisticsCategory: x.logisticsCategory.id,
+        unit: x.unit,
+        cost: x.cost,
+        total: x.total,
+        description: x.description,
+      } as ICreateUpdateLogisticsItemModel)
     );
     this.logisticsModel.grandTotal = this.grandTotalDisplayed;
 
@@ -308,12 +308,12 @@ export class NewLogisticsComponent implements OnInit, OnDestroy {
                 const isLocal =
                   purchase.company.name?.toLowerCase() === 'local';
                 const maxAllowed = isLocal ? 2 : 1;
-
-                if (logistics.length >= maxAllowed) {
+                const hasDifferentTypes = isLocal ? new Set(logistics.map(l => l.type)).size > 1 : true;
+                if (logistics.length >= maxAllowed && hasDifferentTypes) {
                   this.alertService.showTranslatedAlert({
                     alertType: 'warning',
                     messageKey: 'MESSAGES.LOGISTICS_LIMIT_REACHED',
-                    params: { count: isLocal ? 2 : 1 },
+                    params: { count: isLocal ? 2 : 1, record: Array.from(new Set(logistics.map(l => l.description))).join(', ') },
                   });
 
                   this.initializeModels();

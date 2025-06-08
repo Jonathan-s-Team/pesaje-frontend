@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 import { PERMISSION_ROUTES } from 'src/app/constants/routes.constants';
 import { WholeTableComponent } from 'src/app/modules/shared/components/prices/whole-table/whole-table.component';
 import { HeadlessTableComponent } from 'src/app/modules/shared/components/prices/headless-table/headless-table.component';
+import { ResidualTableComponent } from 'src/app/modules/shared/components/prices/residual-table/residual-table.component';
 import {
   IReadPeriodModel,
   IUpdatePeriodModel,
@@ -40,7 +41,8 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   @ViewChild(WholeTableComponent) wholeTableComponent!: WholeTableComponent;
   @ViewChild(HeadlessTableComponent)
   headlessTableComponent!: HeadlessTableComponent;
-
+  @ViewChild(ResidualTableComponent) residualTableComponent!: ResidualTableComponent;
+  
   years: number[] = [];
   companies: ICompany[] = [];
   existingPeriods: IReadPeriodModel[] = [];
@@ -63,6 +65,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
 
   wholeSizePrices: IReadSizePriceModel[] = [];
   headlessSizePrices: IReadSizePriceModel[] = [];
+  residualSizePrices: IReadSizePriceModel[] = [];
 
   private unsubscribe: Subscription[] = [];
 
@@ -144,7 +147,13 @@ export class SizePriceComponent implements OnInit, OnDestroy {
 
         this.headlessSizePrices = [
           ...(periodDetails.sizePrices?.filter(
-            (item) => item.size.type !== SizeTypeEnum.WHOLE
+            (item) => (item.size.type !== SizeTypeEnum.WHOLE && item.size.type !== SizeTypeEnum.RESIDUAL)
+          ) || []),
+        ];
+        
+        this.residualSizePrices = [
+          ...(periodDetails.sizePrices?.filter(
+            (item) => item.size.type === SizeTypeEnum.RESIDUAL
           ) || []),
         ];
 
@@ -165,6 +174,10 @@ export class SizePriceComponent implements OnInit, OnDestroy {
 
         if (this.headlessTableComponent) {
           this.headlessTableComponent.disableForm();
+        }
+        
+        if (this.residualTableComponent) {
+          this.residualTableComponent.disableForm();
         }
 
         this.cdr.detectChanges();
@@ -206,6 +219,10 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     if (this.headlessTableComponent) {
       this.headlessTableComponent.disableForm();
     }
+    
+    if (this.residualTableComponent) {
+      this.residualTableComponent.disableForm();
+    }
 
     this.cdr.detectChanges();
   }
@@ -222,6 +239,12 @@ export class SizePriceComponent implements OnInit, OnDestroy {
       this.headlessTableComponent.form.reset();
       this.headlessTableComponent.enableForm();
     }
+
+    if (this.residualTableComponent){
+      this.residualTableComponent.clearValidationErrors();
+      this.residualTableComponent.form.reset();
+      this.residualTableComponent.enableForm();
+    }
   }
 
   editPeriod() {
@@ -233,6 +256,9 @@ export class SizePriceComponent implements OnInit, OnDestroy {
 
     if (this.headlessTableComponent) {
       this.headlessTableComponent.enableForm();
+    }
+    if (this.residualTableComponent) {
+      this.residualTableComponent.enableForm();
     }
 
     this.cdr.detectChanges();
@@ -247,6 +273,9 @@ export class SizePriceComponent implements OnInit, OnDestroy {
 
     if (this.headlessTableComponent) {
       this.headlessTableComponent.disableForm();
+    }
+    if (this.residualTableComponent) {
+      this.residualTableComponent.disableForm();
     }
 
     this.search();
@@ -263,6 +292,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
       sizePrices: [
         ...this.extractSizePrices(this.wholeTableComponent),
         ...this.extractSizePrices(this.headlessTableComponent),
+        ...this.extractSizePrices(this.residualTableComponent),
       ],
     };
 
@@ -328,7 +358,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     // ✅ Trigger form validation checks
     const hasErrors =
       this.wholeTableComponent?.form.invalid ||
-      this.headlessTableComponent?.form.invalid;
+      this.headlessTableComponent?.form.invalid || this.residualTableComponent?.form.invalid;
 
     if (this.wholeTableComponent?.form.invalid) {
       this.wholeTableComponent.triggerValidation();
@@ -336,6 +366,9 @@ export class SizePriceComponent implements OnInit, OnDestroy {
 
     if (this.headlessTableComponent?.form.invalid) {
       this.headlessTableComponent.triggerValidation();
+    }
+    if (this.residualTableComponent?.form.invalid) {
+      this.residualTableComponent.triggerValidation();
     }
 
     // ✅ Stop execution if any validation errors exist
@@ -349,7 +382,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   }
 
   extractSizePrices(
-    component: WholeTableComponent | HeadlessTableComponent
+    component: WholeTableComponent | HeadlessTableComponent | ResidualTableComponent
   ): IUpdateSizePriceModel[] {
     if (!component?.sizes || !component.form) return [];
 

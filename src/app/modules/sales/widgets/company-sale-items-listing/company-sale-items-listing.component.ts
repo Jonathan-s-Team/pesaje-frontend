@@ -70,6 +70,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
 
   isLoading = false;
   isWhole = false;
+  isResidual = false;
 
   poundsGrandTotal: number = 0;
   grandTotal: number = 0;
@@ -84,6 +85,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
 
   wholeSizes: IReadSizeModel[];
   tailSizes: IReadSizeModel[];
+  residualSizes: IReadSizeModel[];
   shrimpClassList: { type: string; label: string }[] = [];
   sizeList: string[] = [];
   periodModel: IReadPeriodModel;
@@ -101,6 +103,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
           if (!data && data !== 0) return '-';
 
           if (data === SaleStyleEnum.WHOLE) return 'Entero';
+          else if (data === SaleStyleEnum.RESIDUAL) return 'Residual';
 
           return 'Cola';
         },
@@ -211,7 +214,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
     private inputUtils: InputUtilsService,
     private formUtils: FormUtilsService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get periodId(): string {
     return this._periodId;
@@ -222,6 +225,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
     this.companySaleStylesLabels = {
       [SaleStyleEnum.WHOLE]: 'Entero',
       [SaleStyleEnum.TAIL]: 'Cola',
+      [SaleStyleEnum.RESIDUAL]: 'Residual',
     };
     this.companySaleStyles = Object.values(SaleStyleEnum);
   }
@@ -234,6 +238,7 @@ export class CompanySaleItemsListingComponent implements OnInit {
           SizeTypeEnum['TAIL-A'],
           SizeTypeEnum['TAIL-A-'],
           SizeTypeEnum['TAIL-B'],
+          SizeTypeEnum.RESIDUAL,
         ].join(',')
       )
       .subscribe({
@@ -242,7 +247,10 @@ export class CompanySaleItemsListingComponent implements OnInit {
             (size) => size.type === SizeTypeEnum.WHOLE
           );
           this.tailSizes = sizes.filter(
-            (size) => size.type !== SizeTypeEnum.WHOLE
+            (size) => (size.type !== SizeTypeEnum.WHOLE && size.type !== SizeTypeEnum.RESIDUAL)
+          );
+          this.residualSizes = sizes.filter(
+            (size) => size.type === SizeTypeEnum.RESIDUAL
           );
 
           const uniqueTypes = new Set(this.tailSizes.map((s) => s.type));
@@ -356,8 +364,11 @@ export class CompanySaleItemsListingComponent implements OnInit {
     this.companySaleItem = foundItem ?? ({} as ICompanySaleItemModel);
 
     this.isWhole = this.companySaleItem.style === SaleStyleEnum.WHOLE;
+    this.isResidual = this.companySaleItem.style === SaleStyleEnum.RESIDUAL;
     if (this.isWhole) {
       this.sizeList = this.wholeSizes.map((size) => size.size);
+    } else if (this.isResidual) {
+      this.sizeList = this.residualSizes.map((size) => size.size);
     } else {
       if (this.companySaleItem.class) {
         this.sizeList = this.tailSizes
@@ -408,9 +419,12 @@ export class CompanySaleItemsListingComponent implements OnInit {
     this.companySaleItem.referencePrice = undefined;
 
     this.isWhole = style === SaleStyleEnum.WHOLE;
-
+    this.isResidual = style === SaleStyleEnum.RESIDUAL;
+debugger
     if (this.isWhole) {
       this.sizeList = this.wholeSizes.map((size) => size.size);
+    } else if (this.isResidual) {
+      this.sizeList = this.residualSizes.map((size) => size.size);
     } else {
       if (this.companySaleItem.class) {
         this.sizeList = this.tailSizes
@@ -433,6 +447,10 @@ export class CompanySaleItemsListingComponent implements OnInit {
     if (this.companySaleItem.style === SaleStyleEnum.WHOLE) {
       this.companySaleItem.referencePrice = this.periodModel.sizePrices?.filter(
         (x) => x.size.size === size && x.size.type === SizeTypeEnum.WHOLE
+      )[0].price;
+    } else if (this.companySaleItem.style === SaleStyleEnum.RESIDUAL) {
+      this.companySaleItem.referencePrice = this.periodModel.sizePrices?.filter(
+        (x) => x.size.size === size && x.size.type === SizeTypeEnum.RESIDUAL
       )[0].price;
     } else {
       this.companySaleItem.referencePrice = this.periodModel.sizePrices?.filter(

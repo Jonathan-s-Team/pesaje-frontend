@@ -130,7 +130,6 @@ export class HeadlessTableComponent implements OnInit, OnChanges, OnDestroy {
               this.form.addControl(
                 controlName,
                 new FormControl('', [
-                  Validators.required,
                   Validators.pattern(/^\d+(\.\d{1,2})?$/), // Allow only numbers with max 2 decimals
                 ])
               );
