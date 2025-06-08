@@ -2,10 +2,12 @@ export interface ICompany {
   id?: string;
   name: string;
   code?: string;
+  address?: string;
   city: string;
-  mainPersonName: string;
   mainTelephone: string;
   invoiceEmail?: string;
+
+  mainPersonName: string;
   managerName?: string;
   managerCellPhone?: string;
   managerEmail?: string;
@@ -16,6 +18,7 @@ export interface ICompany {
   positionInCompany?: string;
   aditionalStaffCellPhone?: string;
   aditionalStaffEmail?: string;
+
   priceListByEmail?: boolean;
   priceListByMessagesOrWhatsApp?: boolean;
   receivesWholeShrimp?: boolean;
@@ -29,6 +32,7 @@ export interface ICompany {
     max?: number;
     min?: number;
   };
+
   paymentMethod1?: string;
   paymentMethod2?: string;
   bank1?: string;
@@ -40,6 +44,7 @@ export interface ICompany {
   thirdPaymentPercent?: number;
   daysUntilThirdPayment?: number;
   paymentReliabilityPercent?: number;
+
   logisticsShippingAvailable?: boolean;
   logisticsCompensationWhole?: number;
   logisticsCompensationTails?: number;
@@ -49,11 +54,13 @@ export interface ICompany {
   companyClassifierKnown?: boolean;
   personCanBeSentForClassification?: boolean;
   extraInformation?: string;
+
   classificationQuality?: ['BAD', 'GOOD', 'EXCELLENT'];
   arePaymentsOnTime?: boolean;
   observation1?: string;
   observation2?: string;
   observation3?: string;
   observation4?: string;
+
   deletedAt?: Date;
 }

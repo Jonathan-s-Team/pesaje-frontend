@@ -15,9 +15,15 @@ import { SharedModule } from '../../shared/shared.module';
 import { CompaniesComponent } from './companies.component';
 import { NewCompanyComponent } from './new-company/new-company.component';
 import { CompanyListDetailsComponent } from './company-list-details/company-list-details.component';
+import { CompanyPricesComponent } from './company-prices/company-prices.component';
 
 @NgModule({
-  declarations: [CompaniesComponent, NewCompanyComponent, CompanyListDetailsComponent],
+  declarations: [
+    CompaniesComponent,
+    NewCompanyComponent,
+    CompanyListDetailsComponent,
+    CompanyPricesComponent,
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -35,7 +41,11 @@ import { CompanyListDetailsComponent } from './company-list-details/company-list
             path: 'company-list',
             component: CompanyListDetailsComponent,
           },
-          { path: '', redirectTo: 'new-company', pathMatch: 'full' },
+          {
+            path: 'prices',
+            component: CompanyPricesComponent,
+          },
+          { path: '', redirectTo: 'company-list', pathMatch: 'full' },
         ],
       },
     ]),
