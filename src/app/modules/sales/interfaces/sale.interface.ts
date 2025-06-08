@@ -106,6 +106,7 @@ export enum SaleTypeEnum {
 export enum SaleStyleEnum {
   WHOLE = 'WHOLE',
   TAIL = 'TAIL',
+  RESIDUAL = 'RESIDUAL'
 }
 
 export enum CompanySaleStatusEnum {

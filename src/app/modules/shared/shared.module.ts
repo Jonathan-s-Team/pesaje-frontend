@@ -13,12 +13,14 @@ import { WholeTableComponent } from './components/prices/whole-table/whole-table
 import { HeadlessTableComponent } from './components/prices/headless-table/headless-table.component';
 import {ShrimpFarmInformationComponent} from "./components/clients/shrimp-farm/shrimp-farm-information.component";
 import { MaterialModule } from 'src/app/material.module';
+import { ResidualTableComponent } from './components/prices/residual-table/residual-table.component';
 
 @NgModule({
   declarations: [
     PaymentInformationComponent,
     WholeTableComponent,
     HeadlessTableComponent,
+    ResidualTableComponent,
     CanEditDirective,
     CanCreateDirective,
     CanDeleteDirective,
@@ -38,6 +40,7 @@ import { MaterialModule } from 'src/app/material.module';
     PaymentInformationComponent,
     WholeTableComponent,
     HeadlessTableComponent,
+    ResidualTableComponent,
     CanEditDirective,
     CanCreateDirective,
     CanDeleteDirective,

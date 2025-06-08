@@ -1,28 +1,18 @@
-import {
-  Component,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-} from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { SizeService } from '../../../services/size.service';
+import { Component, Input, SimpleChanges } from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import {
-  IReadSizeModel,
-  SizeTypeEnum,
-} from '../../../interfaces/size.interface';
-import { IReadSizePriceModel } from '../../../interfaces/size-price.interface';
 import { FormUtilsService } from 'src/app/utils/form-utils.service';
 import { InputUtilsService } from 'src/app/utils/input-utils.service';
+import { IReadSizePriceModel } from '../../../interfaces/size-price.interface';
+import { IReadSizeModel, SizeTypeEnum } from '../../../interfaces/size.interface';
+import { SizeService } from '../../../services/size.service';
 
 @Component({
-  selector: 'app-whole-table',
-  templateUrl: './whole-table.component.html',
+  selector: 'app-residual-table',
+  templateUrl: './residual-table.component.html'
 })
-export class WholeTableComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() sizePrices: IReadSizePriceModel[] = [];
+export class ResidualTableComponent {
+ @Input() sizePrices: IReadSizePriceModel[] = [];
 
   isLoading$: Observable<boolean>;
 
@@ -55,7 +45,7 @@ export class WholeTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   loadSizes(): void {
-    const sizesSub = this.sizeService.getSizes(SizeTypeEnum.WHOLE).subscribe({
+    const sizesSub = this.sizeService.getSizes(SizeTypeEnum.RESIDUAL).subscribe({
       next: (sizes) => {
         this.sizes = sizes;
 

@@ -9,4 +9,5 @@ export enum SizeTypeEnum {
   'TAIL-A' = 'TAIL-A',
   'TAIL-A-' = 'TAIL-A-',
   'TAIL-B' = 'TAIL-B',
+  RESIDUAL = 'RESIDUAL'
 }
