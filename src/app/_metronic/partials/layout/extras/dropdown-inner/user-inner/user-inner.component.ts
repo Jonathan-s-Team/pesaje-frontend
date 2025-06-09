@@ -8,7 +8,6 @@ import {
 import { Subscription } from 'rxjs';
 import { TranslationService } from '../../../../../../modules/i18n';
 import { AuthService, UserType } from '../../../../../../modules/auth';
-import { UserService } from 'src/app/modules/settings/services/user.service';
 
 @Component({
   selector: 'app-user-inner',
@@ -31,13 +30,12 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   constructor(
     private auth: AuthService,
     private translationService: TranslationService,
-    private userService: UserService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     // Subscribe to the user observable
-    const userSub = this.userService.user$.subscribe((user) => {
+    const userSub = this.auth.currentUser$.subscribe((user) => {
       this.user = user; // Update the user data
       this.photoUrl =
         this.user?.person.photo || '/assets/media/avatars/blank.png';

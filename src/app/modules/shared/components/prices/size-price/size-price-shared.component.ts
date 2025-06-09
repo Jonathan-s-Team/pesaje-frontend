@@ -43,7 +43,8 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
   @ViewChild(WholeTableComponent) wholeTableComponent!: WholeTableComponent;
   @ViewChild(HeadlessTableComponent)
   headlessTableComponent!: HeadlessTableComponent;
-  @ViewChild(ResidualTableComponent) residualTableComponent!: ResidualTableComponent;
+  @ViewChild(ResidualTableComponent)
+  residualTableComponent!: ResidualTableComponent;
 
   @Input() selectedCompany: string = '';
   years: number[] = [];
@@ -80,13 +81,12 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
     private inputUtils: InputUtilsService,
     private dateUtils: DateUtilsService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.loadYears();
     this.loadCompanies();
-    if (this.selectedCompany != '')
-      this.onCompanyChange();
+    if (this.selectedCompany != '') this.onCompanyChange();
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedCompany']) {
@@ -159,7 +159,9 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
 
         this.headlessSizePrices = [
           ...(periodDetails.sizePrices?.filter(
-            (item) => (item.size.type !== SizeTypeEnum.WHOLE && item.size.type !== SizeTypeEnum.RESIDUAL)
+            (item) =>
+              item.size.type !== SizeTypeEnum.WHOLE &&
+              item.size.type !== SizeTypeEnum.RESIDUAL
           ) || []),
         ];
 
@@ -370,7 +372,8 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
     // ✅ Trigger form validation checks
     const hasErrors =
       this.wholeTableComponent?.form.invalid ||
-      this.headlessTableComponent?.form.invalid || this.residualTableComponent?.form.invalid;
+      this.headlessTableComponent?.form.invalid ||
+      this.residualTableComponent?.form.invalid;
 
     if (this.wholeTableComponent?.form.invalid) {
       this.wholeTableComponent.triggerValidation();
@@ -394,7 +397,10 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
   }
 
   extractSizePrices(
-    component: WholeTableComponent | HeadlessTableComponent | ResidualTableComponent
+    component:
+      | WholeTableComponent
+      | HeadlessTableComponent
+      | ResidualTableComponent
   ): IUpdateSizePriceModel[] {
     if (!component?.sizes || !component.form) return [];
 

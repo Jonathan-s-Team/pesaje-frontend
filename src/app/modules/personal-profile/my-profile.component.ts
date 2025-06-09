@@ -1,7 +1,8 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { UserModel } from '../auth';
 import { UserService } from '../settings/services/user.service';
+import { AuthService } from '../auth/services/auth.service';
 
 @Component({
   selector: 'app-my-profile',
@@ -10,22 +11,20 @@ import { UserService } from '../settings/services/user.service';
 })
 export class MyProfileComponent implements OnInit, OnDestroy {
   user: UserModel | undefined;
-  isLoading$: Observable<boolean>;
 
   photoUrl: string = '/assets/media/avatars/blank.png'; // Default photo URL
 
   private unsubscribe: Subscription[] = [];
 
   constructor(
+    private authService: AuthService,
     private userService: UserService,
     private cdr: ChangeDetectorRef
-  ) {
-    this.isLoading$ = this.userService.isLoading$;
-  }
+  ) {}
 
   ngOnInit(): void {
     // Subscribe to the user observable
-    const userSub = this.userService.user$.subscribe((user) => {
+    const userSub = this.authService.currentUser$.subscribe((user) => {
       this.user = user; // Update the user data
       this.photoUrl =
         this.user?.person.photo || '/assets/media/avatars/blank.png';

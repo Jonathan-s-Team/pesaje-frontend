@@ -10,7 +10,12 @@
   </div>
 
   <div class="card-body p-9">
-    <div *ngIf="!isEditing">
+    <div *ngIf="isLoading$ | async" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <div *ngIf="!isEditing && !(isLoading$ | async)">
       <div class="row mb-7">
         <label class="col-lg-4 fw-bold text-muted">Nombre Completo</label>
         <div class="col-lg-8">
@@ -76,6 +81,7 @@
       </div>
     </div>
 
-    <app-personal-profile-details *ngIf="isEditing"></app-personal-profile-details>
+    <app-personal-profile-details *ngIf="isEditing" [user]="user"
+      (saveCompleted)="onSaveCompleted()"></app-personal-profile-details>
   </div>
 </div>

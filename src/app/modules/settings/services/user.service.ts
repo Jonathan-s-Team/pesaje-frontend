@@ -8,6 +8,7 @@ import {
   IReadUserModel,
   IUpdateUserModel,
 } from '../interfaces/user.interface';
+import { AuthService } from '../../auth';
 
 const API_USERS_URL = `${environment.apiUrl}/user`;
 
@@ -15,31 +16,16 @@ const API_USERS_URL = `${environment.apiUrl}/user`;
   providedIn: 'root',
 })
 export class UserService {
-  user$: Observable<UserModel | undefined>;
-  private userSubject: BehaviorSubject<UserModel | undefined>;
-
   isLoading$: Observable<boolean>;
   private isLoadingSubject: BehaviorSubject<boolean>;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private authService: AuthService) {
     this.isLoadingSubject = new BehaviorSubject<boolean>(false);
     this.isLoading$ = this.isLoadingSubject.asObservable();
-
-    this.userSubject = new BehaviorSubject<UserModel | undefined>(undefined);
-    this.user$ = this.userSubject.asObservable();
-  }
-
-  get user(): UserModel | undefined {
-    return this.userSubject.getValue();
-  }
-
-  set user(user: UserModel) {
-    this.userSubject.next(user);
   }
 
   getUserById(id: string): Observable<UserModel> {
     this.isLoadingSubject.next(true);
-
     return this.http.get<{ user: UserModel }>(`${API_USERS_URL}/${id}`).pipe(
       map((response) => response.user),
       finalize(() => this.isLoadingSubject.next(false))
@@ -112,10 +98,10 @@ export class UserService {
         map((res) => res.photo),
         tap((updatedPhotoPath: string) => {
           // Update the current user object with the new photo path and emit it
-          const currentUser = this.userSubject.getValue();
+          const currentUser = this.authService.currentUserValue;
           if (currentUser) {
             currentUser.person.photo = updatedPhotoPath;
-            this.userSubject.next(currentUser);
+            this.authService.currentUserValue = currentUser;
           }
         }),
         finalize(() => this.isLoadingSubject.next(false))

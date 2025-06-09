@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { menuReinitialization } from 'src/app/_metronic/kt/kt-helpers';
 import { AuthService, UserModel } from 'src/app/modules/auth';
-import { UserService } from 'src/app/modules/settings/services/user.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -31,7 +30,6 @@ export class NavbarComponent implements OnInit, AfterViewInit {
   private userSub: Subscription;
 
   constructor(
-    private userService: UserService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -41,7 +39,7 @@ export class NavbarComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.userSub = this.userService.user$.subscribe((user) => {
+    this.userSub = this.authService.currentUser$.subscribe((user) => {
       this.user = user;
       this.photoUrl =
         this.user?.person.photo || '/assets/media/avatars/blank.png';

@@ -19,8 +19,8 @@ const routes: Routes = [
         component: PaymentInformationComponent,
         resolve: { personId: PersonIdResolver },
       },
-      // { path: '', redirectTo: 'personal-information', pathMatch: 'full' },
-      // { path: '**', redirectTo: 'personal-information', pathMatch: 'full' },
+      { path: '', redirectTo: 'personal-information', pathMatch: 'full' },
+      { path: '**', redirectTo: 'personal-information', pathMatch: 'full' },
     ],
   },
   {
