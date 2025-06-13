@@ -1,8 +1,10 @@
 import {
   ChangeDetectorRef,
   Component,
+  Input,
   OnDestroy,
   OnInit,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -32,23 +34,24 @@ import { ICompany } from 'src/app/modules/settings/interfaces/company.interfaces
 import { CompanyService } from 'src/app/modules/settings/services/company.service';
 
 @Component({
-  selector: 'app-size-price',
-  templateUrl: './size-price.component.html',
+  selector: 'app-size-price-shared',
+  templateUrl: './size-price-shared.component.html',
 })
-export class SizePriceComponent implements OnInit, OnDestroy {
+export class SizePriceSharedComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PRICES;
 
   @ViewChild(WholeTableComponent) wholeTableComponent!: WholeTableComponent;
   @ViewChild(HeadlessTableComponent)
   headlessTableComponent!: HeadlessTableComponent;
   @ViewChild(ResidualTableComponent) residualTableComponent!: ResidualTableComponent;
-  
+
+  @Input() selectedCompany: string = '';
   years: number[] = [];
   companies: ICompany[] = [];
   existingPeriods: IReadPeriodModel[] = [];
 
   selectedPeriod = '';
-  selectedCompany = '';
+  //selectedCompany = '';
   selectedYear = '';
   periodNumber = '';
 
@@ -62,6 +65,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   isSearching = false;
   showEditButton = false;
   showErrors = false;
+  showCompany = true;
 
   wholeSizePrices: IReadSizePriceModel[] = [];
   headlessSizePrices: IReadSizePriceModel[] = [];
@@ -76,11 +80,20 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     private inputUtils: InputUtilsService,
     private dateUtils: DateUtilsService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadYears();
     this.loadCompanies();
+    if (this.selectedCompany != '')
+      this.onCompanyChange();
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedCompany']) {
+      this.onCompanyChange();
+      this.loadYears();
+      this.showCompany = !this.selectedCompany;
+    }
   }
 
   loadYears() {
@@ -106,7 +119,6 @@ export class SizePriceComponent implements OnInit, OnDestroy {
       this.existingPeriods = [];
       return;
     }
-
     // Fetch periods for the selected company
     this.periodService.getPeriodsByCompany(this.selectedCompany).subscribe({
       next: (periods) => {
@@ -150,7 +162,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
             (item) => (item.size.type !== SizeTypeEnum.WHOLE && item.size.type !== SizeTypeEnum.RESIDUAL)
           ) || []),
         ];
-        
+
         this.residualSizePrices = [
           ...(periodDetails.sizePrices?.filter(
             (item) => item.size.type === SizeTypeEnum.RESIDUAL
@@ -175,7 +187,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
         if (this.headlessTableComponent) {
           this.headlessTableComponent.disableForm();
         }
-        
+
         if (this.residualTableComponent) {
           this.residualTableComponent.disableForm();
         }
@@ -219,7 +231,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     if (this.headlessTableComponent) {
       this.headlessTableComponent.disableForm();
     }
-    
+
     if (this.residualTableComponent) {
       this.residualTableComponent.disableForm();
     }
@@ -240,7 +252,7 @@ export class SizePriceComponent implements OnInit, OnDestroy {
       this.headlessTableComponent.enableForm();
     }
 
-    if (this.residualTableComponent){
+    if (this.residualTableComponent) {
       this.residualTableComponent.clearValidationErrors();
       this.residualTableComponent.form.reset();
       this.residualTableComponent.enableForm();

@@ -16,6 +16,8 @@ import { CompaniesComponent } from './companies.component';
 import { NewCompanyComponent } from './new-company/new-company.component';
 import { CompanyListDetailsComponent } from './company-list-details/company-list-details.component';
 import { CompanyPricesComponent } from './company-prices/company-prices.component';
+import { CompanyBestPricesComponent } from './company-best-prices/company-best-prices.component';
+import { PricesModule } from 'src/app/pages/prices/prices.module';
 
 @NgModule({
   declarations: [
@@ -23,6 +25,7 @@ import { CompanyPricesComponent } from './company-prices/company-prices.componen
     NewCompanyComponent,
     CompanyListDetailsComponent,
     CompanyPricesComponent,
+    CompanyBestPricesComponent,
   ],
   imports: [
     CommonModule,
@@ -44,6 +47,10 @@ import { CompanyPricesComponent } from './company-prices/company-prices.componen
           {
             path: 'prices',
             component: CompanyPricesComponent,
+          },
+          {
+            path: 'best-prices',
+            component: CompanyBestPricesComponent,
           },
           { path: '', redirectTo: 'company-list', pathMatch: 'full' },
         ],

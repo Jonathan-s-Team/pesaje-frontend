@@ -19,7 +19,7 @@ export class PeriodService {
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoadingSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   createPeriod(
     periodPayload: ICreatePeriodModel
@@ -46,6 +46,24 @@ export class PeriodService {
     this.isLoadingSubject.next(true);
     return this.http
       .get<{ data: IReadPeriodModel }>(`${API_PERIOD_URL}/${id}`)
+      .pipe(
+        map((response) => response.data), // ✅ Extract array from response
+        finalize(() => this.isLoadingSubject.next(false))
+      );
+  }
+  getAllPeriods(): Observable<string[]> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .get<{ data: string[] }>(`${API_PERIOD_URL}/distinct-names`)
+      .pipe(
+        map((response) => response.data), // ✅ Extract array from response
+        finalize(() => this.isLoadingSubject.next(false))
+      );
+  }
+  getPeriodByName(periodName: string): Observable<string[]> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .get<{ data: string[] }>(`${API_PERIOD_URL}/prices/by-period-name?periodName=${periodName}`)
       .pipe(
         map((response) => response.data), // ✅ Extract array from response
         finalize(() => this.isLoadingSubject.next(false))

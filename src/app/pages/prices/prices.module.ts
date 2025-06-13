@@ -11,12 +11,12 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { SizePriceComponent } from './size-price/size-price.component';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { MaterialModule } from 'src/app/material.module';
+import { SizePriceSharedComponent } from 'src/app/modules/shared/components/prices/size-price/size-price-shared.component';
 
 @NgModule({
-  declarations: [SizePriceComponent],
+  declarations: [],
   imports: [
     CommonModule,
     FormsModule,
@@ -24,7 +24,7 @@ import { MaterialModule } from 'src/app/material.module';
     RouterModule.forChild([
       {
         path: '',
-        component: SizePriceComponent,
+        component: SizePriceSharedComponent,
       },
     ]),
     CrudModule,
