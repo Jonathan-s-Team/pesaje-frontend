@@ -1,10 +1,4 @@
-<div *ngIf="isLoading$ | async" class="text-center py-5">
-  <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Loading...</span>
-  </div>
-</div>
-
-<div *ngIf="!(isLoading$ | async)" class="card card-custom mb-5 mb-xl-10">
+<div class="card card-custom mb-5 mb-xl-10">
   <div class="row g-0">
     <div class="col-md-4 company-list-section">
       <div class="card-header card-header-stretch">
@@ -30,7 +24,7 @@
           </div>
           <div class="card-body">
             <form #companyForm="ngForm" (ngSubmit)="onSubmit(companyForm)" class="company-form">
-
+              <app-size-price-shared [selectedCompany]="selectedCompanyInput"></app-size-price-shared>
             </form>
           </div>
         </div>

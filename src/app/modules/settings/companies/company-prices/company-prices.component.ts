@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
 export class CompanyPricesComponent implements OnInit {
   companies: ICompany[] = [];
   selectedCompany: ICompany | null = null;
-
+  selectedCompanyInput: string = '';
   isLoading$: Observable<boolean>;
 
   constructor(private companyService: CompanyService) {
@@ -33,6 +33,7 @@ export class CompanyPricesComponent implements OnInit {
         // Optionally handle error
       },
     });
+    
   }
 
   selectCompany(company: ICompany) {
@@ -43,6 +44,7 @@ export class CompanyPricesComponent implements OnInit {
         min: 0,
       };
     }
+    this.selectedCompanyInput = company.id ?? '';
   }
 
   onSubmit(form: NgForm) {

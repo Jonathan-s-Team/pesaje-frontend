@@ -420,7 +420,6 @@ export class CompanySaleItemsListingComponent implements OnInit {
 
     this.isWhole = style === SaleStyleEnum.WHOLE;
     this.isResidual = style === SaleStyleEnum.RESIDUAL;
-debugger
     if (this.isWhole) {
       this.sizeList = this.wholeSizes.map((size) => size.size);
     } else if (this.isResidual) {

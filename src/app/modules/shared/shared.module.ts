@@ -14,6 +14,8 @@ import { HeadlessTableComponent } from './components/prices/headless-table/headl
 import {ShrimpFarmInformationComponent} from "./components/clients/shrimp-farm/shrimp-farm-information.component";
 import { MaterialModule } from 'src/app/material.module';
 import { ResidualTableComponent } from './components/prices/residual-table/residual-table.component';
+import { SizePriceSharedComponent } from './components/prices/size-price/size-price-shared.component';
+import { BestPricesTableComponent } from './components/prices/best-prices-table/best-prices-table.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +28,8 @@ import { ResidualTableComponent } from './components/prices/residual-table/resid
     CanDeleteDirective,
     CanReadDirective,
     ShrimpFarmInformationComponent,
+    SizePriceSharedComponent,
+    BestPricesTableComponent
   ],
   imports: [
     CommonModule,
@@ -46,6 +50,8 @@ import { ResidualTableComponent } from './components/prices/residual-table/resid
     CanDeleteDirective,
     CanReadDirective,
     ShrimpFarmInformationComponent,
+    SizePriceSharedComponent,
+    BestPricesTableComponent
   ], // ✅ Export so all modules can use them
 })
 export class SharedModule {}
