@@ -13,7 +13,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { MaterialModule } from 'src/app/material.module';
-import { SizePriceSharedComponent } from 'src/app/modules/shared/components/prices/size-price/size-price-shared.component';
+import { SizePriceComponent } from 'src/app/modules/shared/components/prices/size-price/size-price.component';
 
 @NgModule({
   declarations: [],
@@ -24,7 +24,7 @@ import { SizePriceSharedComponent } from 'src/app/modules/shared/components/pric
     RouterModule.forChild([
       {
         path: '',
-        component: SizePriceSharedComponent,
+        component: SizePriceComponent,
       },
     ]),
     CrudModule,

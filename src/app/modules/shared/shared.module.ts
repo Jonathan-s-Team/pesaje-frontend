@@ -11,11 +11,11 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { SharedModule as SharedModuleMetronic } from 'src/app/_metronic/shared/shared.module';
 import { WholeTableComponent } from './components/prices/whole-table/whole-table.component';
 import { HeadlessTableComponent } from './components/prices/headless-table/headless-table.component';
-import {ShrimpFarmInformationComponent} from "./components/clients/shrimp-farm/shrimp-farm-information.component";
+import { ShrimpFarmInformationComponent } from './components/clients/shrimp-farm/shrimp-farm-information.component';
 import { MaterialModule } from 'src/app/material.module';
 import { ResidualTableComponent } from './components/prices/residual-table/residual-table.component';
-import { SizePriceSharedComponent } from './components/prices/size-price/size-price-shared.component';
 import { BestPricesTableComponent } from './components/prices/best-prices-table/best-prices-table.component';
+import { SizePriceComponent } from './components/prices/size-price/size-price.component';
 
 @NgModule({
   declarations: [
@@ -28,8 +28,8 @@ import { BestPricesTableComponent } from './components/prices/best-prices-table/
     CanDeleteDirective,
     CanReadDirective,
     ShrimpFarmInformationComponent,
-    SizePriceSharedComponent,
-    BestPricesTableComponent
+    SizePriceComponent,
+    BestPricesTableComponent,
   ],
   imports: [
     CommonModule,
@@ -50,8 +50,8 @@ import { BestPricesTableComponent } from './components/prices/best-prices-table/
     CanDeleteDirective,
     CanReadDirective,
     ShrimpFarmInformationComponent,
-    SizePriceSharedComponent,
-    BestPricesTableComponent
+    SizePriceComponent,
+    BestPricesTableComponent,
   ], // ✅ Export so all modules can use them
 })
 export class SharedModule {}

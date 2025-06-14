@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CompanyService } from '../../services/company.service';
-import { NgForm } from '@angular/forms';
 import { ICompany } from '../../interfaces/company.interfaces';
 import { Observable } from 'rxjs';
 
@@ -33,31 +32,11 @@ export class CompanyPricesComponent implements OnInit {
         // Optionally handle error
       },
     });
-    
   }
 
   selectCompany(company: ICompany) {
     this.selectedCompany = { ...company };
-    if (!this.selectedCompany.maxAndMinTideQuotaReceived) {
-      this.selectedCompany.maxAndMinTideQuotaReceived = {
-        max: 0,
-        min: 0,
-      };
-    }
-    this.selectedCompanyInput = company.id ?? '';
-  }
 
-  onSubmit(form: NgForm) {
-    if (form.invalid) {
-      form.control.markAllAsTouched();
-      return;
-    }
-    this.companyService
-      .updateCompany(this.selectedCompany as ICompany)
-      .subscribe({
-        next: () => {
-          this.fetchCompanies();
-        },
-      });
+    this.selectedCompanyInput = company.id ?? '';
   }
 }
