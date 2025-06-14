@@ -5,10 +5,9 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import {  Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { TranslationService } from '../../../../../../modules/i18n';
 import { AuthService, UserType } from '../../../../../../modules/auth';
-import { UserService } from 'src/app/modules/settings/services/user.service';
 
 @Component({
   selector: 'app-user-inner',
@@ -31,24 +30,18 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   constructor(
     private auth: AuthService,
     private translationService: TranslationService,
-    private userService: UserService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     // Subscribe to the user observable
-    const userSub = this.userService.user$.subscribe((user) => {
+    const userSub = this.auth.currentUser$.subscribe((user) => {
       this.user = user; // Update the user data
-      this.cdr.detectChanges(); // Trigger Angular's change detection
+      this.photoUrl =
+        this.user?.person.photo || '/assets/media/avatars/blank.png';
+      this.cdr.detectChanges(); // Only needed if you have OnPush change detection
     });
     this.unsubscribe.push(userSub);
-
-    // Subscribe to the image observable
-    const imageSub = this.userService.image$.subscribe((imageUrl) => {
-      this.photoUrl = imageUrl || './assets/media/avatars/blank.png'; // Default avatar
-      this.cdr.detectChanges(); // Trigger Angular's change detection
-    });
-    this.unsubscribe.push(imageSub);
 
     // Set the language
     this.setLanguage(this.translationService.getSelectedLanguage());

@@ -1,4 +1,12 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { UserModel } from 'src/app/modules/auth';
 import { ViewChild } from '@angular/core';
@@ -13,7 +21,9 @@ import { AlertService } from 'src/app/utils/alert.service';
 })
 export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
   @ViewChild('profileForm') profileForm!: NgForm;
-  user: UserModel | undefined = undefined;
+  @Input() user: UserModel | undefined = undefined;
+  @Output() saveCompleted = new EventEmitter<void>();
+
   isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   isLoading: boolean;
   private unsubscribe: Subscription[] = [];
@@ -29,18 +39,12 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
     this.unsubscribe.push(loadingSubscr);
   }
 
-  ngOnInit(): void {
-    const userSub = this.userService.user$.subscribe((user) => {
-      this.user = user;
-    });
-    this.unsubscribe.push(userSub);
-  }
+  ngOnInit(): void {}
 
   saveSettings() {
     if (this.profileForm.invalid || !this.user) {
       return;
     }
-
     this.isLoading$.next(true);
 
     const payload: IUpdateUserModel = {
@@ -69,6 +73,7 @@ export class PersonalProfileDetailsComponent implements OnInit, OnDestroy {
         this.isLoading$.next(false);
         this.cdr.detectChanges();
         this.alertService.showTranslatedAlert({ alertType: 'success' });
+        this.saveCompleted.emit();
       },
       error: (error) => {
         this.isLoading$.next(false);

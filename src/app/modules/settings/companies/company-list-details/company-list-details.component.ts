@@ -45,6 +45,13 @@ export class CompanyListDetailsComponent implements OnInit {
     }
   }
 
+  onLogisticsPayedChange() {
+    if (this.selectedCompany && !this.selectedCompany.isLogisticsPayed) {
+      this.selectedCompany.wholeAmountToPay = 0;
+      this.selectedCompany.tailAmountToPay = 0;
+    }
+  }
+
   onSubmit(form: NgForm) {
     if (form.invalid) {
       form.control.markAllAsTouched();

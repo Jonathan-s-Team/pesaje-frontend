@@ -157,7 +157,7 @@
 
     <app-logistics-items-listing *ngIf="personnelLogisticsCategoryList.length>0" title="Personal"
       [logisticsCategories]="personnelLogisticsCategoryList" [logisticsItems]="personnelLogisticsItems"
-      (logisticsItemsChange)="handlePersonnelLogisticsItems($event)" />
+      [hasDescription]="true" (logisticsItemsChange)="handlePersonnelLogisticsItems($event)" />
   </div>
   <!-- end::Fourth Section: Personnel Logistics Details -->
 

@@ -1,6 +1,13 @@
 <div class="card card-custom mb-5 mb-xl-10">
   <div class="row g-0">
-    <div class="col-md-4 company-list-section">
+
+    <div *ngIf="isLoading$ | async" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div *ngIf="!(isLoading$ | async)" class="col-md-4 company-list-section">
       <div class="card-header card-header-stretch">
         <h4 class="card-title mb-3">Compañías</h4>
       </div>
@@ -15,6 +22,7 @@
         </div>
       </div>
     </div>
+
     <div class="col-md-8 company-details-section d-flex align-items-center justify-content-center"
       [ngClass]="{'empty-section': !selectedCompany}">
       <ng-container *ngIf="selectedCompany; else noCompanySelected">
@@ -23,9 +31,7 @@
             <h3 class="card-title">{{ selectedCompany.name || 'Detalles de la Compañía' }}</h3>
           </div>
           <div class="card-body">
-            <form #companyForm="ngForm" (ngSubmit)="onSubmit(companyForm)" class="company-form">
-              <app-size-price-shared [selectedCompany]="selectedCompanyInput"></app-size-price-shared>
-            </form>
+            <app-size-price [selectedCompany]="selectedCompanyInput"></app-size-price>
           </div>
         </div>
       </ng-container>

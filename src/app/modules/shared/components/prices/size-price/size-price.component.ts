@@ -34,16 +34,17 @@ import { ICompany } from 'src/app/modules/settings/interfaces/company.interfaces
 import { CompanyService } from 'src/app/modules/settings/services/company.service';
 
 @Component({
-  selector: 'app-size-price-shared',
-  templateUrl: './size-price-shared.component.html',
+  selector: 'app-size-price',
+  templateUrl: './size-price.component.html',
 })
-export class SizePriceSharedComponent implements OnInit, OnDestroy {
+export class SizePriceComponent implements OnInit, OnDestroy {
   PERMISSION_ROUTE = PERMISSION_ROUTES.PRICES;
 
   @ViewChild(WholeTableComponent) wholeTableComponent!: WholeTableComponent;
   @ViewChild(HeadlessTableComponent)
   headlessTableComponent!: HeadlessTableComponent;
-  @ViewChild(ResidualTableComponent) residualTableComponent!: ResidualTableComponent;
+  @ViewChild(ResidualTableComponent)
+  residualTableComponent!: ResidualTableComponent;
 
   @Input() selectedCompany: string = '';
   years: number[] = [];
@@ -80,18 +81,18 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
     private inputUtils: InputUtilsService,
     private dateUtils: DateUtilsService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.loadYears();
-    this.loadCompanies();
-    if (this.selectedCompany != '')
-      this.onCompanyChange();
+
+    if (this.selectedCompany === '') this.loadCompanies();
   }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedCompany']) {
       this.onCompanyChange();
-      this.loadYears();
+      // this.loadYears();
       this.showCompany = !this.selectedCompany;
     }
   }
@@ -123,6 +124,7 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
     this.periodService.getPeriodsByCompany(this.selectedCompany).subscribe({
       next: (periods) => {
         this.existingPeriods = periods;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error al cargar periodos:', err);
@@ -130,11 +132,11 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
     });
 
     this.selectedPeriod = '';
-    this.resetTableForms();
+    this.resetFields();
   }
 
   onPeriodChange() {
-    this.resetTableForms();
+    this.resetFields();
   }
 
   search() {
@@ -159,7 +161,9 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
 
         this.headlessSizePrices = [
           ...(periodDetails.sizePrices?.filter(
-            (item) => (item.size.type !== SizeTypeEnum.WHOLE && item.size.type !== SizeTypeEnum.RESIDUAL)
+            (item) =>
+              item.size.type !== SizeTypeEnum.WHOLE &&
+              item.size.type !== SizeTypeEnum.RESIDUAL
           ) || []),
         ];
 
@@ -203,7 +207,7 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
   toggleAddPeriod() {
     this.isAdding = !this.isAdding;
 
-    this.selectedCompany = '';
+    if (this.showCompany) this.selectedCompany = '';
     this.selectedYear = '';
     this.selectedPeriod = '';
     this.receivedDate = '';
@@ -213,7 +217,7 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
     this.showErrors = false;
     this.showEditButton = false;
 
-    this.resetTableForms();
+    this.resetFields();
 
     this.cdr.detectChanges();
   }
@@ -239,7 +243,7 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  resetTableForms() {
+  resetFields() {
     if (this.wholeTableComponent) {
       this.wholeTableComponent.clearValidationErrors();
       this.wholeTableComponent.form.reset();
@@ -257,6 +261,14 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
       this.residualTableComponent.form.reset();
       this.residualTableComponent.enableForm();
     }
+
+    this.fromDate = '';
+    this.timeOfDay = '';
+    this.receivedDate = '';
+    this.receivedTime = '';
+
+    this.isEditing = false;
+    this.showEditButton = false;
   }
 
   editPeriod() {
@@ -370,7 +382,8 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
     // ✅ Trigger form validation checks
     const hasErrors =
       this.wholeTableComponent?.form.invalid ||
-      this.headlessTableComponent?.form.invalid || this.residualTableComponent?.form.invalid;
+      this.headlessTableComponent?.form.invalid ||
+      this.residualTableComponent?.form.invalid;
 
     if (this.wholeTableComponent?.form.invalid) {
       this.wholeTableComponent.triggerValidation();
@@ -394,7 +407,10 @@ export class SizePriceSharedComponent implements OnInit, OnDestroy {
   }
 
   extractSizePrices(
-    component: WholeTableComponent | HeadlessTableComponent | ResidualTableComponent
+    component:
+      | WholeTableComponent
+      | HeadlessTableComponent
+      | ResidualTableComponent
   ): IUpdateSizePriceModel[] {
     if (!component?.sizes || !component.form) return [];
 

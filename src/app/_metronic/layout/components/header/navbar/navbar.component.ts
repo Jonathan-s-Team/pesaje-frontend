@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { menuReinitialization } from 'src/app/_metronic/kt/kt-helpers';
 import { AuthService, UserModel } from 'src/app/modules/auth';
-import { UserService } from 'src/app/modules/settings/services/user.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -27,36 +27,29 @@ export class NavbarComponent implements OnInit, AfterViewInit {
   user: UserModel | undefined;
   photoUrl: string = './assets/media/avatars/blank.png'; // Default avatar
 
+  private userSub: Subscription;
+
   constructor(
-    private userService: UserService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
+
   ngAfterViewInit(): void {
     menuReinitialization();
   }
 
   ngOnInit(): void {
-    const currentUser = this.authService.currentUserValue;
+    this.userSub = this.authService.currentUser$.subscribe((user) => {
+      this.user = user;
+      this.photoUrl =
+        this.user?.person.photo || '/assets/media/avatars/blank.png';
+      this.cdr.detectChanges(); // Ensure UI updates when photo changes
+    });
+  }
 
-    if (currentUser?.id) {
-      // Fetch user data by ID
-      this.userService.getUserById(currentUser.id).subscribe({
-        next: (user) => {
-          this.user = user; // Update the user data
-        },
-        error: (err) => {
-          console.error('Failed to fetch user data:', err);
-        },
-      });
-
-      // Subscribe to the image observable for dynamic updates
-      this.userService.image$.subscribe((imageUrl) => {
-        this.photoUrl = imageUrl || './assets/media/avatars/blank.png'; // Default avatar
-        this.cdr.detectChanges(); // Trigger change detection
-      });
-    } else {
-      console.warn('No current user found.');
+  ngOnDestroy(): void {
+    if (this.userSub) {
+      this.userSub.unsubscribe();
     }
   }
 }
