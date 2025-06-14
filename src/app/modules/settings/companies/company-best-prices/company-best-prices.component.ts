@@ -9,7 +9,7 @@ import { PeriodService } from 'src/app/modules/shared/services/period.service';
 @Component({
   selector: 'app-company-best-prices',
   templateUrl: './company-best-prices.component.html',
-  styleUrl: './company-best-prices.component.scss'
+  styleUrl: './company-best-prices.component.scss',
 })
 export class CompanyBestPricesComponent {
   periods: string[] = [];
@@ -24,7 +24,10 @@ export class CompanyBestPricesComponent {
 
   isLoading$: Observable<boolean>;
 
-  constructor(private companyService: CompanyService, private periodService: PeriodService) {
+  constructor(
+    private companyService: CompanyService,
+    private periodService: PeriodService
+  ) {
     this.isLoading$ = this.companyService.isLoading$;
   }
 
@@ -45,24 +48,30 @@ export class CompanyBestPricesComponent {
   }
 
   onPeriodChange() {
-    const sizes = ['']
+    const sizes = [''];
     this.periodService.getPeriodByName(this.selectedPeriod).subscribe({
       next: (prices) => {
         this.typeSizeData = prices;
         this.groupedSizes = [
           {
             type: 'ENTERO',
-            sizes: this.typeSizeData.filter((size: any) => size.type.includes('WHOLE'))
+            sizes: this.typeSizeData.filter((size: any) =>
+              size.type.includes('WHOLE')
+            ),
           },
           {
             type: 'SIN CABEZA',
-            sizes: this.typeSizeData.filter((size: any) => size.type.includes('TAIL'))
+            sizes: this.typeSizeData.filter((size: any) =>
+              size.type.includes('TAIL')
+            ),
           },
           {
             type: 'RESIDUAL',
-            sizes: this.typeSizeData.filter((size: any) => size.type.includes('RESIDUAL'))
-          }
-        ].filter(group => group.sizes.length > 0); // Eliminar grupos vacíos
+            sizes: this.typeSizeData.filter((size: any) =>
+              size.type.includes('RESIDUAL')
+            ),
+          },
+        ].filter((group) => group.sizes.length > 0); // Eliminar grupos vacíos
       },
       error: () => {
         // Optionally handle error
@@ -71,7 +80,10 @@ export class CompanyBestPricesComponent {
   }
 
   search() {
-
+    this.showErrors = !this.selectedPeriod;
+    if (!this.selectedPeriod) {
+      return;
+    }
+    this.onPeriodChange();
   }
-
 }

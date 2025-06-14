@@ -266,6 +266,9 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     this.timeOfDay = '';
     this.receivedDate = '';
     this.receivedTime = '';
+
+    this.isEditing = false;
+    this.showEditButton = false;
   }
 
   editPeriod() {
