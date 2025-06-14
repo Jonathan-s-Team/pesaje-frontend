@@ -62,5 +62,10 @@ export interface ICompany {
   observation3?: string;
   observation4?: string;
 
+  isLogisticsSent?: boolean;
+  isLogisticsPayed?: boolean;
+  wholeAmountToPay?: number;
+  tailAmountToPay?: number;
+
   deletedAt?: Date;
 }

@@ -364,10 +364,62 @@
                   </div>
                 </div>
               </div>
-              <div class="card-footer d-flex justify-content-end p-0 mt-0 border-0 bg-transparent">
-                <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid">
-                  Guardar
-                </button>
+
+              <!-- Nueva sección: Logística -->
+              <div class="mb-4">
+                <h5 class="mb-3 fw-bold">Logística</h5>
+                <div class="row">
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">¿Se envía logística?</label>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" id="isLogisticsSent"
+                        [(ngModel)]="selectedCompany.isLogisticsSent" name="isLogisticsSent" />
+                      <label class="form-check-label ms-2" for="isLogisticsSent">
+                        {{ selectedCompany.isLogisticsSent ? 'Sí' : 'No' }}
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">¿Se paga logística?</label>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" id="isLogisticsPayed"
+                        [(ngModel)]="selectedCompany.isLogisticsPayed" name="isLogisticsPayed"
+                        (change)="onLogisticsPayedChange()" />
+                      <label class="form-check-label ms-2" for="isLogisticsPayed">
+                        {{ selectedCompany.isLogisticsPayed ? 'Sí' : 'No' }}
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row" *ngIf="selectedCompany.isLogisticsPayed">
+                    <label class="form-label required">Monto a pagar por entero</label>
+                    <input type="number" class="form-control" [(ngModel)]="selectedCompany.wholeAmountToPay"
+                      name="wholeAmountToPay" required #wholeAmountToPay="ngModel"
+                      [ngClass]="{'is-invalid': wholeAmountToPay.invalid && wholeAmountToPay.touched}" />
+                    <div class="invalid-feedback" *ngIf="wholeAmountToPay.invalid && wholeAmountToPay.touched">
+                      El monto es requerido.
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row" *ngIf="selectedCompany.isLogisticsPayed">
+                    <label class="form-label required">Monto a pagar por cola</label>
+                    <input type="number" class="form-control" [(ngModel)]="selectedCompany.tailAmountToPay"
+                      name="tailAmountToPay" required #tailAmountToPay="ngModel"
+                      [ngClass]="{'is-invalid': tailAmountToPay.invalid && tailAmountToPay.touched}" />
+                    <div class="invalid-feedback" *ngIf="tailAmountToPay.invalid && tailAmountToPay.touched">
+                      El monto es requerido.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-4">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="d-flex justify-content-end">
+                      <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid">
+                        Guardar
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </form>
           </div>
