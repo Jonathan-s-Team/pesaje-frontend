@@ -43,4 +43,11 @@ export class CompanyService {
         finalize(() => this.isLoadingSubject.next(false))
       );
   }
+
+  deleteCompany(id: string): Observable<{ message: string }> {
+    this.isLoadingSubject.next(true);
+    return this.http
+      .delete<{ message: string }>(`${API_COMPANY_URL}/${id}`)
+      .pipe(finalize(() => this.isLoadingSubject.next(false)));
+  }
 }

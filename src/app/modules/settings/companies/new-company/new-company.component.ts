@@ -5,6 +5,7 @@ import { UserService } from '../../services/user.service';
 import { PERMISSION_ROUTES } from '../../../../constants/routes.constants';
 import { AlertService } from 'src/app/utils/alert.service';
 import { CompanyService } from '../../services/company.service';
+import { Router } from '@angular/router';
 
 type Tabs = 'New Company' | 'Details';
 
@@ -28,7 +29,8 @@ export class NewCompanyComponent implements OnInit, OnDestroy {
   constructor(
     private companyService: CompanyService,
     private alertService: AlertService,
-    private userService: UserService
+    private userService: UserService,
+    private router: Router
   ) {
     this.isLoading$ = this.userService.isLoading$;
   }
@@ -48,6 +50,7 @@ export class NewCompanyComponent implements OnInit, OnDestroy {
               alertType: 'success',
             });
             form.resetForm();
+            this.router.navigateByUrl('settings/companies/company-list');
           },
           error: () => {
             this.alertService.showTranslatedAlert({

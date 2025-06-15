@@ -37,7 +37,7 @@ export class CompanyListDetailsComponent implements OnInit {
     // No need to set isLoading here, handled by the service
     this.companyService.getCompanies().subscribe({
       next: (companies) => {
-        this.companies = companies;
+        this.companies = companies.filter((c) => c.name !== 'Local');
       },
       error: () => {
         // Optionally handle error
@@ -102,5 +102,44 @@ export class CompanyListDetailsComponent implements OnInit {
 
   validateWholeNumber(event: KeyboardEvent) {
     this.inputUtils.validateWholeNumber(event);
+  }
+
+  deleteCompany(company: ICompany, event: MouseEvent) {
+    event.stopPropagation();
+    this.alertService
+      .confirm({
+        title: this.alertService['translate'].instant(
+          'MESSAGES.DELETE_CONFIRM_TITLE',
+          { name: company.name }
+        ),
+        text: this.alertService['translate'].instant(
+          'MESSAGES.DELETE_CONFIRM_TEXT',
+          { name: company.name }
+        ),
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.companyService.deleteCompany(company.id!).subscribe({
+            next: () => {
+              this.alertService.showTranslatedAlert({
+                alertType: 'success',
+                messageKey: 'MESSAGES.DELETE_SUCCESS',
+              });
+              this.fetchCompanies();
+              if (
+                this.selectedCompany &&
+                this.selectedCompany.id === company.id
+              ) {
+                this.selectedCompany = null;
+              }
+            },
+            error: () => {
+              this.alertService.showTranslatedAlert({
+                alertType: 'error',
+              });
+            },
+          });
+        }
+      });
   }
 }
