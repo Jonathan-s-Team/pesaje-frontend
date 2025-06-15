@@ -225,7 +225,7 @@
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Cupo máximo y mínimo por aguage a recibir (Lb)</label>
+                    <label class="form-label">Cupo máximo y mínimo por aguage a recibir (lb)</label>
                     <input type="text" name="maxTideQuota" [(ngModel)]="selectedCompany.maxAndMinTideQuotaReceived!.max"
                       placeholder="Máx" #maxTideQuota="ngModel" class="form-control" (keypress)="validateNumber($event)"
                       (blur)="formatDecimal('maxTideQuota')" />
@@ -307,7 +307,7 @@
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Cantidad mínima recibida (Lb)</label>
+                    <label class="form-label">Cantidad mínima recibida (lb)</label>
                     <input type="number" name="minimumQuantityReceivedLb" class="form-control"
                       [(ngModel)]="selectedCompany.minimumQuantityReceivedLb" />
                   </div>
