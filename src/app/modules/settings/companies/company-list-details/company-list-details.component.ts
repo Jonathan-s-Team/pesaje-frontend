@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CompanyService } from '../../services/company.service';
 import { NgForm } from '@angular/forms';
 import { ICompany } from '../../interfaces/company.interfaces';
 import { Observable } from 'rxjs';
+import { AlertService } from 'src/app/utils/alert.service';
+import { FormUtilsService } from '../../../../utils/form-utils.service';
+import { InputUtilsService } from 'src/app/utils/input-utils.service';
 
 @Component({
   selector: 'app-company-list-details',
@@ -10,12 +13,19 @@ import { Observable } from 'rxjs';
   styleUrls: ['./company-list-details.component.scss'],
 })
 export class CompanyListDetailsComponent implements OnInit {
+  @ViewChild('companyForm') companyForm!: NgForm;
+
   companies: ICompany[] = [];
   selectedCompany: ICompany | null = null;
 
   isLoading$: Observable<boolean>;
 
-  constructor(private companyService: CompanyService) {
+  constructor(
+    private companyService: CompanyService,
+    private alertService: AlertService,
+    private formUtils: FormUtilsService,
+    private inputUtils: InputUtilsService
+  ) {
     this.isLoading$ = this.companyService.isLoading$;
   }
 
@@ -27,7 +37,7 @@ export class CompanyListDetailsComponent implements OnInit {
     // No need to set isLoading here, handled by the service
     this.companyService.getCompanies().subscribe({
       next: (companies) => {
-        this.companies = companies;
+        this.companies = companies.filter((c) => c.name !== 'Local');
       },
       error: () => {
         // Optionally handle error
@@ -57,12 +67,79 @@ export class CompanyListDetailsComponent implements OnInit {
       form.control.markAllAsTouched();
       return;
     }
-    this.companyService
-      .updateCompany(this.selectedCompany as ICompany)
-      .subscribe({
-        next: () => {
-          this.fetchCompanies();
-        },
+
+    this.alertService.confirm().then((result) => {
+      if (result.isConfirmed) {
+        this.companyService
+          .updateCompany(this.selectedCompany as ICompany)
+          .subscribe({
+            next: () => {
+              this.alertService.showTranslatedAlert({
+                alertType: 'success',
+              });
+              this.fetchCompanies();
+            },
+            error: () => {
+              this.alertService.showTranslatedAlert({
+                alertType: 'error',
+              });
+            },
+          });
+      }
+    });
+  }
+
+  formatDecimal(controlName: string) {
+    const control = this.companyForm.controls[controlName];
+    if (control) {
+      this.formUtils.formatControlToDecimal(control);
+    }
+  }
+
+  validateNumber(event: KeyboardEvent) {
+    this.inputUtils.validateNumber(event);
+  }
+
+  validateWholeNumber(event: KeyboardEvent) {
+    this.inputUtils.validateWholeNumber(event);
+  }
+
+  deleteCompany(company: ICompany, event: MouseEvent) {
+    event.stopPropagation();
+    this.alertService
+      .confirm({
+        title: this.alertService['translate'].instant(
+          'MESSAGES.DELETE_CONFIRM_TITLE',
+          { name: company.name }
+        ),
+        text: this.alertService['translate'].instant(
+          'MESSAGES.DELETE_CONFIRM_TEXT',
+          { name: company.name }
+        ),
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.companyService.deleteCompany(company.id!).subscribe({
+            next: () => {
+              this.alertService.showTranslatedAlert({
+                alertType: 'success',
+                messageKey: 'MESSAGES.DELETE_SUCCESS',
+              });
+              this.fetchCompanies();
+              if (
+                this.selectedCompany &&
+                this.selectedCompany.id === company.id
+              ) {
+                this.selectedCompany = null;
+              }
+            },
+            error: () => {
+              this.alertService.showTranslatedAlert({
+                alertType: 'error',
+              });
+            },
+          });
+        }
       });
   }
 }

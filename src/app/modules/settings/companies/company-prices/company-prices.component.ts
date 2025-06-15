@@ -26,7 +26,7 @@ export class CompanyPricesComponent implements OnInit {
     // No need to set isLoading here, handled by the service
     this.companyService.getCompanies().subscribe({
       next: (companies) => {
-        this.companies = companies;
+        this.companies = companies.filter((c) => c.name !== 'Local');
       },
       error: () => {
         // Optionally handle error

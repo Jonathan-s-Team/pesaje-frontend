@@ -4,7 +4,8 @@
   </div>
 
   <div *ngFor="let group of processedData" class="mb-5">
-    <h6 class="fw-semibold mb-3">{{group.type}}</h6>
+    <h6 *ngIf="typeSize.type === 'COLA'" class="fw-semibold mb-3">
+      {{ getGroupTypeLabel(group.type) }}</h6>
 
     <div class="table-responsive">
       <table class="table table-bordered align-middle">

@@ -12,8 +12,11 @@
       </div>
       <div class="company-list px-2 pb-2">
         <div *ngFor="let company of companies" (click)="selectCompany(company)"
-          [class.selected]="selectedCompany && selectedCompany.id === company.id" class="company-list-item">
-          {{ company.code ? (company.code + ' - ') : '' }}{{ company.name }}
+          [class.selected]="selectedCompany && selectedCompany.id === company.id" class="company-list-item d-flex align-items-center justify-content-between">
+          <span>
+            {{ company.code ? (company.code + ' - ') : '' }}{{ company.name }}
+          </span>
+          <i class="bi bi-trash text-danger ms-2" (click)="deleteCompany(company, $event)" title="Eliminar"></i>
         </div>
         <!-- Show a message if no companies are available -->
         <div *ngIf="!companies.length" class="text-muted text-center py-4">
@@ -44,16 +47,16 @@
                   </div>
                   <div class="col-md-6 mb-3 form-row">
                     <label class="form-label required">Código</label>
-                    <input name="code" class="form-control" [(ngModel)]="selectedCompany.code" required #code="ngModel"
-                      [ngClass]="{'is-invalid': code.invalid && code.touched}" />
+                    <input type="text" name="code" class="form-control" [(ngModel)]="selectedCompany.code" required
+                      #code="ngModel" [ngClass]="{'is-invalid': code.invalid && code.touched}"
+                      (keypress)="validateWholeNumber($event)" />
                     <div class="invalid-feedback" *ngIf="code.invalid && code.touched">
                       El código es requerido.
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
                     <label class="form-label ">Dirección</label>
-                    <input name="city" class="form-control" [(ngModel)]="selectedCompany.address" #address="ngModel"
-                      [ngClass]="{'is-invalid': address.invalid && address.touched}" />
+                    <input name="address" class="form-control" [(ngModel)]="selectedCompany.address" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
                     <label class="form-label required">Ciudad</label>
@@ -168,7 +171,7 @@
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Recibe colas de camarón</label>
+                    <label class="form-label">Recibe camarones cola</label>
                     <div class="form-check">
                       <input type="checkbox" name="receivesShrimpTails" class="form-check-input"
                         [(ngModel)]="selectedCompany.receivesShrimpTails" />
@@ -178,35 +181,60 @@
                   <!-- Especificaciones de Producto section -->
                   <div class="col-md-6 mb-3 form-row">
                     <label class="form-label">Porcentaje máximo de sabor permitido en camarones enteros</label>
-                    <input type="number" name="maxFlavorPercentReceived" class="form-control"
-                      [(ngModel)]="selectedCompany.maxFlavorPercentReceived" />
+                    <div class="input-group input-group-sm">
+                      <input type="text" id="maxFlavorPercentReceived" name="maxFlavorPercentReceived"
+                        [(ngModel)]="selectedCompany.maxFlavorPercentReceived" #maxFlavorPercentReceived="ngModel"
+                        class="form-control text-end" (keypress)="validateNumber($event)"
+                        (blur)="formatDecimal('maxFlavorPercentReceived')" />
+                      <span class="input-group-text">%</span>
+                    </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
                     <label class="form-label">Porcentaje máximo de muda y suavidad permitido</label>
-                    <input type="number" name="maxMoultingAndSoftnessPercentReceived" class="form-control"
-                      [(ngModel)]="selectedCompany.maxMoultingAndSoftnessPercentReceived" />
+                    <div class="input-group input-group-sm">
+                      <input type="text" id="maxMoultingAndSoftnessPercentReceived"
+                        name="maxMoultingAndSoftnessPercentReceived"
+                        [(ngModel)]="selectedCompany.maxMoultingAndSoftnessPercentReceived"
+                        #maxMoultingAndSoftnessPercentReceived="ngModel" class="form-control text-end"
+                        (keypress)="validateNumber($event)"
+                        (blur)="formatDecimal('maxMoultingAndSoftnessPercentReceived')" />
+                      <span class="input-group-text">%</span>
+                    </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Peso promedio del empaque de camarones enteros</label>
-                    <input type="number" name="avgWholeShrimpPackagingWeight" class="form-control"
-                      [(ngModel)]="selectedCompany.avgWholeShrimpPackagingWeight" />
+                    <label class="form-label">Peso promedio del empaque de camarones enteros (Kg)</label>
+                    <input type="text" name="avgWholeShrimpPackagingWeight"
+                      [(ngModel)]="selectedCompany.avgWholeShrimpPackagingWeight"
+                      #avgWholeShrimpPackagingWeight="ngModel" class="form-control" (keypress)="validateNumber($event)"
+                      (blur)="formatDecimal('avgWholeShrimpPackagingWeight')" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Peso promedio del empaque de colas de camarón</label>
-                    <input type="number" name="avgShrimpTailPackagingWeight" class="form-control"
-                      [(ngModel)]="selectedCompany.avgShrimpTailPackagingWeight" />
+                    <label class="form-label">Peso promedio del empaque de colas de camarón (Kg)</label>
+                    <input type="text" name="avgShrimpTailPackagingWeight"
+                      [(ngModel)]="selectedCompany.avgShrimpTailPackagingWeight" #avgShrimpTailPackagingWeight="ngModel"
+                      class="form-control" (keypress)="validateNumber($event)"
+                      (blur)="formatDecimal('avgShrimpTailPackagingWeight')" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
                     <label class="form-label">Porcentaje máximo de sabor ligero permitido en camarones enteros</label>
-                    <input type="number" name="maxLightFlavorPercentAllowedInWholeShrimp" class="form-control"
-                      [(ngModel)]="selectedCompany.maxLightFlavorPercentAllowedInWholeShrimp" />
+                    <div class="input-group input-group-sm">
+                      <input type="text" id="maxLightFlavorPercentAllowedInWholeShrimp"
+                        name="maxLightFlavorPercentAllowedInWholeShrimp"
+                        [(ngModel)]="selectedCompany.maxLightFlavorPercentAllowedInWholeShrimp"
+                        #maxLightFlavorPercentAllowedInWholeShrimp="ngModel" class="form-control text-end"
+                        (keypress)="validateNumber($event)"
+                        (blur)="formatDecimal('maxLightFlavorPercentAllowedInWholeShrimp')" />
+                      <span class="input-group-text">%</span>
+                    </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Cuota máxima y mínima de marea recibida</label>
-                    <input type="number" name="maxTideQuota" class="form-control"
-                      [(ngModel)]="selectedCompany.maxAndMinTideQuotaReceived!.max" placeholder="Máx" />
-                    <input type="number" name="minTideQuota" class="form-control"
-                      [(ngModel)]="selectedCompany.maxAndMinTideQuotaReceived!.min" placeholder="Mín" />
+                    <label class="form-label">Cupo máximo y mínimo por aguage a recibir (lb)</label>
+                    <input type="text" name="maxTideQuota" [(ngModel)]="selectedCompany.maxAndMinTideQuotaReceived!.max"
+                      placeholder="Máx" #maxTideQuota="ngModel" class="form-control" (keypress)="validateNumber($event)"
+                      (blur)="formatDecimal('maxTideQuota')" />
+                    <input type="text" name="minTideQuota" [(ngModel)]="selectedCompany.maxAndMinTideQuotaReceived!.min"
+                      placeholder="Mín" #minTideQuota="ngModel" class="form-control" (keypress)="validateNumber($event)"
+                      (blur)="formatDecimal('minTideQuota')" />
                   </div>
                 </div>
               </div>
@@ -272,24 +300,17 @@
                 <h5 class="mb-3 fw-bold">Información de Pesca</h5>
                 <div class="row">
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">¿Envío de logística?</label>
+                    <label class="form-label">¿Se envía logística?</label>
                     <div class="form-check">
-                      <input type="checkbox" name="logisticsShippingAvailable" class="form-check-input"
-                        [(ngModel)]="selectedCompany.logisticsShippingAvailable" />
+                      <input type="checkbox" class="form-check-input" id="isLogisticsSent"
+                        [(ngModel)]="selectedCompany.isLogisticsSent" name="isLogisticsSent" />
+                      <label class="form-check-label ms-2" for="isLogisticsSent">
+                        {{ selectedCompany.isLogisticsSent ? 'Sí' : 'No' }}
+                      </label>
                     </div>
                   </div>
                   <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">¿Cuánto reconocen de logística para entero ($)?</label>
-                    <input type="number" name="logisticsCompensationWhole" class="form-control"
-                      [(ngModel)]="selectedCompany.logisticsCompensationWhole" />
-                  </div>
-                  <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">¿Cuánto reconocen de logística para cola ($)?</label>
-                    <input type="number" name="logisticsCompensationTails" class="form-control"
-                      [(ngModel)]="selectedCompany.logisticsCompensationTails" />
-                  </div>
-                  <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">Cantidad mínima recibida (Lb)</label>
+                    <label class="form-label">Cantidad mínima recibida (lb)</label>
                     <input type="number" name="minimumQuantityReceivedLb" class="form-control"
                       [(ngModel)]="selectedCompany.minimumQuantityReceivedLb" />
                   </div>
@@ -325,8 +346,49 @@
                     <label class="form-label">Información Extra</label>
                     <input name="bank2" class="form-control" [(ngModel)]="selectedCompany.extraInformation" />
                   </div>
+
+                  <div class="col-md-6 mb-3 form-row">
+                    <label class="form-label">¿Se paga logística?</label>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" id="isLogisticsPayed"
+                        [(ngModel)]="selectedCompany.isLogisticsPayed" name="isLogisticsPayed"
+                        (change)="onLogisticsPayedChange()" />
+                      <label class="form-check-label ms-2" for="isLogisticsPayed">
+                        {{ selectedCompany.isLogisticsPayed ? 'Sí' : 'No' }}
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row" *ngIf="selectedCompany.isLogisticsPayed">
+                    <label class="form-label required">Monto a pagar por entero</label>
+                    <div class="input-group">
+                      <span class="input-group-text">$</span>
+                      <input type="text" id="wholeAmountToPay" name="wholeAmountToPay"
+                        [(ngModel)]="selectedCompany.wholeAmountToPay" #wholeAmountToPay="ngModel"
+                        [ngClass]="{'is-invalid': wholeAmountToPay.invalid && wholeAmountToPay.touched}"
+                        class="form-control form-control-sm text-end" required (keypress)="validateNumber($event)"
+                        (blur)="formatDecimal('wholeAmountToPay')" />
+                      <div class="invalid-feedback" *ngIf="wholeAmountToPay.invalid && wholeAmountToPay.touched">
+                        El monto es requerido.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3 form-row" *ngIf="selectedCompany.isLogisticsPayed">
+                    <label class="form-label required">Monto a pagar por cola</label>
+                    <div class="input-group">
+                      <span class="input-group-text">$</span>
+                      <input type="text" id="tailAmountToPay" name="tailAmountToPay"
+                        [(ngModel)]="selectedCompany.tailAmountToPay" #tailAmountToPay="ngModel"
+                        [ngClass]="{'is-invalid': tailAmountToPay.invalid && tailAmountToPay.touched}"
+                        class="form-control form-control-sm text-end" required (keypress)="validateNumber($event)"
+                        (blur)="formatDecimal('tailAmountToPay')" />
+                      <div class="invalid-feedback" *ngIf="tailAmountToPay.invalid && tailAmountToPay.touched">
+                        El monto es requerido.
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
+
               <!-- Detalles Adicionales de la Empresa section -->
               <div class="mb-4">
                 <h5 class="mb-3 fw-bold">Detalles Adicionales de la Empresa</h5>
@@ -365,51 +427,6 @@
                 </div>
               </div>
 
-              <!-- Nueva sección: Logística -->
-              <div class="mb-4">
-                <h5 class="mb-3 fw-bold">Logística</h5>
-                <div class="row">
-                  <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">¿Se envía logística?</label>
-                    <div class="form-check">
-                      <input type="checkbox" class="form-check-input" id="isLogisticsSent"
-                        [(ngModel)]="selectedCompany.isLogisticsSent" name="isLogisticsSent" />
-                      <label class="form-check-label ms-2" for="isLogisticsSent">
-                        {{ selectedCompany.isLogisticsSent ? 'Sí' : 'No' }}
-                      </label>
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-3 form-row">
-                    <label class="form-label">¿Se paga logística?</label>
-                    <div class="form-check">
-                      <input type="checkbox" class="form-check-input" id="isLogisticsPayed"
-                        [(ngModel)]="selectedCompany.isLogisticsPayed" name="isLogisticsPayed"
-                        (change)="onLogisticsPayedChange()" />
-                      <label class="form-check-label ms-2" for="isLogisticsPayed">
-                        {{ selectedCompany.isLogisticsPayed ? 'Sí' : 'No' }}
-                      </label>
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-3 form-row" *ngIf="selectedCompany.isLogisticsPayed">
-                    <label class="form-label required">Monto a pagar por entero</label>
-                    <input type="number" class="form-control" [(ngModel)]="selectedCompany.wholeAmountToPay"
-                      name="wholeAmountToPay" required #wholeAmountToPay="ngModel"
-                      [ngClass]="{'is-invalid': wholeAmountToPay.invalid && wholeAmountToPay.touched}" />
-                    <div class="invalid-feedback" *ngIf="wholeAmountToPay.invalid && wholeAmountToPay.touched">
-                      El monto es requerido.
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-3 form-row" *ngIf="selectedCompany.isLogisticsPayed">
-                    <label class="form-label required">Monto a pagar por cola</label>
-                    <input type="number" class="form-control" [(ngModel)]="selectedCompany.tailAmountToPay"
-                      name="tailAmountToPay" required #tailAmountToPay="ngModel"
-                      [ngClass]="{'is-invalid': tailAmountToPay.invalid && tailAmountToPay.touched}" />
-                    <div class="invalid-feedback" *ngIf="tailAmountToPay.invalid && tailAmountToPay.touched">
-                      El monto es requerido.
-                    </div>
-                  </div>
-                </div>
-              </div>
               <div class="mb-4">
                 <div class="row">
                   <div class="col-12">
