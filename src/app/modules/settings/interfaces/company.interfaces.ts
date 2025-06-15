@@ -45,15 +45,16 @@ export interface ICompany {
   daysUntilThirdPayment?: number;
   paymentReliabilityPercent?: number;
 
-  logisticsShippingAvailable?: boolean;
-  logisticsCompensationWhole?: number;
-  logisticsCompensationTails?: number;
+  isLogisticsSent?: boolean;
   minimumQuantityReceivedLb?: number;
   custodyCovered?: boolean;
   fishingInsuranceCovered?: boolean;
   companyClassifierKnown?: boolean;
   personCanBeSentForClassification?: boolean;
   extraInformation?: string;
+  isLogisticsPayed?: boolean;
+  wholeAmountToPay?: number;
+  tailAmountToPay?: number;
 
   classificationQuality?: ['BAD', 'GOOD', 'EXCELLENT'];
   arePaymentsOnTime?: boolean;
@@ -61,11 +62,6 @@ export interface ICompany {
   observation2?: string;
   observation3?: string;
   observation4?: string;
-
-  isLogisticsSent?: boolean;
-  isLogisticsPayed?: boolean;
-  wholeAmountToPay?: number;
-  tailAmountToPay?: number;
 
   deletedAt?: Date;
 }
