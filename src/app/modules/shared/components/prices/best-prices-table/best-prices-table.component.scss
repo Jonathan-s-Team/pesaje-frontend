@@ -16,17 +16,12 @@ td {
 }
 
 th {
-  background-color: #f8f9fa;
   font-weight: 600;
 }
 
 .highest-price {
   font-weight: bold;
   color: #28a745;
-}
-
-tr:hover {
-  background-color: #f5f5f5;
 }
 
 /* Agrega esto a los estilos de tu componente */
@@ -36,7 +31,7 @@ tr:hover {
   -webkit-overflow-scrolling: touch;
   /* Suavizado en iOS */
   max-width: 100%;
-  border: 1px solid #dee2e6;
+  border: 1px solid #b0b3b8;
   border-radius: 4px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
 }
@@ -51,23 +46,17 @@ tr:hover {
 .sticky-column {
   position: sticky;
   left: 0;
-  background-color: white;
   z-index: 1;
   box-shadow: 2px 0 3px -1px rgba(0, 0, 0, 0.1);
 }
 
-th.sticky-column {
-  background-color: #f8f9fa;
-  /* Color diferente para el header */
-}
-
 .table-bordered {
-  border: 1px solid #dee2e6;
+  border: 1px solid #b0b3b8; // Neutral gray, works well on both dark and light themes
 }
 
 .table-bordered th,
 .table-bordered td {
-  border: 1px solid #dee2e6;
+  border: 1px solid #b0b3b8;
   padding: 12px;
 }
 
@@ -79,18 +68,4 @@ th.sticky-column {
 
 .text-nowrap {
   white-space: nowrap;
-}
-
-/* Efecto hover para filas */
-tbody tr:hover {
-  background-color: rgba(0, 0, 0, 0.02);
-}
-
-/* Color alternado para filas */
-tbody tr:nth-child(even) {
-  background-color: #f8f9fa;
-}
-
-tbody tr:nth-child(even):hover {
-  background-color: rgba(0, 0, 0, 0.04);
 }

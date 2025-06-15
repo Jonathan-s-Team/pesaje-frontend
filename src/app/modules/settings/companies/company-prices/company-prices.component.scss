@@ -10,7 +10,6 @@
 
 .company-list-section {
   border-right: 1px solid #e5e5e5;
-  background: #f9f9f9;
   min-height: 100%;
   max-height: 700px;
   display: flex;
@@ -37,11 +36,11 @@
 .company-list-item.selected,
 .company-list-item:hover {
   background: #e0e0e0;
+  color: #222;
   font-weight: bold;
 }
 
 .company-details-section {
-  background: #fff;
   min-height: 100%;
   padding: 0;
   min-height: 500px;
@@ -51,7 +50,6 @@
 }
 
 .company-details-section.empty-section {
-  background: #f9f9f9;
   border-left: 1px solid #e5e5e5;
 }
 
