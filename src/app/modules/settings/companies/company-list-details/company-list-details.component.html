@@ -52,8 +52,7 @@
                   </div>
                   <div class="col-md-6 mb-3 form-row">
                     <label class="form-label ">Dirección</label>
-                    <input name="city" class="form-control" [(ngModel)]="selectedCompany.address" #address="ngModel"
-                      [ngClass]="{'is-invalid': address.invalid && address.touched}" />
+                    <input name="address" class="form-control" [(ngModel)]="selectedCompany.address" />
                   </div>
                   <div class="col-md-6 mb-3 form-row">
                     <label class="form-label required">Ciudad</label>

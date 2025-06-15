@@ -3,6 +3,7 @@ import { CompanyService } from '../../services/company.service';
 import { NgForm } from '@angular/forms';
 import { ICompany } from '../../interfaces/company.interfaces';
 import { Observable } from 'rxjs';
+import { AlertService } from 'src/app/utils/alert.service';
 
 @Component({
   selector: 'app-company-list-details',
@@ -15,7 +16,10 @@ export class CompanyListDetailsComponent implements OnInit {
 
   isLoading$: Observable<boolean>;
 
-  constructor(private companyService: CompanyService) {
+  constructor(
+    private companyService: CompanyService,
+    private alertService: AlertService
+  ) {
     this.isLoading$ = this.companyService.isLoading$;
   }
 
@@ -57,12 +61,25 @@ export class CompanyListDetailsComponent implements OnInit {
       form.control.markAllAsTouched();
       return;
     }
-    this.companyService
-      .updateCompany(this.selectedCompany as ICompany)
-      .subscribe({
-        next: () => {
-          this.fetchCompanies();
-        },
-      });
+
+    this.alertService.confirm().then((result) => {
+      if (result.isConfirmed) {
+        this.companyService
+          .updateCompany(this.selectedCompany as ICompany)
+          .subscribe({
+            next: () => {
+              this.alertService.showTranslatedAlert({
+                alertType: 'success',
+              });
+              this.fetchCompanies();
+            },
+            error: () => {
+              this.alertService.showTranslatedAlert({
+                alertType: 'error',
+              });
+            },
+          });
+      }
+    });
   }
 }
