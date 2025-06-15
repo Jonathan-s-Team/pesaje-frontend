@@ -99,4 +99,8 @@ export class CompanyListDetailsComponent implements OnInit {
   validateNumber(event: KeyboardEvent) {
     this.inputUtils.validateNumber(event);
   }
+
+  validateWholeNumber(event: KeyboardEvent) {
+    this.inputUtils.validateWholeNumber(event);
+  }
 }

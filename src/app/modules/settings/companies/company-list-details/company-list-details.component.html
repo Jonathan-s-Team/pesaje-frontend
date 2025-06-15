@@ -44,8 +44,9 @@
                   </div>
                   <div class="col-md-6 mb-3 form-row">
                     <label class="form-label required">Código</label>
-                    <input name="code" class="form-control" [(ngModel)]="selectedCompany.code" required #code="ngModel"
-                      [ngClass]="{'is-invalid': code.invalid && code.touched}" />
+                    <input type="text" name="code" class="form-control" [(ngModel)]="selectedCompany.code" required
+                      #code="ngModel" [ngClass]="{'is-invalid': code.invalid && code.touched}"
+                      (keypress)="validateWholeNumber($event)" />
                     <div class="invalid-feedback" *ngIf="code.invalid && code.touched">
                       El código es requerido.
                     </div>
