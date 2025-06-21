@@ -124,6 +124,7 @@ export const locale = {
         'Total payments cannot exceed the total agreed amount of ${{total}}',
       COMPANY_SALE_TOTAL_AGREED_EXCEEDED:
         'Total payments cannot exceed the total amount of ${{total}}',
+      REPEATED_COMPANY_CODE: 'Company code is already used in other Company.',
     },
     INFO: {
       TITLE: 'Information',
