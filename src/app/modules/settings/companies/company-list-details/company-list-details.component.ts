@@ -79,7 +79,15 @@ export class CompanyListDetailsComponent implements OnInit {
               });
               this.fetchCompanies();
             },
-            error: () => {
+            error: (error) => {
+              const rawMessage = error?.error?.message ?? '';
+              if (rawMessage === 'Company code already exists') {
+                this.alertService.showTranslatedAlert({
+                  alertType: 'error',
+                  messageKey: 'ERROR.REPEATED_COMPANY_CODE',
+                });
+                return;
+              }
               this.alertService.showTranslatedAlert({
                 alertType: 'error',
               });

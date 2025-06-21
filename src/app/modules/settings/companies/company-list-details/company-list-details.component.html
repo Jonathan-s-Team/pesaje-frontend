@@ -12,11 +12,12 @@
       </div>
       <div class="company-list px-2 pb-2">
         <div *ngFor="let company of companies" (click)="selectCompany(company)"
-          [class.selected]="selectedCompany && selectedCompany.id === company.id" class="company-list-item d-flex align-items-center justify-content-between">
+          [class.selected]="selectedCompany && selectedCompany.id === company.id"
+          class="company-list-item d-flex align-items-center justify-content-between">
           <span>
             {{ company.code ? (company.code + ' - ') : '' }}{{ company.name }}
           </span>
-          <i class="bi bi-trash text-danger ms-2" (click)="deleteCompany(company, $event)" title="Eliminar"></i>
+          <i class="bi bi-trash text-muted ms-2" (click)="deleteCompany(company, $event)" title="Eliminar"></i>
         </div>
         <!-- Show a message if no companies are available -->
         <div *ngIf="!companies.length" class="text-muted text-center py-4">
