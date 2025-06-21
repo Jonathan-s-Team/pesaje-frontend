@@ -57,9 +57,10 @@ export class SizePriceComponent implements OnInit, OnDestroy {
   periodNumber = '';
 
   fromDate: string = '';
-  timeOfDay: TimeOfDayEnum | '';
+  toDate: string = '';
+  // timeOfDay: TimeOfDayEnum | '';
   receivedDate: string = '';
-  receivedTime: string = '';
+  // receivedTime: string = '';
 
   isAdding = false;
   isEditing = false;
@@ -177,12 +178,13 @@ export class SizePriceComponent implements OnInit, OnDestroy {
           periodDetails.receivedDateTime
         );
         this.receivedDate = date;
-        this.receivedTime = time;
+        // this.receivedTime = time;
 
         this.fromDate = this.dateUtils.formatISOToDateInput(
           periodDetails.fromDate
         );
-        this.timeOfDay = periodDetails.timeOfDay;
+        this.toDate = this.dateUtils.formatISOToDateInput(periodDetails.toDate);
+        // this.timeOfDay = periodDetails.timeOfDay;
 
         if (this.wholeTableComponent) {
           this.wholeTableComponent.disableForm();
@@ -211,9 +213,10 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     this.selectedYear = '';
     this.selectedPeriod = '';
     this.receivedDate = '';
-    this.receivedTime = '';
+    // this.receivedTime = '';
     this.fromDate = '';
-    this.timeOfDay = '';
+    this.toDate = '';
+    // this.timeOfDay = '';
     this.showErrors = false;
     this.showEditButton = false;
 
@@ -263,9 +266,10 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     }
 
     this.fromDate = '';
-    this.timeOfDay = '';
+    this.toDate = '';
+    // this.timeOfDay = '';
     this.receivedDate = '';
-    this.receivedTime = '';
+    // this.receivedTime = '';
 
     this.isEditing = false;
     this.showEditButton = false;
@@ -309,10 +313,12 @@ export class SizePriceComponent implements OnInit, OnDestroy {
     const periodPayload: IUpdatePeriodModel = {
       receivedDateTime: this.dateUtils.toISODateTime(
         this.receivedDate,
-        this.receivedTime
+        '0:00'
+        // this.receivedTime
       ),
       fromDate: this.dateUtils.convertLocalDateToUTC(this.fromDate),
-      timeOfDay: this.timeOfDay as TimeOfDayEnum,
+      toDate: this.dateUtils.convertLocalDateToUTC(this.toDate),
+      // timeOfDay: this.timeOfDay as TimeOfDayEnum,
       sizePrices: [
         ...this.extractSizePrices(this.wholeTableComponent),
         ...this.extractSizePrices(this.headlessTableComponent),
@@ -365,18 +371,20 @@ export class SizePriceComponent implements OnInit, OnDestroy {
         !this.selectedCompany ||
         !this.selectedPeriod ||
         !this.receivedDate ||
-        !this.receivedTime ||
+        // !this.receivedTime ||
+        // !this.timeOfDay ||
         !this.fromDate ||
-        !this.timeOfDay;
+        !this.toDate;
     } else {
       this.showErrors =
         !this.selectedCompany ||
         !this.selectedYear ||
         !this.periodNumber ||
         !this.receivedDate ||
-        !this.receivedTime ||
+        // !this.receivedTime ||
+        // !this.timeOfDay ||
         !this.fromDate ||
-        !this.timeOfDay;
+        !this.toDate;
     }
 
     // ✅ Trigger form validation checks

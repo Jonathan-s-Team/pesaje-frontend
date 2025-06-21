@@ -149,7 +149,7 @@
         <div class="row g-3 align-items-center">
 
           <!-- Date Picker -->
-          <div class="col-md-6">
+          <div class="col-md-12">
             <label for="receivedDate" class="required fw-semibold fs-6 mb-2">Fecha de recibido</label>
             <input type="date" class="form-control form-control-sm" id="receivedDate" name="receivedDate"
               [(ngModel)]="receivedDate" [disabled]="!isEditing && !isAdding" required>
@@ -159,14 +159,14 @@
           </div>
 
           <!-- Time Picker -->
-          <div class="col-md-6">
+          <!-- <div class="col-md-6">
             <label for="receivedTime" class="required fw-semibold fs-6 mb-2">Hora de recibido</label>
             <input type="time" class="form-control form-control-sm" [(ngModel)]="receivedTime" id="receivedTime"
               name="receivedTime" [disabled]="!isEditing && !isAdding" required>
             <small *ngIf="showErrors && !receivedTime && !isSearching" class="text-danger small">
               La hora de recibido es obligatoria.
             </small>
-          </div>
+          </div> -->
 
           <!-- Fecha inicio periodo -->
           <div class="col-md-6">
@@ -178,8 +178,18 @@
             </small>
           </div>
 
-          <!-- Time of Day Selector -->
+          <!-- Fecha inicio periodo -->
           <div class="col-md-6">
+            <label for="toDate" class="required fw-semibold fs-6 mb-2">Fecha fin periodo</label>
+            <input type="date" class="form-control form-control-sm" id="toDate" name="toDate" [(ngModel)]="toDate"
+              [disabled]="!isEditing && !isAdding" required>
+            <small *ngIf="showErrors && !toDate && !isSearching" class="text-danger small">
+              La fecha de fin del periodo es obligatoria.
+            </small>
+          </div>
+
+          <!-- Time of Day Selector -->
+          <!-- <div class="col-md-6">
             <label for="timeOfDay" class="required fw-semibold fs-6 mb-2">Hora del día</label>
             <select id="timeOfDay" name="timeOfDay" class="form-select form-select-sm" [(ngModel)]="timeOfDay"
               [disabled]="!isEditing && !isAdding" required>
@@ -190,7 +200,7 @@
             <small *ngIf="showErrors && !timeOfDay && !isSearching" class="text-danger small">
               La hora del día es obligatoria.
             </small>
-          </div>
+          </div> -->
 
         </div>
       </div>

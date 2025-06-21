@@ -6,9 +6,10 @@ import {
 
 export interface ICreatePeriodModel {
   name: string;
-  receivedDateTime: string;
+  receivedDateTime?: string;
   fromDate: string;
-  timeOfDay: TimeOfDayEnum;
+  toDate: string;
+  timeOfDay?: TimeOfDayEnum;
   company: string;
   sizePrices: ICreateSizePriceModel[];
 }
@@ -18,6 +19,7 @@ export interface IReadPeriodModel {
   name: string;
   receivedDateTime: string;
   fromDate: string;
+  toDate: string;
   timeOfDay: TimeOfDayEnum;
   company: string;
   sizePrices?: IReadSizePriceModel[];
@@ -29,9 +31,10 @@ export interface IReducedPeriodModel {
 }
 
 export interface IUpdatePeriodModel {
-  receivedDateTime: string;
+  receivedDateTime?: string;
   fromDate: string;
-  timeOfDay: TimeOfDayEnum;
+  toDate: string;
+  timeOfDay?: TimeOfDayEnum;
   sizePrices: IUpdateSizePriceModel[];
 }
 
